@@ -1,0 +1,17 @@
+{
+  "author": "ktmud <kissmud@gmail.com>",
+  "name": "curio-api",
+  "description": "Wechat mp marketing platform Curio - backend api",
+  "version": "0.0.1",
+  "repository": "CuriousityChina/curio-api",
+  "scripts": {
+    "start": "node --harmony server.js",
+    "test": "./node_modules/.bin/mocha"
+  },
+  "dependencies": {
+    "koa": "~0.2.1"
+  },
+  "devDependencies": {
+    "mocha": "*"
+  }
+}
