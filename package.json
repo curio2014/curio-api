@@ -9,7 +9,20 @@
     "test": "./node_modules/.bin/mocha"
   },
   "dependencies": {
-    "koa": "~0.2.1"
+    "koa": "~0.2.1",
+    "koa-router": "~2.2.0",
+    "koa-common": "koajs/common",
+    "koa-logger": "koajs/logger",
+    "koa-etag": "koajs/etag",
+    "koa-error": "~1.1.0",
+    "koa-csrf": "~1.0.0",
+    "koa-sess": "~0.0.5",
+    "koa-redis": "dead-horse/koa-redis",
+    "http-assert": "~0.0.1",
+    "co-body": "visionmedia/co-body",
+    "swig": "~1.2.2",
+    "debug": "~0.7.4",
+    "co-views": "~0.1.0"
   },
   "devDependencies": {
     "mocha": "*"

@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Error - {{status}}</title>
+    <style>
+    </style>
+  </head>
+  <body>
+    <div id="error">
+      <h1>Error</h1>
+      <p>Looks like something broke!</p>
+      {% if env == 'development' %}
+      <pre>
+        <code>
+{{stack}}
+        </code>
+      </pre>
+      {% endif %}
+    </div>
+  </body>
+</html>
