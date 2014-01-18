@@ -1,5 +1,32 @@
 # Curio API [![repo dependency](https://david-dm.org/CuriousityChina/curio-api.png)](https://david-dm.org/CuriousityChina/curio-api)
 
-The backend for curio web app, built with [koajs](http://koajs.com/) and [jugglingdb](https://npmjs.org/package/jugglingdb).
+The backend for [curio](http://github.com/CuriousityChina/curio) web app, built with [koajs](http://koajs.com/) and [bookshelf.js](http://bookshelf.js).
 
-You'll need `node --harmony` to run this app, which means `node >= 0.11.7`.
+Requires `node --harmony` enabaled, which means `node >= 0.11.7`.
+
+## Start
+
+### PostgreSQL basics
+
+Run a PostgreSQL server, add your own user and database via `psql` or `createuser`:
+
+```bash
+createuser -P -e curio   # `-P` means prompt password(`--pwprompt`)
+createdb -e -O curio curio 'The wechat app Curio'  # `-O` means `--owner`.
+```
+
+Or simply `make createdb`.
+
+
+### Preparing for test data
+
+1. Create database tables
+
+    ./bin/curio init_db
+
+2. Fillup test data
+
+    ./bin/curio fillup
+
+
+3. Run `make` to start a development server (file changes watched by `Supervisor`)

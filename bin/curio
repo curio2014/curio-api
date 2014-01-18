@@ -1,0 +1,68 @@
+#!/usr/bin/env node --harmony
+
+var path_ = require('path')
+var confirm = require('co-prompt').confirm
+var co = require('co')
+
+require('color')
+
+// application level absolute require
+global.require_ = function(path) {
+  return require(path_.join(__dirname, '../', path))
+}
+
+process.on('uncaughtException', function(err) {
+  if (err.clientError) {
+    console.log(err)
+  } else {
+    throw err
+  }
+  process.exit()
+})
+
+var program = require('nomnom')
+
+program
+  .option('version', {
+    abbr: 'v',
+    flag: true,
+    help: 'Print program version',
+    callback: function() {
+      return require('../package.json').version
+    }
+  })
+
+program
+  .command('init_db')
+  .option('force', {
+    abbr: 'f',
+    flag: true,
+  })
+  .callback(co(function *(opts) {
+    var ok = opts.force
+    if (!ok) {
+      ok = yield confirm('This will drop all existing tables, continue? (y/N) '.red)
+    }
+    if (ok) {
+      yield require_('database').init
+      process.exit()
+    } else {
+      console.log()
+      console.log('Init database canceled.')
+      process.exit()
+    }
+  }))
+  .help('init database')
+
+
+program
+  .command('fillup')
+  .callback(co(function *(opts) {
+    yield require_('test/init').fillupAll
+    process.exit()
+  }))
+
+program.parse()
+
+
+// vim: set filetype=javascript:
