@@ -3,9 +3,17 @@ ERRORS = {
     code: 4001,
     message: 'login required'
   },
+  LOGIN_FAILED: {
+    code: 4002,
+    message: 'login failed'
+  },
   NOT_ALLOWED: {
     code: 4003,
     message: 'not allowed'
+  },
+  MISSING_FIELD: {
+    code: 4010,
+    message: 'required parameter missing'
   },
 };
 

@@ -8,7 +8,6 @@ var cors = require('koa-cors')
 var common = require('koa-common')
 var session = require('koa-sess')
 var redisStore = require('koa-redis')
-var assert = require('http-assert')
 var parse = require('co-body')
 var debug = require('debug')('curio:app')
 var conf = require_('conf')
@@ -42,15 +41,17 @@ app.use(session({
 }))
 
 app.use(function *(next){
-  if ('POST' != this.method) return yield next;
-  var body;
+  if ('GET' == this.method || 'HEAD' == this.method) return yield next;
 
-  this.parse = function *(opts) {
-    if (body === undefined) {
-      body = yield parse(this, opts || { limit: '10kb' })
+  var body = yield parse(this, this.bodyConstraints || { limit: '20kb' })
+
+  Object.defineProperty(this.req, 'body', {
+    get: function() {
+      return body
     }
-    return body
-  }
+  })
+
+  return yield next
 })
 
 // load controllers

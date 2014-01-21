@@ -2,7 +2,7 @@
 
 The backend for [curio](http://github.com/CuriousityChina/curio) web app, built with [koajs](http://koajs.com/) and [bookshelf.js](http://bookshelf.js).
 
-Requires `node --harmony` enabaled, which means `node >= 0.11.7`.
+Requires `node --harmony-generators` enabaled, which means `node >= 0.11.7` or [gnode](https://github.com/TooTallNate/gnode).
 
 ## Start
 

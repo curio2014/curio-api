@@ -1,4 +1,4 @@
-#!/usr/bin/env node --harmony
+#!/usr/bin/env gnode
 
 var path_ = require('path')
 var confirm = require('co-prompt').confirm

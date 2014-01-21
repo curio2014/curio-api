@@ -9,6 +9,7 @@
     "test": "./node_modules/.bin/mocha"
   },
   "dependencies": {
+    "gnode": ">= 0.0.6",
     "koa": "~0.2.1",
     "koa-router": "~2.2.0",
     "koa-common": "koajs/common",
@@ -24,7 +25,6 @@
     "debug": "~0.7.4",
     "koa-passport": "rkusa/koa-passport",
     "lodash": "latest",
-    "passport-local": "latest",
     "co": "latest",
     "co-body": "visionmedia/co-body",
     "co-views": "latest",

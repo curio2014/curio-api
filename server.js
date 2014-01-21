@@ -1,3 +1,5 @@
+require('gnode')
+
 var app = require('./app')
 
 function boot() {

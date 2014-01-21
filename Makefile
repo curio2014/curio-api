@@ -1,5 +1,5 @@
 start:
-	@export DEBUG="curio:*" && supervisor -w 'lib,serve,models,app.js,server.js,conf' -p 1000 -n error -- --harmony server.js 
+	@export DEBUG="curio:* koa-router" && supervisor -w 'lib,serve,models,app.js,server.js,conf' -p 1000 -n error -- --harmony-generators --debug server.js 
 
 createdb:
 	@createuser -P -e curio

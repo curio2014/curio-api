@@ -3,18 +3,13 @@ var auth = require_('lib/auth')
 
 var Passport = db.model({
   tableName: 'passport',
+  hasTimestamps: true,
   idAttribute: 'user_id',
-  set: function(name, value) {
-    var args = Array.prototype.slice.call(arguments)
-    if (name == 'password') {
-      args[1] = auth.crypt(value)
-    } else if (name.password) {
-      name.password = auth.crypt(name.password)
-    }
-    return db.proto.set.apply(this, args)
+  setPassword: function(passwd) {
+    this.set('password', auth.crypt(passwd))
   },
-  comparePassword: function(passport) {
-    return auth.compare(passport, this.get('password'))
+  comparePassword: function(passwd) {
+    return auth.compare(passwd, this.get('password'))
   }
 })
 
