@@ -1,10 +1,37 @@
 module.exports = function(app) {
 
+var parse = require('co-body')
 var utils = require('./utils')
 var auth = require('./auth')
+var ERRORS = require('./consts').ERRORS
+var assert = utils.assert
+
+app.use(utils.error())
+
+// parse body and csrf assert
+app.use(function *(next){
+  if (['POST', 'PUT', 'DELETE'].indexOf(this.method) == -1) return yield next;
+
+  var body
+
+  this.parse = function *() {
+    body = yield parse(this)
+    return body
+  }
+
+  Object.defineProperty(this.req, 'body', {
+    get: function() {
+      return body || {}
+    }
+  })
+
+  // parse with default options
+  yield this.parse
+
+  return yield next
+})
 
 app.use(utils.flash())
-app.use(utils.error())
 
 app.use(auth.passport.initialize())
 app.use(auth.passport.session())

@@ -22,6 +22,7 @@ exports.login = function *authPOST() {
   assert(this.req.user, 200, ERRORS.LOGIN_FAILED)
 
   this.body = {
+    ok: true,
     user: this.req.user
   }
 }

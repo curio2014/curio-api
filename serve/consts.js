@@ -15,6 +15,10 @@ ERRORS = {
     code: 4010,
     message: 'required parameter missing'
   },
+  INVALID_TOKEN: {
+    code: 4011,
+    message: 'invalid token'
+  },
 };
 
 exports.ERRORS = ERRORS;

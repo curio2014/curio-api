@@ -48,7 +48,7 @@ exports.error = function(opts) {
         }
       } else {
         this.body = {
-          code: 500,
+          code: this.status,
           error: http.STATUS_CODES[this.status]
         }
       }

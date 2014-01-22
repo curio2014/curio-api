@@ -8,7 +8,6 @@ var cors = require('koa-cors')
 var common = require('koa-common')
 var session = require('koa-sess')
 var redisStore = require('koa-redis')
-var parse = require('co-body')
 var debug = require('debug')('curio:app')
 var conf = require_('conf')
 var utils = require_('lib/utils')
@@ -24,6 +23,7 @@ if (conf.debug) {
   app.use(require('koa-etag')())
 }
 
+// cross origin request
 app.use(cors({
   methods: 'GET,PUT,HEAD,POST,DELETE',
   credentials: true,
@@ -39,20 +39,6 @@ app.use(session({
     port: conf.redisStore.port || conf.redis.port,
   })
 }))
-
-app.use(function *(next){
-  if ('GET' == this.method || 'HEAD' == this.method) return yield next;
-
-  var body = yield parse(this, this.bodyConstraints || { limit: '20kb' })
-
-  Object.defineProperty(this.req, 'body', {
-    get: function() {
-      return body
-    }
-  })
-
-  return yield next
-})
 
 // load controllers
 require('./serve')(app)
