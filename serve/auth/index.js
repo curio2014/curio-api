@@ -4,7 +4,7 @@ var ERRORS = require_('serve/consts').ERRORS
 var User = require_('models/user')
 var passport = require('./passport')
 
-exports.get = function *authGET(next) {
+exports.index = function *authGET(next) {
   var user = this.req.user
   this.body = {
     ok: true,
@@ -12,7 +12,7 @@ exports.get = function *authGET(next) {
   }
 }
 
-exports.login = function *authPOST() {
+exports.create = function *authPOST() {
   var form = this.req.body
 
   assert(form.username && form.password, 401, ERRORS.MISSING_FIELD)
@@ -22,13 +22,13 @@ exports.login = function *authPOST() {
   assert(this.req.user, 200, ERRORS.LOGIN_FAILED)
 
   this.body = {
-    ok: true,
     user: this.req.user
   }
 }
 
-exports.logout = function *authDELETE() {
-  yield passport.localAuth
+exports.destroy = function *authDELETE() {
+  // with passport initialized, we will have a logout functionn here
+  this.req.logout()
   this.body = {
     ok: true
   }
@@ -57,5 +57,3 @@ exports.need = function(act) {
   }
   return checks[act]
 }
-
-exports.passport = passport

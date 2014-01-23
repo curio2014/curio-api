@@ -105,7 +105,7 @@ queue(knex.schema.createTable('message', function(table) {
   table.boolean('is_reply')
     .comment('whether this message is a reply to subscriber')
   table.dateTime('sent_at')
-    .comment('when do we receive this message / send it subscriber')
+    .comment('when do we receive this message / send it to subscriber')
     .notNullable()
     .defaultTo(CURRENT_TIMESTAMP)
   table.json('content')

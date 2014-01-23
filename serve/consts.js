@@ -8,15 +8,19 @@ ERRORS = {
     message: 'login failed'
   },
   NOT_ALLOWED: {
-    code: 4003,
+    code: 4004,
     message: 'not allowed'
   },
-  MISSING_FIELD: {
+  BAD_REQUEST: {
     code: 4010,
+    message: 'bad request'
+  },
+  MISSING_FIELD: {
+    code: 4011,
     message: 'required parameter missing'
   },
   INVALID_TOKEN: {
-    code: 4011,
+    code: 5001,
     message: 'invalid token'
   },
 };

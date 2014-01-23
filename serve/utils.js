@@ -1,3 +1,4 @@
+var parse = require('co-body')
 var http = require('http')
 var consts = require('./consts')
 var conf = require_('conf')
@@ -15,7 +16,6 @@ exports.assert = function(value, status, message, detail) {
 }
 
 exports.error = function(opts) {
-
   // env
   var env = process.env.NODE_ENV || 'development'
 
@@ -80,5 +80,26 @@ exports.flash = function() {
     } else {
       delete this.session.messages
     }
+  }
+}
+
+exports.parseBody = function(options) {
+  return function *parseBody(next) {
+    if (['POST', 'PUT'].indexOf(this.method) == -1) return yield next;
+    var body
+
+    this.parse = function *() {
+      body = yield parse(this, options)
+      return body
+    }
+
+    Object.defineProperty(this.req, 'body', {
+      get: function() {
+        return body || {}
+      }
+    })
+    // parse with default options
+    yield this.parse
+    return yield next
   }
 }

@@ -1,10 +1,9 @@
 /**
  * To serve a backbone compatible RESTful API
  */
-
-function has(arr, item) {
-  return arr.indexOf(item) !== -1
-}
+var _ = require_('lib/utils')
+var assert = require_('serve/utils').assert
+var ERRORS = require_('serve/consts').ERRORS
 
 function defaultHandler(method, model, paramName) {
   if (method == 'index') {
@@ -16,44 +15,71 @@ function defaultHandler(method, model, paramName) {
         items: items
       }
     }
-  }
-  if (method == 'read') {
+  } else if (method == 'create') {
+    return function *create() {
+      var item = model.forge(this.body)
+      var err = item.validate()
+      assert(!err, 401, err)
+      var ret = {}
+      this.body = {
+        item: item
+      }
+    }
+  } else if (method == 'read') {
     return function *read() {
       var item = yield model.get(this.params[paramName])
       if (!item) this.throw(404)
       var ret = {}
-      ret[paramName] = item
-      this.body = ret
+      this.body = {
+        item: item
+      }
+    }
+  } else if (method == 'destroy') {
+    return function *destroy() {
+      yield model.fromId(this.params[paramName]).destroy()
+      this.body = {
+        ok: true
+      }
     }
   }
 }
 
 
 function Resource(model, handlers, paramName) {
+  paramName = paramName || 'id'
 
-  paramName = paramName || model.prototype.tableName
+  if (Array.isArray(handlers)) {
+    handlers = _.zipObject(handlers)
+  }
 
-  var methods = handlers ? Object.keys(handlers) : ['index', 'create', 'read', 'update', 'destroy']
+  var methods = handlers ? Object.keys(handlers) : ['read', 'update', 'destroy']
   var middlewares = {}
 
-  var resource = {
-    Model: model,
-    use: function(method, middleware) {
-      if (!middleware) {
-        middleware = method
-        method = 'all'
-      }
-      var list = [method]
-      if (method == 'all') {
-        list = methods
-      } else if (method == 'write') {
-        list = ['create', 'update', 'destroy']
-      }
-      list.forEach(function(method) {
-        middlewares[method].push(middleware)
-      })
-      return this
+  var resource = {}
+
+  /**
+   * Add access control handlers
+   *
+   * @param {String|Array} method
+   * @param {Function} middleware
+   */
+  resource.use = function(method, middleware) {
+    if (!middleware) {
+      middleware = method
+      method = 'all'
     }
+    var list = method
+    if (method === 'all') {
+      list = methods
+    } else if (method === 'write') {
+      list = ['create', 'update', 'destroy']
+    } else if ('string' === typeof method) {
+      list = [method]
+    }
+    list.forEach(function(method) {
+      middlewares[method].push(middleware)
+    })
+    return this
   }
 
   methods.forEach(function(method, i) {
@@ -64,7 +90,7 @@ function Resource(model, handlers, paramName) {
         yield access
       }
       yield handler
-      yield next
+      if (next) yield next
     }
   })
 

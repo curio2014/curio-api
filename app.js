@@ -5,7 +5,6 @@ global.require_ = function(path) {
 
 var app = require('koa')()
 var cors = require('koa-cors')
-var common = require('koa-common')
 var session = require('koa-sess')
 var redisStore = require('koa-redis')
 var debug = require('debug')('curio:app')
