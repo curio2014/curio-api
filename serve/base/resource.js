@@ -9,7 +9,7 @@ function defaultHandler(method, model, paramName) {
   if (method == 'index') {
     return function *list() {
       var total = yield model.count()
-      var items = yield model.find()
+      var items = yield model.all()
       this.body = {
         total: total,
         items: items

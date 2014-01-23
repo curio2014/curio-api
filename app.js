@@ -17,6 +17,7 @@ app.keys = [conf.secret, conf.salt]
 app.proxy = true;
 
 if (conf.debug) {
+  debug('DEBUG on')
   app.outputErrors = true
   app.use(require('koa-logger')())
   app.use(require('koa-etag')())

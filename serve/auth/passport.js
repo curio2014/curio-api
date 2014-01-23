@@ -49,9 +49,7 @@ passport.serializeUser(function(user, done) {
   done(null, user.id)
 })
 
-passport.deserializeUser(function(id, done) {
-  User.fromId(id).fetch().exec(done)
-})
+passport.deserializeUser(User.find.bind(User))
 
 passport.localAuth = passport.authenticate('local', {})
 

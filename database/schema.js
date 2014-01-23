@@ -53,7 +53,7 @@ queue(knex.schema.createTable('user', function(table) {
 queue(knex.schema.createTable('passport', function(table) {
   table.comment('Login credentials')
   $(table).timestamps()
-  table.string('user_id').unique().primary()
+  table.string('id').unique().primary()
     .comment('login user id')
     .notNullable()
   table.string('password').notNullable()
