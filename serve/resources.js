@@ -11,7 +11,7 @@ var Media = require_('models/media')
 rest('/auth', auth)
 
 rest('/medias', Collection(Media))
-rest('/medias/:id', Resource(Media))
+rest('/medias/:id(\\w+)', Resource(Media))
 rest('/users', Collection(User))
 rest('/users/:id', Resource(User))
 

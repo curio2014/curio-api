@@ -27,6 +27,9 @@ function defaultHandler(method, model, paramName) {
     }
   } else if (method == 'read') {
     return function *read() {
+      if (!this.params[paramName]) {
+        this.throw(404)
+      }
       var item = yield model.get(this.params[paramName])
       if (!item) this.throw(404)
       var ret = {}
