@@ -1,6 +1,12 @@
 start:
-	@export DEBUG="curio:*" && supervisor -w 'lib,serve,models,app.js,server.js,conf' \
-		-p 1000 -n error -- --harmony-generators server.js 
+	@export DEBUG="curio:* koa:redis" && supervisor -w 'lib,serve,models,app.js,server.js,conf' \
+		-p 1000 -n error -- --debug --harmony-generators server.js 
+
+debug:
+	@export DEBUG="curio:*" && gnode --debug server.js
+
+inspector:
+	@node-inspector --web-port=3001
 
 createdb:
 	@createuser -P -e curio

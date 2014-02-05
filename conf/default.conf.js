@@ -6,12 +6,12 @@ module.exports = {
   secret: 'say hello',
   salt: 'hello again',
   redisStore: {
-    prefix: 'curio:sess'
+    prefix: 'curio:sess:'
   },
   redis: {
+    database: 'curio'
     // host: ..
     // port: ..
-    // database: ..
     // password: ..
   },
   postgres: {

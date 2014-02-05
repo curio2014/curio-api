@@ -49,7 +49,7 @@ passport.serializeUser(function(user, done) {
   done(null, user.id)
 })
 
-passport.deserializeUser(User.find.bind(User))
+passport.deserializeUser(User.find_.bind(User))
 
 passport.localAuth = passport.authenticate('local', {})
 

@@ -6,10 +6,10 @@ global.require_ = function(path) {
 var app = require('koa')()
 var cors = require('koa-cors')
 var session = require('koa-sess')
-var redisStore = require('koa-redis')
 var debug = require('debug')('curio:app')
 var conf = require_('conf')
 var utils = require_('lib/utils')
+var redisc =  require_('lib/redis')
 
 app.debug = debug
 app.name = 'curio-api'
@@ -30,15 +30,7 @@ app.use(cors({
   origin: conf.corsOrigin
 }))
 
-app.use(session({
-  store: redisStore({
-    prefix: conf.redisStore.prefix,
-    db: conf.redisStore.database || conf.redis.database,
-    pass: conf.redisStore.password || conf.redis.password,
-    host: conf.redisStore.host || conf.redis.host,
-    port: conf.redisStore.port || conf.redis.port,
-  })
-}))
+app.use(session({ store: redisc() }))
 
 // load controllers
 require('./serve')(app)

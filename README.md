@@ -1,6 +1,6 @@
 # Curio API [![repo dependency](https://david-dm.org/CuriousityChina/curio-api.png)](https://david-dm.org/CuriousityChina/curio-api)
 
-The backend for [curio](http://github.com/CuriousityChina/curio) web app, built with [koajs](http://koajs.com/) and [bookshelf.js](http://bookshelf.js).
+The backend for [curio](http://github.com/CuriousityChina/curio) web app, built with [koajs](http://koajs.com/).
 
 Requires `node --harmony-generators` enabaled, which means `node >= 0.11.7` or [gnode](https://github.com/TooTallNate/gnode).
 

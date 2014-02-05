@@ -18,7 +18,7 @@
     "koa-error": "~1.1.0",
     "koa-csrf": "koajs/csrf",
     "koa-sess": "dead-horse/koa-session",
-    "koa-redis": "dead-horse/koa-redis",
+    "koa-redis": "ktmud/koa-redis",
     "bcryptjs": "~0.7.10",
     "swig": "~1.2.2",
     "debug": "~0.7.4",
@@ -31,8 +31,7 @@
     "co": "latest",
     "co-body": "visionmedia/co-body",
     "co-views": "latest",
-    "co-parallel": "latest",
-    "thunkify": "latest"
+    "co-parallel": "latest"
   },
   "devDependencies": {
     "color": "*",

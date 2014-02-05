@@ -44,8 +44,7 @@ program
       ok = yield confirm('This will drop all existing tables, continue? (y/N) '.red)
     }
     if (ok) {
-      yield require_('database').init
-      process.exit()
+      require_('database').init(process.exit)
     } else {
       console.log()
       console.log('Init database canceled.')

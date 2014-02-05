@@ -9,7 +9,10 @@ function defaultHandler(method, model, paramName) {
   if (method == 'index') {
     return function *list() {
       var total = yield model.count()
-      var items = yield model.all()
+      var items = yield model.all(null, { loadProps: true })
+      //yield items[0].saveProps({ wx_appkey: 'abaf' })
+      items[1].wx_appkey = null
+      yield items[1].save()
       this.body = {
         total: total,
         items: items
@@ -39,7 +42,10 @@ function defaultHandler(method, model, paramName) {
     }
   } else if (method == 'destroy') {
     return function *destroy() {
-      yield model.fromId(this.params[paramName]).destroy()
+      var item = yield model.get(this.params[paramName])
+      if (item) {
+        yield item.destroy()
+      }
       this.body = {
         ok: true
       }
