@@ -22,4 +22,6 @@ rest('/messages/:id', Resource(Message))
 //rest('/medias/:media_id/users', require('./medias/admin'))
 //rest('/users/:user_id/medias', require('./medias/admin'))
 
+Media.schema.autoupdate()
+
 }

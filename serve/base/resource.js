@@ -10,9 +10,7 @@ function defaultHandler(method, model, paramName) {
     return function *list() {
       var total = yield model.count()
       var items = yield model.all(null, { loadProps: true })
-      //yield items[0].saveProps({ wx_appkey: 'abaf' })
-      items[1].wx_appkey = null
-      yield items[1].save()
+      //yield items[0].updateAttributes({ wx_secret: 'abaf' })
       this.body = {
         total: total,
         items: items

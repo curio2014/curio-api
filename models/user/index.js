@@ -2,12 +2,11 @@ var db = require_('lib/db')
 var USER_LEVEL = require_('models/consts').USER_LEVEL
 
 var User = db.define('user', {
-  uid: { type: String, null: false },
-  name: { type: String, default: '' },
-  email: { type: String, index: true },
-  level: { type: Number, dataType: 'tinyint', null: false },
   created_at: Date,
   updated_at: Date,
+  uid: { type: String, null: false, unique: true },
+  email: { type: String, unique: true },
+  name: { type: String, default: '' },
   desc: String,
 })
 USER_LEVEL.bind(User, 'level')
@@ -18,7 +17,7 @@ module.exports = User
 var Passport = require('./passport')
 
 User.prototype.setPassword = function *(password) {
-  return Passport.upsert({ id: this.id, password: Passport.hash(password) })
+  return Passport.upsert(this.id, { password: Passport.hash(password) })
 }
 
 
