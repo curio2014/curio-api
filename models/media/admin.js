@@ -36,8 +36,8 @@ MediaAdmin.upsert = function *(media_id, user_id, props) {
   return yield this.create(props)
 }
 
-MediaAdmin.findByUser = function *(user_id, options) {
-  return yield this.all({ user_id: user_id }, options)
+MediaAdmin.findByUser = function(user_id, options) {
+  return this.all({ user_id: user_id }, options)
 }
 
 MediaAdmin.findByMedia = function() {
