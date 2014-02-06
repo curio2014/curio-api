@@ -16,7 +16,7 @@ module.exports = User
 
 var Passport = require('./passport')
 
-User.prototype.setPassword = function *(password) {
+User.prototype.setPassword = function(password) {
   return Passport.upsert(this.id, { password: Passport.hash(password) })
 }
 
@@ -27,7 +27,7 @@ User.prototype.setPassword = function *(password) {
 User.prototype.comparePassword = function(raw) {
   var self = this
   return function *() {
-    var pass = yield Passport.get(this.id)
+    var pass = yield Passport.get(self.id)
     return pass.compare(raw)
   }
 }
@@ -56,3 +56,4 @@ User.prototype.mediaRole = function *(media_id) {
 }
 
 User.LEVEL = USER_LEVEL
+User.Passport = Passport
