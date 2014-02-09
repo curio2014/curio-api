@@ -22,7 +22,8 @@ exports.create = function *authPOST() {
   assert(this.req.user, 200, ERRORS.LOGIN_FAILED)
 
   this.body = {
-    user: this.req.user
+    user: this.req.user,
+    admins: yield this.req.user.admins()
   }
 }
 
@@ -51,9 +52,9 @@ exports.need = function(act) {
     return checks[act]
   }
   checks[act] = function *(next) {
-    assert(this.user, 401, ERRORS.NEED_LOGIN)
-    assert(this.user.permitted(act), 403, ERRORS.NOT_ALLOWED)
-    return yield next
+    assert(this.req.user, 401, ERRORS.NEED_LOGIN)
+    assert(this.req.user.permitted(act), 403, ERRORS.NOT_ALLOWED)
+    if (next) yield next
   }
   return checks[act]
 }

@@ -10,17 +10,30 @@ var MediaAdmin = db.define('media_admin', {
 })
 MEDIA_ADMIN.bind(MediaAdmin, 'role')
 
+MediaAdmin.belongsTo('user', {foreignKey: 'user_id'})
+MediaAdmin.belongsTo('media', {foreignKey: 'media_id'})
 
 module.exports = MediaAdmin
 
+MediaAdmin.fetcher.media = function *() {
+  this.media = yield Media.get(this.media_id)
+  return this
+}
+//MediaAdmin.mfetcher.media = function *(items) {
+  //var ids = items.map(function(item) { return item.media_id })
+  //// ...
+  //return this
+//}
 
 MediaAdmin.get = function(media_id, user_id) {
   if (arguments.length != 2) {
     throw new Error('Must provide media_id & user_id for MediaAdmin get')
   }
   return this.findOne({
-    media_id: media_id,
-    user_id: user_id
+    where: {
+      media_id: media_id,
+      user_id: user_id
+    }
   })
 }
 
@@ -37,10 +50,17 @@ MediaAdmin.upsert = function *(media_id, user_id, props) {
 }
 
 MediaAdmin.findByUser = function(user_id, options) {
-  return this.all({ user_id: user_id }, options)
+  options = options || {}
+  options.where = options.where || {}
+  options.where.user_id = user_id
+  return this.all(options)
 }
 
-MediaAdmin.findByMedia = function() {
+MediaAdmin.findByMedia = function(media_id, options) {
+  options = options || {}
+  options.where = options.where || {}
+  options.where.media_id = media_id
+  return this.all(options)
 }
 
 

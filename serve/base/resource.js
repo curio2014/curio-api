@@ -9,9 +9,14 @@ function defaultHandler(method, model, paramName) {
   if (method == 'index') {
     return function *list() {
       var total = yield model.count()
-      var items = yield model.all(null, { loadProps: true })
+      var query = model.safeQuery(this.query)
+      var items = yield model.all(query)
+      var offset = query.offset || 0
+      var limit = query.limit || 20
       //yield items[0].updateAttributes({ wx_secret: 'abaf' })
       this.body = {
+        offset: offset,
+        limit: limit,
         total: total,
         items: items
       }
@@ -55,6 +60,10 @@ function defaultHandler(method, model, paramName) {
 function Resource(model, handlers, paramName) {
   paramName = paramName || 'id'
 
+  // first argument is not a constructor, then it is handlers
+  if (typeof model == 'object') {
+    handlers = model
+  }
   if (Array.isArray(handlers)) {
     handlers = _.zipObject(handlers)
   }
@@ -79,7 +88,8 @@ function Resource(model, handlers, paramName) {
     if (method === 'all') {
       list = methods
     } else if (method === 'write') {
-      list = ['create', 'update', 'destroy']
+      // only wirte methods
+      list = _.intersection(methods, ['create', 'update', 'destroy'])
     } else if ('string' === typeof method) {
       list = [method]
     }
@@ -94,7 +104,12 @@ function Resource(model, handlers, paramName) {
     var handler = handlers && handlers[method] || defaultHandler(method, model, paramName)
     resource[method] = function *(next) {
       if (access.length) {
-        yield access
+        for (var i = 0, l = access.length; i++; i < l) {
+          // access function returned error, stop
+          if (yield access[i]) {
+            return
+          }
+        }
       }
       yield handler
       if (next) yield next

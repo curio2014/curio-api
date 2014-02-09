@@ -1,17 +1,11 @@
 var pkg = require_('package.json')
-var MediaAdmin = require_('models/media/admin')
+var Media = require_('models/media')
 
 module.exports = function *(next) {
   var user = this.req.user
   var admins
   if (user) {
-    admins = yield MediaAdmin.findByUser(user.id)
-    admins = admins.map(function(item) {
-      return {
-        media_id: item.media_id,
-        role: item.role,
-      }
-    })
+    admins = yield user.admins()
   }
   this.body = {
     version: pkg.version,
