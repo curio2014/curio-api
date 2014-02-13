@@ -6,6 +6,7 @@ var Media = db.define('media', {
   oid: { type: String, null: false, unique: true },
   name: String,
   desc: String,
+  wx_token: String,
   wx_appkey: String,
   wx_secret: String,
 }, {

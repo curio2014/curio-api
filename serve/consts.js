@@ -23,6 +23,9 @@ ERRORS = {
     code: 5001,
     message: 'invalid token'
   },
+  NOT_FOUND: {
+    code: 404
+  },
 };
 
 exports.ERRORS = ERRORS;

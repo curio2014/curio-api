@@ -49,8 +49,25 @@ function defaultHandler(method, model, paramName) {
       if (item) {
         yield item.destroy()
       }
+      this.status = 202
       this.body = {
         ok: true
+      }
+    }
+  } else if (method == 'update') {
+    return function *update() {
+      var item = yield model.get(this.params[paramName])
+      if (!item) {
+        assert(item, 404)
+      }
+      try {
+        yield item.updateAttributes(this.req.body)
+      } catch (e) {
+        assert(!item.errors, 400, 'bad fields', item.errors)
+        throw e
+      }
+      this.body = {
+        item: item
       }
     }
   }
@@ -102,6 +119,9 @@ function Resource(model, handlers, paramName) {
   methods.forEach(function(method, i) {
     var access = middlewares[method] = []
     var handler = handlers && handlers[method] || defaultHandler(method, model, paramName)
+    if (!handler) {
+      throw new Error('handler for "' + method + '" cannot be empty')
+    }
     resource[method] = function *(next) {
       if (access.length) {
         for (var i = 0, l = access.length; i++; i < l) {

@@ -3,9 +3,12 @@ var http = require('http')
 var consts = require('./consts')
 var conf = require_('conf')
 
+/**
+ * do assertions, and expose error message
+ */
 exports.assert = function(value, status, message, detail) {
   if (value) return
-  var msg = 'string' === message ? message : message.message
+  var msg = 'string' == typeof message ? message : message.message
   var err = new Error(msg)
   err.status = status || 500
   err.expose = true

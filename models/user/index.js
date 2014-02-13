@@ -1,18 +1,29 @@
 var db = require_('lib/db')
 var _ = require_('lib/utils')
-var USER_LEVEL = require_('models/consts').USER_LEVEL
+var consts = require_('models/consts')
+var USER_LEVEL = consts.USER_LEVEL
 
 var User = db.define('user', {
   created_at: Date,
   updated_at: Date,
-  uid: { type: String, null: false, unique: true },
   email: { type: String, unique: true },
+  uid: { type: String, null: false, unique: true },
   name: { type: String, default: '' },
   desc: String,
 })
 USER_LEVEL.bind(User, 'level')
 
+
 module.exports = User
+
+
+var RE_EMAIL = /^[\w\.\-]+\@([\w\-]+\.){1,}[\w]+$/i;
+
+User.validatesUniquenessOf('email', {message: 'conflict'})
+User.validate('email', function(err) {
+  if (!RE_EMAIL.test(this.email)) err()
+}, {message: 'bad'})
+
 
 
 var Passport = require('./passport')
@@ -20,7 +31,6 @@ var Passport = require('./passport')
 User.prototype.setPassword = function(password) {
   return Passport.upsert(this.id, { password: Passport.hash(password) })
 }
-
 
 /**
  * Compare password as a yieldable function
@@ -79,3 +89,6 @@ User.LEVEL = USER_LEVEL
 User.Passport = Passport
 User.LEVEL = USER_LEVEL
 User.Passport = Passport
+
+
+

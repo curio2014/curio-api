@@ -16,7 +16,7 @@ util.inherits(LocalStrategy, passport.Strategy)
 
 LocalStrategy.prototype.authenticate = function(req, options) {
   options = options || {}
-  req.user = null // falsy logout first
+  req.user = null // falsy logout first, to prevent later middlewares find a user
   var username = req.body.username
   var password = req.body.password
   if (!username || !password) {
