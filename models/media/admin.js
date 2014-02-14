@@ -15,10 +15,14 @@ MediaAdmin.belongsTo('media', {foreignKey: 'media_id'})
 
 module.exports = MediaAdmin
 
-MediaAdmin.fetcher.media = function *() {
-  this.media = yield Media.get(this.media_id)
-  return this
-}
+//MediaAdmin.fetcher.media = function *() {
+  //this.media = yield Media.get(this.media_id)
+  //return this
+//}
+//MediaAdmin.fetch.user = function *() {
+  //this.user = yield User.get(this.user_id)
+  //return this
+//}
 //MediaAdmin.mfetcher.media = function *(items) {
   //var ids = items.map(function(item) { return item.media_id })
   //// ...

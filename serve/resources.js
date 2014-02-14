@@ -22,7 +22,13 @@ rest('/medias/:id(\\w+)', Resource(Media))
 .use(auth.need('super'))
 
 // users who can admin this media
-rest('/medias/:id/users', Resource({
+rest('/medias/:id/admins', Resource({
+  read: function *() {
+    var admins = yield Media.Admin.findByMedia(this.params.id).attach('user')
+    this.body = {
+      items: admins
+    }
+  }
 }))
 .use(auth.need('super'))
 

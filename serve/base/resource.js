@@ -10,7 +10,18 @@ function defaultHandler(method, model, paramName) {
     return function *list() {
       var total = yield model.count()
       var query = model.safeQuery(this.query)
-      var items = yield model.all(query)
+      var runner = model.all(query)
+      var includes = this.query.include
+      if (includes) {
+        if (!Array.isArray(includes)) {
+          includes = includes.split(',')
+        }
+        includes = includes.filter(function(item) {
+          return model.canAttach(item)
+        })
+        runner = runner.attach(includes)
+      }
+      var items = yield runner
       var offset = query.offset || 0
       var limit = query.limit || 20
       //yield items[0].updateAttributes({ wx_secret: 'abaf' })
