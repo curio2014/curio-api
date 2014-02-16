@@ -27,6 +27,7 @@ module.exports = {
     UNSUBSCRIBE: 21,
     CLICK: 22,
     REPORT_LOC: 23,
-    REPLY: 99,
+    REPLY: 98, // a manual reply by media admin
+    AUTO_REPLY: 99, // an auto reply with API
   })
 }

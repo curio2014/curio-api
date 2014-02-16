@@ -13,33 +13,9 @@ MEDIA_ADMIN.bind(MediaAdmin, 'role')
 MediaAdmin.belongsTo('user', {foreignKey: 'user_id'})
 MediaAdmin.belongsTo('media', {foreignKey: 'media_id'})
 
-module.exports = MediaAdmin
-
-//MediaAdmin.fetcher.media = function *() {
-  //this.media = yield Media.get(this.media_id)
-  //return this
-//}
-//MediaAdmin.fetch.user = function *() {
-  //this.user = yield User.get(this.user_id)
-  //return this
-//}
-//MediaAdmin.mfetcher.media = function *(items) {
-  //var ids = items.map(function(item) { return item.media_id })
-  //// ...
-  //return this
-//}
-
-MediaAdmin.get = function(media_id, user_id) {
-  if (arguments.length != 2) {
-    throw new Error('Must provide media_id & user_id for MediaAdmin get')
-  }
-  return this.findOne({
-    where: {
-      media_id: media_id,
-      user_id: user_id
-    }
-  })
-}
+MediaAdmin.get = MediaAdmin.finder('media_id', 'user_id', true)
+MediaAdmin.findByUser = MediaAdmin.finder('user_id')
+MediaAdmin.findByMedia = MediaAdmin.finder('media_id')
 
 var _upsert = MediaAdmin.upsert
 MediaAdmin.upsert = function *(media_id, user_id, props) {
@@ -53,20 +29,26 @@ MediaAdmin.upsert = function *(media_id, user_id, props) {
   return yield this.create(props)
 }
 
-MediaAdmin.findByUser = function(user_id, options) {
-  options = options || {}
-  options.where = options.where || {}
-  options.where.user_id = user_id
-  return this.all(options)
-}
-
-MediaAdmin.findByMedia = function(media_id, options) {
-  options = options || {}
-  options.where = options.where || {}
-  options.where.media_id = media_id
-  return this.all(options)
-}
-
-
 MediaAdmin.ROLES = MEDIA_ADMIN
+
+Media.Admin = MediaAdmin
+Media.ADMIN_ROLES = Media.Admin.ROLES
+
+Media.fetcher.admins = function *() {
+  var admins = yield MediaAdmin.findByMedia(this.id).attach('user')
+  this.admins = admins.map(function(item, i) {
+    var user = item.user
+    return {
+      id: user.id,
+      uid: user.uid,
+      name: user.name,
+      level: user.level,
+      role: item.role
+    }
+  })
+  return this
+}
+
+
+module.exports = MediaAdmin
 

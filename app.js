@@ -3,6 +3,7 @@ global.require_ = function(path) {
   return require(__dirname + '/' + path)
 }
 
+var mount = require('koa-mount')
 var app = require('koa')()
 var cors = require('koa-cors')
 var session = require('koa-sess')
@@ -20,8 +21,11 @@ if (conf.debug) {
   debug('DEBUG on')
   app.outputErrors = true
   app.use(require('koa-logger')())
-  app.use(require('koa-etag')())
 }
+
+app.use(mount('/webot', require('./serve/webot')))
+
+app.use(require('koa-etag')())
 
 // cross origin request
 app.use(cors({

@@ -17,5 +17,8 @@ exports.fillupAll = function *() {
   debug('Filling up media...')
   yield fillup('media')
 
+  debug('Filling up some messages...')
+  yield fillup('message')
+
   debug('All done.')
 }

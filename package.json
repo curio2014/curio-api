@@ -10,7 +10,7 @@
   },
   "dependencies": {
     "gnode": ">= 0.0.6",
-    "koa": "~0.2.1",
+    "koa": "~0.4.0",
     "koa-trie-router": "koajs/trie-router",
     "koa-logger": "koajs/logger",
     "koa-etag": "koajs/etag",
@@ -18,6 +18,9 @@
     "koa-csrf": "koajs/csrf",
     "koa-sess": "dead-horse/koa-session",
     "koa-redis": "ktmud/koa-redis",
+    "koa-mount": "koajs/mount",
+    "koa-wechat": "ktmud/koa-wechat",
+    "thunkify": "latest",
     "bcryptjs": "~0.7.10",
     "debug": "~0.7.4",
     "koa-passport": "rkusa/koa-passport",
@@ -28,8 +31,9 @@
     "lodash": "latest",
     "co": "latest",
     "co-body": "visionmedia/co-body",
-    "co-views": "latest",
-    "co-parallel": "latest"
+    "NodeSimpleCacheManage": "ktmud/Node-Simple-Cache",
+    "buffer-crc32": "~0.2.1",
+    "weixin-robot": "latest"
   },
   "devDependencies": {
     "color": "*",

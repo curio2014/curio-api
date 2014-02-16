@@ -22,11 +22,31 @@ Or simply `make createdb`.
 
 1. Create database tables
 
-    ./bin/curio init_db
+    make init_db
 
 2. Fillup test data
 
-    ./bin/curio fillup
-
+    make fillup
 
 3. Run `make` to start a development server (file changes watched by `Supervisor`)
+
+
+### Conventions
+
+RESTful API are all under serve/resources.js.
+Use a custom handler to override the API behavior .
+
+The `Resource` methods are:
+
+    index     GET      items   Model.all(this.query)
+    create    POST     items   Model.create(this.req.body)
+    read      GET      item    Model.get(this.params.id)
+    destroy   DELETE   item    model.destroy()
+    update    PUT      item    model.updateAttributes(this.req.body)
+
+
+When the logic for a specific handler becomes complext, you may want to move it to
+the model layer or a seperated file under `serve/`.
+
+Each resource can be given an access control by use `auth.need('roleName')`.
+

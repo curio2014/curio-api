@@ -2,11 +2,14 @@ require('gnode')
 
 var app = require('./app')
 
-function boot() {
+function boot(port) {
   var conf = require('./conf')
-  var server = app.listen(conf.port)
-  app.debug('Listening at ' + conf.port + ', url: ' + conf.root)
+  port = port || conf.port
+  var server = app.listen(port)
+  app.debug('Listening at ' + port + ', url: ' + conf.root)
 }
+
+module.exports = boot
 
 if (!module.parent) {
   boot()

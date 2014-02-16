@@ -51,6 +51,7 @@ exports.need = function(act) {
   if (act in checks) {
     return checks[act]
   }
+  // cache the middleware
   checks[act] = function *(next) {
     assert(this.req.user, 401, ERRORS.NEED_LOGIN)
     assert(this.req.user.permitted(act), 403, ERRORS.NOT_ALLOWED)

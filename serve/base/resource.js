@@ -5,6 +5,13 @@ var _ = require_('lib/utils')
 var assert = require_('serve/utils').assert
 var ERRORS = require_('serve/consts').ERRORS
 
+
+function sleep(i) {
+  return function(next) {
+    setTimeout(next, i * 1000)
+  }
+}
+
 function defaultHandler(method, model, paramName) {
   if (method == 'index') {
     return function *list() {
@@ -142,6 +149,7 @@ function Resource(model, handlers, paramName) {
           }
         }
       }
+      yield sleep(.2) // slow request debug
       yield handler
       if (next) yield next
     }

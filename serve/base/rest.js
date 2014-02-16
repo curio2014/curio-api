@@ -1,5 +1,5 @@
 /**
- * Extends route defination to a RESTful route
+ * wrap RESTful resource defination with proper methods
  */
 var method_alias = {
   'index': 'get',

@@ -21,17 +21,6 @@ rest('/medias', Collection(Media))
 rest('/medias/:id(\\w+)', Resource(Media))
 .use(auth.need('super'))
 
-// users who can admin this media
-rest('/medias/:id/admins', Resource({
-  read: function *() {
-    var admins = yield Media.Admin.findByMedia(this.params.id).attach('user')
-    this.body = {
-      items: admins
-    }
-  }
-}))
-.use(auth.need('super'))
-
 // Only super user can create/delete user
 rest('/users', Collection(User))
 .use(auth.need('login'))
@@ -49,7 +38,10 @@ rest('/users/:id', Resource(User))
 rest('/messages', Collection(Message))
 rest('/messages/:id', Resource(Message))
 
+rest('/webot/:media_id', require('./webot'))
 
+
+// the jugglingdb's database migration method
 User.schema.autoupdate()
 
 }

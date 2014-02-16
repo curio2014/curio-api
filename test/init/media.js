@@ -33,7 +33,6 @@ function mediaGenerater(i) {
 }
 
 exports.fillup = function *(next) {
-
   yield _.range(1, 100).map(mediaGenerater)
 
   // Media1 should have multiple admins
