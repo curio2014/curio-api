@@ -21,7 +21,11 @@ Media.getter.wx_token = function() {
 
 module.exports = Media
 
+
+//Media.prototype.
+
 // load mixins
 require('./admin')
 require('./webot')
+require('./api')
 

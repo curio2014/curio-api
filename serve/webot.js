@@ -3,6 +3,8 @@
  */
 var wechat = require('koa-wechat')
 var app = require('koa')()
+var Message = require_('models/message')
+var Media = require_('models/media')
 var Webot = require_('models/webot')
 var session = require('koa-sess')
 var redisc =  require_('lib/redis')
@@ -13,12 +15,16 @@ app.use(function *(next) {
   if (!media_id) {
     this.throw(404)
   }
-  var webot = yield Webot.get(media_id)
-  if (!webot) {
+  var media = yield Media.get(media_id)
+  if (!media) {
     this.throw(404)
   }
+  var webot = yield Webot.get(media.id)
+
+  this.media_id = media.id
+  this.wx_token = media.wx_token
   this.webot = webot
-  this.wx_token = webot.wx_token
+
   yield next
 })
 
@@ -27,13 +33,21 @@ app.use(session({ store: redisc('webot:session:') }))
 
 // do the reply
 app.use(function *(next) {
-  var info = this.req.body
-  info.session = this.session
-  this.body = yield this.webot.reply(info)
+  var req, res
+  req = this.req.body
+  // log request
+  Message.incoming(this.media_id, req)
+  req.session = this.session
+  // do the reply
+  res = yield this.webot.reply(req)
+  // log response
+  Message.outgoing(this.media_id, res)
+  this.body = res
   yield next
 })
 // an empty handler to prevent any following middlewares
 app.use(wechat.close())
+
 
 
 module.exports = app

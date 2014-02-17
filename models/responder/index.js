@@ -1,57 +1,69 @@
 /**
  * Auto reply rule for webot
+ * Use leveldb to save the whole list for each media
+ * Should be super fast!
  */
 var log = require('debug')('curio:responder')
-var db = require_('lib/db')
-var sandbox = require_('lib/sandbox')
-var _ = require_('lib/utils')
-var consts = require_('models/consts')
+var sandbox = require_('lib/utils/sandbox')
+var db = require_('lib/leveldb')
 
-var Responder = db.define('responder', {
-  name: String,
-  pattern: String,
-  handler: String,
-  priority: Number
+var sub = db.sublevel('responder', {
+  valueEncoding: {
+    encode: function(val) {
+      return JSON.stringify(val, replacer)
+    },
+    decode: function(val) {
+      return new Responder(val)
+    },
+    type: 'webotRule'
+  }
 })
 
-Responder.defaultOrder = 'sequece asc'
-Responder.defaultLimit = null // just dump all rules
 
-Responder.belongsTo('media', {foreignKey: 'media_id'})
-
-Responder.findByMedia = Responder.finder('media_id')
-
-Responder.setter.pattern = function(value) {
-  this._pattern = JSON.stringify(value, replacer)
-}
-Responder.setter.handler = function(value) {
-  this._handler = JSON.stringify(value, replacer)
+function Responder(raw) {
+  this._raw = raw
 }
 
 
 /**
- * Convert this responder to a webot rule,
- * with proper context attached
+ * Get responder by media id
  */
-Responder.prototype.revive = function(ctx) {
-  var reviver = reviverFor(ctx)
-  return {
-    name: 'rule_' + this.priority,
-    pattern: JSON.parse(this.pattern, reviver),
-    handler: JSON.parse(this.handler, reviver),
+Responder.load = function(media_id) {
+  return sub.get_(media_id)
+}
+
+Responder.dump = function(media_id, value) {
+  if (!Array.isArray(value)) {
+    throw new Error('Responder rules must be an array')
   }
+  return sub.put_(media_id, value)
+}
+
+Responder.clear = function(media_id) {
+  return sub.del_(media_id)
 }
 
 
+/**
+ * Convert this responder to webot rules,
+ * with proper context attached
+ */
+Responder.prototype.webotfy = function(ctx) {
+  var reviver = reviveFor(ctx)
+  var self = this
+  return JSON.parse(this._raw, reviver)
+}
 
-function reviverFor(ctx) {
+
+function reviveFor(ctx) {
   return function reviver(k, v) {
     if (v && v.pickled) {
-      try {
-        return sandbox(ctx, value)
-      } catch (e) {
-        log('Unpickle %j failed', v)
-      }
+      //try {
+        return sandbox(ctx, v.value)
+      //} catch (e) {
+        //log('Unpickle %j failed', v)
+        return ''
+      //}
     }
     return v
   }
@@ -74,5 +86,3 @@ function replacer(k, v) {
 }
 
 module.exports = Responder
-
-

@@ -8,6 +8,9 @@ module.exports = {
   redisStore: {
     prefix: 'curio:sess:'
   },
+  leveldb: {
+    path: './var/leveldb'
+  },
   redis: {
     database: 'curio'
     // host: ..

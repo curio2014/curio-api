@@ -1,14 +1,41 @@
+var debug = require('debug')('curio:webot')
 var Responder = require('./responder')
 var Media = require('./media')
 var Webot = require('weixin-robot').Webot
 var cache = require('NodeSimpleCacheManage/Cache').createCache('LRU', 20)
 
 
-function *loadResponders(media, robot) {
-  var rules = yield Responder.findByMedia(media.id)
-  rules.forEach(function(item) {
-    robot.set(item.revive())
-  })
+// webot rule pattern arrays as `or`
+//if (Array.isArray(item.pattern)) {
+  //var pattern = item.pattern
+  //item.pattern = function(info) {
+    //function test(item) {
+      //if (item instanceof RegExp) {
+        //return item.test(info.text)
+      //}
+      //for (var k in item) {
+        //if (info[k] != item[k]) {
+          //return false
+        //}
+      //}
+      //return true
+    //}
+    //return _.any(pattern, test)
+  //}
+//}
+
+
+function *loadResponders(media_id, robot) {
+  // common respond rules goes here:
+  // Event, channel, subscribe, unsubscribe, etc...
+
+  // custom respond rules
+  var item = yield Responder.load(media_id)
+  if (item) {
+    item.webotfy().forEach(function(item) {
+      robot.set(item)
+    })
+  }
 }
 
 Webot.get = function *(media_id) {
@@ -16,15 +43,10 @@ Webot.get = function *(media_id) {
   if (robot) {
     return robot
   }
-  var media = yield Media.get(media_id)
-  if (!media) {
-    return null
-  }
+  debug('Cache miss: %s', media_id)
   robot = new Webot()
-  // assign wechat token to the robot
-  robot.wx_token = media.wx_token
 
-  yield loadResponders(media, robot)
+  yield loadResponders(media_id, robot)
 
   cache.set(media_id, robot)
 

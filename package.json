@@ -24,16 +24,19 @@
     "bcryptjs": "~0.7.10",
     "debug": "~0.7.4",
     "koa-passport": "rkusa/koa-passport",
-    "jugglingdb": "latest",
+    "jugglingdb": "jugglingdb/postgres-adapter",
     "jugglingdb-postgres": "latest",
     "pg": "latest",
+    "level": "latest",
+    "level-sublevel": "latest",
     "methods": "latest",
     "lodash": "latest",
     "co": "latest",
     "co-body": "visionmedia/co-body",
     "NodeSimpleCacheManage": "ktmud/Node-Simple-Cache",
     "buffer-crc32": "~0.2.1",
-    "weixin-robot": "latest"
+    "weixin-robot": "latest",
+    "batcher": "0.0.2"
   },
   "devDependencies": {
     "color": "*",
