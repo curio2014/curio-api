@@ -11,14 +11,17 @@ exports.fillup = fillup
 
 exports.fillupAll = function *() {
 
-  debug('Filling up users...')
-  yield fillup('user')
+  //debug('Filling up users...')
+  //yield fillup('user')
 
-  debug('Filling up media...')
-  yield fillup('media')
+  //debug('Filling up media...')
+  //yield fillup('media')
 
-  debug('Filling up some messages...')
-  yield fillup('message')
+  debug('Filling up resonders...')
+  yield fillup('responder')
+
+  //debug('Filling up some messages...')
+  //yield fillup('message')
 
   debug('All done.')
 }

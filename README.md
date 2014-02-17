@@ -22,13 +22,20 @@ Or simply `make createdb`.
 
 1. Create database tables
 
-    make init_db
+    ./bin/curio init_db
 
 2. Fillup test data
 
-    make fillup
+    ./bin/curio fillup
 
 3. Run `make` to start a development server (file changes watched by `Supervisor`)
+
+
+### Make the bin `curio` executable
+
+Try add this to your .bashrc:
+
+    export PATH="./bin:$PATH"
 
 
 ### Conventions

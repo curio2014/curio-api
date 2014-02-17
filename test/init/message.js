@@ -4,7 +4,8 @@ var exec = thunkify(require('child_process').exec)
 var Media = require_('models/media')
 
 var msg_args = [
-  'text "hello! 你好！这是一条测试信息"'
+  'text "hello! 你好！这是一条测试信息"',
+  'text Hello'
 ]
 var PORT = 12809
 

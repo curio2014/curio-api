@@ -23,7 +23,7 @@ rest('/medias/:id(\\w+)', Resource(Media))
 
 // Only super user can create/delete user
 rest('/users', Collection(User))
-.use(auth.need('login'))
+.use(auth.need('super'))
 .use('write', auth.need('super'))
 
 // Only super user or self can view/edit user

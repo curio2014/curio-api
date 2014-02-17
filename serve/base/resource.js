@@ -142,7 +142,7 @@ function Resource(model, handlers, paramName) {
     }
     resource[method] = function *(next) {
       if (access.length) {
-        for (var i = 0, l = access.length; i++; i < l) {
+        for (var i = 0, l = access.length; i < l; i++) {
           // access function returned error, stop
           if (yield access[i]) {
             return

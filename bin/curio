@@ -57,7 +57,11 @@ program
 program
   .command('fillup')
   .callback(co(function *(opts) {
-    yield require_('test/init').fillupAll
+    if (opts[1]) {
+      yield require_('test/init/' + opts[1]).fillup
+    } else {
+      yield require_('test/init').fillupAll
+    }
     process.exit()
   }))
 
