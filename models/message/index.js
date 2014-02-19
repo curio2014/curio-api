@@ -1,6 +1,6 @@
-var debug = require('debug')('curio:model:message')
 var co = require('co')
 var Batcher = require('batcher')
+var debug = require_('lib/utils').debug('message')
 var db = require_('lib/db')
 var consts = require_('models/consts')
 var Subscriber = require_('models/subscriber')
@@ -26,15 +26,17 @@ function batchSave(items) {
   var b = this
   debug('Starting batch write %s messages..', items.length)
   var send = function *() {
-    var users = {}, item, user, key
+    var users = {}, item, user_id, key
     // findout the subscriber_id
     for (var i = 0, l = items.length; i < l; i++) {
       item = items[i]
-      key = item.content.uid
       user = users[key]
       if (!user) {
-        user = users[key] =
-          yield Subscriber.upsertByOpenId(key, { media_id: item.media_id })
+        user = new Subscriber({
+          oid: item.content.uid,
+          media_id: item.media_id
+        })
+        yield user.getId()
       }
       item.subscriber_id = user.id
     }

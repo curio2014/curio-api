@@ -10,32 +10,30 @@ var Resource = require('./base/resource')
 var Collection = require('./base/collection')
 var User = require_('models/user')
 var Message = require_('models/message')
-var Media = require_('models/media')
 
 rest('/auth', auth)
 
+var medias = require('./medias')
 // Only super user can create/delete media
-rest('/medias', Collection(Media))
-.use(auth.need('super'))
-
-rest('/medias/:id(\\w+)', Resource(Media))
-.use(auth.need('super'))
+rest('/medias', medias.collection)
+rest('/medias/:id(\\w+)', medias.item)
+rest('/medias/:id/messages', medias.messages)
 
 // Only super user can create/delete user
 rest('/users', Collection(User))
 .use(auth.need('super'))
-.use('write', auth.need('super'))
 
 // Only super user or self can view/edit user
 rest('/users/:id', Resource(User))
 .use(auth.need('login'))
-.use(function *(next) {
+.use(function *() {
   user = this.req.user
   user_id = this.params.id
   assert(user.isSuper() || user.id == user_id, 403, ERRORS.NOT_ALLOWED)
 })
 
-rest('/messages', Collection(Message))
+var MessageCollection = Collection(Message)
+rest('/messages', MessageCollection)
 rest('/messages/:id', Resource(Message))
 
 rest('/webot/:media_id', require('./webot'))

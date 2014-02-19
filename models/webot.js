@@ -2,8 +2,9 @@ var debug = require('debug')('curio:webot')
 var Responder = require('./responder')
 var Media = require('./media')
 var Webot = require('weixin-robot').Webot
-var cache = require('NodeSimpleCacheManage/Cache').createCache('LRU', 20)
-
+var cache = require('lru-cache')({
+  max: 20,
+})
 
 // webot rule pattern arrays as `or`
 //if (Array.isArray(item.pattern)) {
@@ -25,20 +26,28 @@ var cache = require('NodeSimpleCacheManage/Cache').createCache('LRU', 20)
 //}
 
 
-function *loadResponders(media_id, robot) {
+function *loadResponders(media, robot) {
   // common respond rules goes here:
   // Event, channel, subscribe, unsubscribe, etc...
 
   // custom respond rules
-  var item = yield Responder.load(media_id)
-  if (item) {
-    item.webotfy().forEach(function(item) {
+  yield media.load('responder')
+  var responder = media.responder
+  if (responder) {
+    responder.webotfy().forEach(function(item) {
       robot.set(item)
     })
   }
 }
 
-Webot.get = function *(media_id) {
+Webot.get = function *(media) {
+  if (!(media instanceof Media)) {
+    media = yield Media.get(media)
+    if (!media) {
+      return null
+    }
+  }
+  var media_id = media.id
   var robot = cache.get(media_id)
   if (robot) {
     return robot
@@ -46,7 +55,7 @@ Webot.get = function *(media_id) {
   debug('Cache miss: %s', media_id)
   robot = new Webot()
 
-  yield loadResponders(media_id, robot)
+  yield loadResponders(media, robot)
 
   cache.set(media_id, robot)
 

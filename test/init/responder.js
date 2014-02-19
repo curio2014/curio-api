@@ -1,13 +1,19 @@
-var debug = require('debug')('curio:test:init')
+var debug = require_('lib/utils').debug('test:init')
+
+var _ = require_('lib/utils')
 var Responder = require_('models/responder')
 var Media = require_('models/media')
-var _ = require_('lib/utils')
 
 
 var rules = [{
-  pattern: { type: 'click' },
+  pattern: {
+    type: 'event'
+    param: {
+      event: 'subscribe'
+    }
+  },
   handler: 'thank your for your subscribe'
-} , {
+}, {
   pattern: 'hello',
   handler: {
     type: 'news',
@@ -19,6 +25,9 @@ var rules = [{
 }, {
   pattern: 'abc',
   handler: 'def',
+}, {
+  pattern: { type: 'image' },
+  handler: 'got your image'
 }, {
   pattern: 'function test',
   handler: function (info) {
@@ -35,8 +44,12 @@ function responderGenerator(media, i) {
 
 
 exports.fillup = function *(next) {
+  debug('Filling up responder..')
+
   var medias = yield Media.all()
 
   yield medias.map(responderGenerator)
+
+  debug('Fill up responder done.')
 }
 

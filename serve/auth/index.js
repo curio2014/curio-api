@@ -42,8 +42,17 @@ exports.destroy = function *authDELETE() {
  */
 var checks = {
   login: function *(next) {
-    assert(this.user, 401, ERRORS.NEED_LOGIN)
-    return yield next
+    assert(this.req.user, 401, ERRORS.NEED_LOGIN)
+    if (next) yield next
+  },
+  mediaAdmin: function *(next) {
+    var user = this.req.user
+    assert(user, 401, ERRORS.NEED_LOGIN)
+    if (!Array.isArray(user.mediaAdmins)) {
+      yield user.load('mediaAdmins')
+    }
+    assert(user.mediaAdmins.length || user.permitted('admin'), 403, ERRORS.NOT_ALLOWED)
+    if (next) yield next
   }
 }
 

@@ -1,7 +1,9 @@
+var cached = require_('lib/cached')
 var db = require_('lib/db')
 var _ = require_('lib/utils')
 var consts = require_('models/consts')
 var USER_LEVEL = consts.USER_LEVEL
+var RE_EMAIL = /^[\w\.\-]+\@([\w\-]+\.){1,}[\w]+$/i;
 
 var User = db.define('user', {
   created_at: Date,
@@ -12,21 +14,13 @@ var User = db.define('user', {
   desc: String,
 })
 USER_LEVEL.bind(User, 'level')
+User.LEVEL = USER_LEVEL
 
 
 module.exports = User
 
-
-var RE_EMAIL = /^[\w\.\-]+\@([\w\-]+\.){1,}[\w]+$/i;
-
-User.validatesUniquenessOf('email', {message: 'conflict'})
-User.validate('email', function(err) {
-  if (!RE_EMAIL.test(this.email)) err()
-}, {message: 'bad'})
-
-
-
 var Passport = require('./passport')
+var Media = require_('models/media')
 
 User.prototype.setPassword = function(password) {
   return Passport.upsert(this.id, { password: Passport.hash(password) })
@@ -44,6 +38,31 @@ User.prototype.comparePassword = function(raw) {
 }
 
 
+/**
+ * Get user's role on given media
+ */
+User.prototype.mediaRole = function *(media_id) {
+  if (user._roles) {
+    return user._roles[media_id]
+  }
+  var admin = yield Media.Admin.get(media_id, this.id)
+  if (!admin) {
+    return null
+  }
+  return admin.role
+}
+
+/**
+ * Fetch media admins
+ */
+User.prototype.mediaAdmins = function *(with_media) {
+  var runner = Media.Admin.findByUser(this.id)
+  if (with_media !== false) {
+    runner = runner.attach('media')
+  }
+  return yield runner
+}
+
 User.prototype.permitted = function(action) {
   if (action === 'admin') {
     return this._level >= USER_LEVEL.ADMIN
@@ -58,37 +77,14 @@ User.prototype.isSuper = function() {
   return this.permitted('super')
 }
 
+User.validatesUniquenessOf('email', {message: 'conflict'})
+User.validate('email', function(err) {
+  if (!RE_EMAIL.test(this.email)) err()
+}, {message: 'bad'})
 
-/**
- * Get user's role on given media
- */
-User.prototype.mediaRole = function *(media_id) {
-  if (user._roles) {
-    return user._roles[media_id]
-  }
-  var MediaAdmin = require_('models/media/admin')
-  var admin = yield MediaAdmin.get(media_id, this.id)
-  if (!admin) {
-    return null
-  }
-  return admin.role
-}
+cached.register(User)
+User.enableCache('get_', '{_model_}:{0}')
+User.enableCache('find_', '{_model_}:{0}')
+User.addCacheKey('{_model_}:{uid}')
 
-/**
- * Fetch media admins
- */
-User.prototype.admins = function *(with_media) {
-  var runner = db.models.media_admin.findByUser(this.id)
-  if (with_media !== false) {
-    runner = runner.attach('media')
-  }
-  return yield runner
-}
-
-User.LEVEL = USER_LEVEL
 User.Passport = Passport
-User.LEVEL = USER_LEVEL
-User.Passport = Passport
-
-
-

@@ -6,17 +6,11 @@ var assert = require_('serve/utils').assert
 var ERRORS = require_('serve/consts').ERRORS
 
 
-function sleep(i) {
-  return function(next) {
-    setTimeout(next, i * 1000)
-  }
-}
-
-function defaultHandler(method, model, paramName) {
+function defaultHandler(method, model) {
   if (method == 'index') {
     return function *list() {
-      var total = yield model.count()
-      var query = model.safeQuery(this.query)
+      var query = model.safeQuery(_.assign(this.query, this.params))
+      var total = yield model.count(query.where)
       var runner = model.all(query)
       var includes = this.query.include
       if (includes) {
@@ -41,7 +35,7 @@ function defaultHandler(method, model, paramName) {
     }
   } else if (method == 'create') {
     return function *create() {
-      var item = model.forge(this.body)
+      var item = model.forge(_.assign(this.body, this.params))
       var err = item.validate()
       assert(!err, 401, err)
       var ret = {}
@@ -51,10 +45,7 @@ function defaultHandler(method, model, paramName) {
     }
   } else if (method == 'read') {
     return function *read() {
-      if (!this.params[paramName]) {
-        this.throw(404)
-      }
-      var item = yield model.get(this.params[paramName])
+      var item = yield model.getOne(this.params)
       if (!item) this.throw(404)
       var ret = {}
       this.body = {
@@ -63,7 +54,7 @@ function defaultHandler(method, model, paramName) {
     }
   } else if (method == 'destroy') {
     return function *destroy() {
-      var item = yield model.get(this.params[paramName])
+      var item = yield model.getOne(this.params)
       if (item) {
         yield item.destroy()
       }
@@ -74,7 +65,7 @@ function defaultHandler(method, model, paramName) {
     }
   } else if (method == 'update') {
     return function *update() {
-      var item = yield model.get(this.params[paramName])
+      var item = yield model.getOne(this.params)
       if (!item) {
         assert(item, 404)
       }
@@ -92,55 +83,41 @@ function defaultHandler(method, model, paramName) {
 }
 
 
-function Resource(model, handlers, paramName) {
-  paramName = paramName || 'id'
-
+function Resource(model, handlers, befores) {
+  if (!(this instanceof Resource)) {
+    return new Resource(model, handlers)
+  }
   // first argument is not a constructor, then it is handlers
   if (typeof model == 'object') {
     handlers = model
   }
+  handlers = handlers || ['read', 'update', 'destroy']
   if (Array.isArray(handlers)) {
     handlers = _.zipObject(handlers)
-  }
-
-  var methods = handlers ? Object.keys(handlers) : ['read', 'update', 'destroy']
-  var middlewares = {}
-
-  var resource = {}
-
-  /**
-   * Add access control handlers
-   *
-   * @param {String|Array} method
-   * @param {Function} middleware
-   */
-  resource.use = function(method, middleware) {
-    if (!middleware) {
-      middleware = method
-      method = 'all'
+    for (var k in handlers) {
+      handlers[k] = defaultHandler(k, model)
     }
-    var list = method
-    if (method === 'all') {
-      list = methods
-    } else if (method === 'write') {
-      // only wirte methods
-      list = _.intersection(methods, ['create', 'update', 'destroy'])
-    } else if ('string' === typeof method) {
-      list = [method]
-    }
-    list.forEach(function(method) {
-      middlewares[method].push(middleware)
-    })
-    return this
   }
+  this.handlers = handlers
+  this.befores = befores || {}
+
+  this.init()
+}
+
+
+Resource.prototype.init = function(handlers) {
+  var resource = this
+  var befores = resource.befores
+  var handlers = resource.handlers
+
+  var methods = this.methods = Object.keys(handlers)
+  var handlers = this.handlers = handlers || {}
 
   methods.forEach(function(method, i) {
-    var access = middlewares[method] = []
-    var handler = handlers && handlers[method] || defaultHandler(method, model, paramName)
-    if (!handler) {
-      throw new Error('handler for "' + method + '" cannot be empty')
-    }
+    befores[method] = []
     resource[method] = function *(next) {
+      var access = befores[method]
+      var handler = resource.handlers[method]
       if (access.length) {
         for (var i = 0, l = access.length; i < l; i++) {
           // access function returned error, stop
@@ -149,13 +126,61 @@ function Resource(model, handlers, paramName) {
           }
         }
       }
-      yield sleep(.2) // slow request debug
       yield handler
+      //yield _.sleep(.2) // slow request debug
       if (next) yield next
     }
   })
+}
 
-  return resource
+/**
+ * Add access control handlers
+ *
+ * @param {String|Array} method
+ * @param {Function} middleware
+ */
+Resource.prototype.use = function(method, middleware, isAfter) {
+  if ('function' == typeof method) {
+    isAfter = middleware
+    middleware = method
+    method = 'all'
+  }
+  var list = [method]
+  //var middlewares = isAfter ? afters : befores
+  var middlewares = this.befores
+  if (method === 'all') {
+    list = this.methods
+  } else if (method === 'write') {
+    // only wirte methods
+    list = _.intersection(this.methods, ['create', 'update', 'destroy'])
+  }
+  list.forEach(function(method) {
+    middlewares[method].push(middleware)
+  })
+  return this
+}
+
+/**
+ * Fork a new resource with the same middlewares and handlers
+ */
+Resource.prototype.fork = function(handlers) {
+  return new Resource(this.model, _.assign({}, this.handlers, handlers), this.befores)
+}
+
+/**
+ * Spawn a new resource requires the parent resource
+ */
+Resource.prototype.spawn = function(subResouce) {
+  var model = this.model
+  var befores = subResouce.befores
+
+  function *getItem() {
+    this[model.modelName] = yield model.getOne(this.params)
+  }
+  for (var k in this.befores) {
+    befores[k] = this.befores[k].concat(getItem)
+  }
+  return subResouce
 }
 
 

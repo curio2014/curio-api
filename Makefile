@@ -1,5 +1,5 @@
 start:
-	@export DEBUG="curio:* koa:redis" && supervisor -w 'lib,serve,models,app.js,server.js,conf' \
+	@export DEBUG="curio:* cached:*" && supervisor -w 'lib,serve,models,app.js,server.js,conf,node_modules/cached' \
 		-p 1000 -n error -- --debug --harmony-generators server.js 
 
 debug:

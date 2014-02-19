@@ -11,6 +11,7 @@ var debug = require('debug')('curio:app')
 var conf = require_('conf')
 var utils = require_('lib/utils')
 var redisc =  require_('lib/redis')
+var RedisStore = require('koa-redis')
 
 app.debug = debug
 app.name = 'curio-api'
@@ -34,7 +35,12 @@ app.use(cors({
   origin: conf.corsOrigin
 }))
 
-app.use(session({ store: redisc() }))
+app.use(session({
+  store: new RedisStore({
+    prefix: conf.sessionStore.prefix,
+    client: redisc
+  })
+}))
 
 // load controllers
 require('./serve')(app)

@@ -9,7 +9,8 @@ Media.prototype.webotPath = function() {
 }
 
 /**
- * Load rules and save it to memory cache
+ * Load webot reply rules
  */
-Media.fetcher.responders = function *() {
+Media.fetcher.responder = function() {
+  return Responder.load(this.id)
 }

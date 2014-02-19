@@ -29,18 +29,21 @@ function Responder(raw) {
  * Get responder by media id
  */
 Responder.load = function(media_id) {
-  return sub.get_(media_id)
+  return sub.get(media_id)
 }
 
-Responder.dump = function(media_id, value) {
-  if (!Array.isArray(value)) {
+/**
+ * @param rules, an array of webot rules
+ */
+Responder.dump = function(media_id, rules) {
+  if (!Array.isArray(rules)) {
     throw new Error('Responder rules must be an array')
   }
-  return sub.put_(media_id, value)
+  return sub.put(media_id, rules)
 }
 
 Responder.clear = function(media_id) {
-  return sub.del_(media_id)
+  return sub.del(media_id)
 }
 
 

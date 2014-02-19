@@ -1,5 +1,3 @@
-var debug = require('debug')('curio:test:init')
-
 function fillup(mod) {
   return function *(callback) {
     var result = yield require('./' + mod).fillup
@@ -10,18 +8,8 @@ function fillup(mod) {
 exports.fillup = fillup
 
 exports.fillupAll = function *() {
-
-  //debug('Filling up users...')
-  //yield fillup('user')
-
-  //debug('Filling up media...')
-  //yield fillup('media')
-
-  debug('Filling up resonders...')
+  yield fillup('user')
+  yield fillup('media')
   yield fillup('responder')
-
-  //debug('Filling up some messages...')
-  //yield fillup('message')
-
-  debug('All done.')
+  yield fillup('message')
 }

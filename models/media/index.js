@@ -1,3 +1,4 @@
+var cached = require_('lib/cached')
 var db = require_('lib/db')
 var crc32 = require_('lib/utils').crc32
 
@@ -19,6 +20,10 @@ Media.getter.wx_token = function() {
   return this._wx_token || 'keyboardcat123'
 }
 
+cached.register(Media)
+Media.enableCache('get_', '{_model_}:{0}')
+Media.itemCacheKeys.push('{_model_}:{uid}')
+
 module.exports = Media
 
 
@@ -27,5 +32,3 @@ module.exports = Media
 // load mixins
 require('./admin')
 require('./webot')
-require('./api')
-

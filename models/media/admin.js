@@ -16,18 +16,7 @@ MediaAdmin.belongsTo('media', {foreignKey: 'media_id'})
 MediaAdmin.get = MediaAdmin.finder('media_id', 'user_id', true)
 MediaAdmin.findByUser = MediaAdmin.finder('user_id')
 MediaAdmin.findByMedia = MediaAdmin.finder('media_id')
-
-var _upsert = MediaAdmin.upsert
-MediaAdmin.upsert = function *(media_id, user_id, props) {
-  props = props || {}
-  var item = yield this.get(media_id, user_id)
-  if (item) {
-    return yield item.updateAttributes(props)
-  }
-  props.media_id = media_id
-  props.user_id = user_id
-  return yield this.create(props)
-}
+MediaAdmin.upsert = MediaAdmin.upsertBy('media_id', 'user_id')
 
 MediaAdmin.ROLES = MEDIA_ADMIN
 
@@ -36,7 +25,7 @@ Media.ADMIN_ROLES = Media.Admin.ROLES
 
 Media.fetcher.admins = function *() {
   var admins = yield MediaAdmin.findByMedia(this.id).attach('user')
-  this.admins = admins.map(function(item, i) {
+  return admins.map(function(item, i) {
     var user = item.user
     return {
       id: user.id,
@@ -46,7 +35,6 @@ Media.fetcher.admins = function *() {
       role: item.role
     }
   })
-  return this
 }
 
 

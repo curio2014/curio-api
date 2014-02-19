@@ -1,4 +1,5 @@
-var debug = require('debug')('curio:test:init')
+var debug = require_('lib/utils').debug('test:init')
+
 
 var _ = require_('lib/utils')
 var User = require_('models/user')
@@ -8,6 +9,7 @@ var MediaAdmin = Media.Admin
 function addMedia(uid, screenname) {
   return Media.upsert(uid, {
     oid: 'gh_' + uid,
+    wx_token: uid + (Math.random() * 1000),
     name: screenname,
   })
 }
@@ -33,6 +35,8 @@ function mediaGenerater(i) {
 }
 
 exports.fillup = function *(next) {
+  debug('Filling up media...')
+
   yield _.range(1, 100).map(mediaGenerater)
 
   // Media1 should have multiple admins
@@ -42,4 +46,6 @@ exports.fillup = function *(next) {
 
   yield addAdmin(media1, user1, Media.ADMIN_ROLES.CHIEF)
   yield addAdmin(media1, user2, Media.ADMIN_ROLES.EDITOR)
+
+  debug('Fill up media done.')
 }

@@ -4,7 +4,7 @@ var path_ = require('path')
 var confirm = require('co-prompt').confirm
 var co = require('co')
 
-require('color')
+require('colors')
 
 // application level absolute require
 global.require_ = function(path) {

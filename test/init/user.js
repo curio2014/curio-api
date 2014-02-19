@@ -1,4 +1,4 @@
-var debug = require('debug')('curio:test:fillup_user')
+var debug = require_('lib/utils').debug('test:init')
 
 var _ = require_('lib/utils')
 var User = require_('models/user')
@@ -14,10 +14,14 @@ function addUser(uid, screenname, password, level) {
 }
 
 exports.fillup = function *() {
+  debug('Filling up users...')
+
   // add super admin
   var admin = yield addUser('super', 'Super Admin', 'test', User.LEVEL.SUPER)
 
   yield _.range(1, 100).map(function(i) {
     return addUser('test' + i, 'Test ' + i, 'test')
   })
+
+  debug('Fill up user done.')
 }

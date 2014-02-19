@@ -5,17 +5,18 @@ module.exports = {
   corsOrigin: 'http://www.curio.com',
   secret: 'say hello',
   salt: 'hello again',
-  redisStore: {
-    prefix: 'curio:sess:'
-  },
   leveldb: {
-    path: './var/leveldb'
+    default: './var/leveldb/curio',
   },
   redis: {
-    database: 'curio'
+    prefix: 'curio:',
+    // database: 3
     // host: ..
     // port: ..
     // password: ..
+  },
+  sessionStore: {
+    prefix: 'curio:sess:'
   },
   postgres: {
     // host: ..
