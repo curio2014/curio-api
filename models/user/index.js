@@ -42,6 +42,7 @@ User.prototype.comparePassword = function(raw) {
  * Get user's role on given media
  */
 User.prototype.mediaRole = function *(media_id) {
+  var user = this
   if (user._roles) {
     return user._roles[media_id]
   }
@@ -49,7 +50,16 @@ User.prototype.mediaRole = function *(media_id) {
   if (!admin) {
     return null
   }
+  user._roles = user._roles || {}
+  user._roles[media_id] = admin.role
   return admin.role
+}
+
+User.prototype.canAdmin = function *(media_id) {
+  if (this.permitted('admin')) {
+    return true
+  }
+  return yield this.mediaRole(media_id)
 }
 
 /**
@@ -57,7 +67,7 @@ User.prototype.mediaRole = function *(media_id) {
  */
 User.prototype.mediaAdmins = function *(with_media) {
   var runner = Media.Admin.findByUser(this.id)
-  if (with_media !== false) {
+  if (with_media === true) {
     runner = runner.attach('media')
   }
   return yield runner
@@ -77,10 +87,10 @@ User.prototype.isSuper = function() {
   return this.permitted('super')
 }
 
-User.validatesUniquenessOf('email', {message: 'conflict'})
-User.validate('email', function(err) {
-  if (!RE_EMAIL.test(this.email)) err()
-}, {message: 'bad'})
+//User.validatesUniquenessOf('email', {message: 'conflict'})
+//User.validate('email', function(err) {
+  //if (!RE_EMAIL.test(this.email)) err()
+//}, {message: 'bad'})
 
 cached.register(User)
 User.enableCache('get_', '{_model_}:{0}')

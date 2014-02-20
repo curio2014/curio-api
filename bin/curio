@@ -6,6 +6,9 @@ var co = require('co')
 
 require('colors')
 
+process.env.DEBUG = 'curio* cached* -*:debug'
+process.env.NODE_ENV = 'test'
+
 // application level absolute require
 global.require_ = function(path) {
   return require(path_.join(__dirname, '../', path))
@@ -44,12 +47,12 @@ program
       ok = yield confirm('This will drop all existing tables, continue? (y/N) '.red)
     }
     if (ok) {
-      require_('database').init(process.exit)
+      yield require_('database').init()
     } else {
       console.log()
       console.log('Init database canceled.')
-      process.exit()
     }
+    process.exit()
   }))
   .help('init database')
 

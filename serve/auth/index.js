@@ -23,7 +23,7 @@ exports.create = function *authPOST() {
 
   this.body = {
     user: this.req.user,
-    admins: yield this.req.user.admins()
+    admins: yield this.req.user.mediaAdmins(true)
   }
 }
 
@@ -47,11 +47,12 @@ var checks = {
   },
   mediaAdmin: function *(next) {
     var user = this.req.user
+    var admins = this.mediaAdmins
     assert(user, 401, ERRORS.NEED_LOGIN)
-    if (!Array.isArray(user.mediaAdmins)) {
-      yield user.load('mediaAdmins')
+    if (!Array.isArray(admins)) {
+      admins = this.mediaAdmins = yield user.mediaAdmins()
     }
-    assert(user.mediaAdmins.length || user.permitted('admin'), 403, ERRORS.NOT_ALLOWED)
+    assert(admins.length || user.permitted('admin'), 403, ERRORS.NOT_ALLOWED)
     if (next) yield next
   }
 }

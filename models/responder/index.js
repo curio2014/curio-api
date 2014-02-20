@@ -3,21 +3,16 @@
  * Use leveldb to save the whole list for each media
  * Should be super fast!
  */
-var log = require('debug')('curio:responder')
+var log = require_('lib/utils/logger').log('responder')
 var sandbox = require_('lib/utils/sandbox')
-var db = require_('lib/leveldb')
+var store = require_('lib/store')('responder')
 
-var sub = db.sublevel('responder', {
-  valueEncoding: {
-    encode: function(val) {
-      return JSON.stringify(val, replacer)
-    },
-    decode: function(val) {
-      return new Responder(val)
-    },
-    type: 'webotRule'
-  }
-})
+store.pickle = function(val) {
+  return JSON.stringify(val, replacer)
+}
+store.unpickle = function(val) {
+  return new Responder(val)
+}
 
 
 function Responder(raw) {
@@ -29,7 +24,7 @@ function Responder(raw) {
  * Get responder by media id
  */
 Responder.load = function(media_id) {
-  return sub.get(media_id)
+  return store.get(media_id)
 }
 
 /**
@@ -39,11 +34,11 @@ Responder.dump = function(media_id, rules) {
   if (!Array.isArray(rules)) {
     throw new Error('Responder rules must be an array')
   }
-  return sub.put(media_id, rules)
+  return store.set(media_id, rules)
 }
 
 Responder.clear = function(media_id) {
-  return sub.del(media_id)
+  return store.del(media_id)
 }
 
 

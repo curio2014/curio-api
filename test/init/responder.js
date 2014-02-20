@@ -1,4 +1,4 @@
-var debug = require_('lib/utils').debug('test:init')
+var log = require_('lib/utils/logger').log('test:init')
 
 var _ = require_('lib/utils')
 var Responder = require_('models/responder')
@@ -7,7 +7,7 @@ var Media = require_('models/media')
 
 var rules = [{
   pattern: {
-    type: 'event'
+    type: 'event',
     param: {
       event: 'subscribe'
     }
@@ -21,6 +21,14 @@ var rules = [{
       title: 'abc',
       url: '/curio',
     }],
+  },
+}, {
+  pattern: {
+    type: 'location'
+  },
+  handler: {
+    type: 'image',
+    picUrl: 'http://news.baidu.com/z/resource/r/image/2014-02-20/654a9ee49520c0e5b40ffc413e2fbd2d.jpg'
   },
 }, {
   pattern: 'abc',
@@ -37,19 +45,19 @@ var rules = [{
 
 function responderGenerator(media, i) {
   return function*() {
-    debug('Generating responder for %s', media.uid)
     yield Responder.dump(media.id, _.shuffle(rules))
+    log('Generated responder for %s.', media.uid)
   }
 }
 
 
 exports.fillup = function *(next) {
-  debug('Filling up responder..')
+  log('Filling up responder..')
 
   var medias = yield Media.all()
 
   yield medias.map(responderGenerator)
 
-  debug('Fill up responder done.')
+  log('Fill up responder done.')
 }
 

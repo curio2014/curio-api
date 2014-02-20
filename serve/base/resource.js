@@ -45,7 +45,7 @@ function defaultHandler(method, model) {
     }
   } else if (method == 'read') {
     return function *read() {
-      var item = yield model.getOne(this.params)
+      var item = this.item || (yield model.getOne(this.params))
       if (!item) this.throw(404)
       var ret = {}
       this.body = {
@@ -54,7 +54,7 @@ function defaultHandler(method, model) {
     }
   } else if (method == 'destroy') {
     return function *destroy() {
-      var item = yield model.getOne(this.params)
+      var item = this.item || (yield model.getOne(this.params))
       if (item) {
         yield item.destroy()
       }
@@ -65,7 +65,7 @@ function defaultHandler(method, model) {
     }
   } else if (method == 'update') {
     return function *update() {
-      var item = yield model.getOne(this.params)
+      var item = this.item || (yield model.getOne(this.params))
       if (!item) {
         assert(item, 404)
       }
@@ -127,7 +127,7 @@ Resource.prototype.init = function(handlers) {
         }
       }
       yield handler
-      //yield _.sleep(.2) // slow request debug
+      yield _.sleep(.5) // slow request debug
       if (next) yield next
     }
   })

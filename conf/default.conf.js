@@ -6,7 +6,7 @@ module.exports = {
   secret: 'say hello',
   salt: 'hello again',
   leveldb: {
-    default: './var/leveldb/curio',
+    default: './var/leveldb',
   },
   redis: {
     prefix: 'curio:',

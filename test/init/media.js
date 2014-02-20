@@ -1,4 +1,4 @@
-var debug = require_('lib/utils').debug('test:init')
+var log = require_('lib/utils/logger').log('test:init')
 
 
 var _ = require_('lib/utils')
@@ -9,8 +9,8 @@ var MediaAdmin = Media.Admin
 function addMedia(uid, screenname) {
   return Media.upsert(uid, {
     oid: 'gh_' + uid,
-    wx_token: uid + (Math.random() * 1000),
     name: screenname,
+    wx_token: 'token'
   })
 }
 
@@ -20,32 +20,38 @@ function addAdmin(media, user, role) {
 
 function mediaGenerater(i) {
   var uid = 'media' + i
-  return function *() {
-    debug('adding media: %s ...', uid)
-
+  return function *generateMedia() {
+    var user = yield User.get('test' + (i % 20))
     var media = yield addMedia(uid, 'Media No.' + i)
-    var user = yield User.get('test' + i)
-
+    log('added media: %s', uid)
     var role = Media.ADMIN_ROLES._list[i % 3].value
-
-    yield addAdmin(media, user, role)
-
+    if (!user) {
+      return
+    }
+    var admin = yield addAdmin(media, user, role)
+    log('added media admin: %s -> %s, as %s', user.uid, media.uid, admin.role)
     return media
   }
 }
 
 exports.fillup = function *(next) {
-  debug('Filling up media...')
+  log('Filling up media...')
 
-  yield _.range(1, 100).map(mediaGenerater)
+  yield _.sleep(.1) // avoid databae still connecting memory leak
+
+  yield _.range(1, 60).map(mediaGenerater)
 
   // Media1 should have multiple admins
   var media1 = yield Media.get('media1')
   var user1 = yield User.get('test1')
   var user2 = yield User.get('test2')
 
-  yield addAdmin(media1, user1, Media.ADMIN_ROLES.CHIEF)
-  yield addAdmin(media1, user2, Media.ADMIN_ROLES.EDITOR)
+  if (user1) {
+    yield addAdmin(media1, user1, Media.ADMIN_ROLES.CHIEF)
+  }
+  if (user2) {
+    yield addAdmin(media1, user2, Media.ADMIN_ROLES.EDITOR)
+  }
 
-  debug('Fill up media done.')
+  log('Fill up media done.')
 }

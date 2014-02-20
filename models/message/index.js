@@ -1,6 +1,7 @@
 var co = require('co')
 var Batcher = require('batcher')
-var debug = require_('lib/utils').debug('message')
+var debug = require_('lib/utils/logger').debug('message')
+var error = require_('lib/utils/logger').error('message')
 var db = require_('lib/db')
 var consts = require_('models/consts')
 var Subscriber = require_('models/subscriber')
@@ -11,7 +12,7 @@ var TYPES = consts.MESSAGE_TYPES
  * Messages (and interacts) between end user and media account
  */
 var Message = db.define('message', {
-  create_at: Date,
+  created_at: Date,
   content: db.JSON, // the raw json of wechat message
 })
 TYPES.bind(Message, 'type')
@@ -20,6 +21,13 @@ CONTENT_TYPES.bind(Message, 'contentType')
 // from whom to whom
 Message.belongsTo('media', {foreignKey: 'media_id'})
 Message.belongsTo('subscriber', {foreignKey: 'subscriber_id'})
+
+Message.scolumns = {
+  'created_at': 'desc',
+  'media_id': null,
+  'subscriber_id': null,
+  'type': null
+}
 
 
 function batchSave(items) {
@@ -30,12 +38,14 @@ function batchSave(items) {
     // findout the subscriber_id
     for (var i = 0, l = items.length; i < l; i++) {
       item = items[i]
+      key = item.content.uid + ':' + item.media_id
       user = users[key]
       if (!user) {
-        user = new Subscriber({
+        users[key] = user = new Subscriber({
           oid: item.content.uid,
           media_id: item.media_id
         })
+        debug('getting user id: %s', user.oid)
         yield user.getId()
       }
       item.subscriber_id = user.id
@@ -44,17 +54,20 @@ function batchSave(items) {
       // batch create message items
       yield Message.create(items)
     } catch (e) {
-      return setTimeout(co(send), 1000)
+      // ignore ?
+      error('Save messages failed. %j', items)
+      //setTimeout(co(send), 1000)
     }
     b.resume()
+    debug('batch write %s messages done.', items.length)
   }
   b.pause()
   co(send)()
 }
 
 var buffer = new Batcher({
-  batchSize: 100,
-  batchTimeMs: 2000, // try batch write every 10 seconds
+  batchSize: 50,
+  batchTimeMs: 3000, // try batch write every 3 seconds
   encoder: batchSave
 })
 
@@ -84,7 +97,7 @@ Message.incoming = function(media_id, content) {
   }
   buffer.write({
     type: TYPES.INCOMING,
-    create_at: content.createTime,
+    created_at: content.createTime,
     media_id: media_id,
     contentType: contentType,
     content: {
@@ -105,7 +118,7 @@ Message.outgoing = function(media_id, content, type) {
   type = type || TYPES.REPLY
   buffer.write({
     type: type,
-    create_at: content.createTime,
+    created_at: content.createTime,
     media_id: media_id,
     contentType: contentType,
     content: {
@@ -113,13 +126,6 @@ Message.outgoing = function(media_id, content, type) {
       content: content.content,
     }
   })
-}
-
-
-Message.scolumns = {
-  'media_id': null,
-  'sent_at': 'desc',
-  'type': null
 }
 
 

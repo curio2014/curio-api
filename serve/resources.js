@@ -4,20 +4,20 @@ var _ = require_('lib/utils')
 var assert = require_('serve/utils').assert
 var ERRORS = require_('serve/consts').ERRORS
 
-var rest = require('./base/rest')(app)
-var auth = require('./auth')
-var Resource = require('./base/resource')
-var Collection = require('./base/collection')
+// Exports common utilities as globals
+global.rest = require('./base/rest')(app)
+global.auth = require('./auth')
+global.Resource = require('./base/resource')
+global.Collection = require('./base/collection')
+
+
 var User = require_('models/user')
 var Message = require_('models/message')
+var Subscriber = require_('models/subscriber')
 
 rest('/auth', auth)
 
-var medias = require('./medias')
-// Only super user can create/delete media
-rest('/medias', medias.collection)
-rest('/medias/:id(\\w+)', medias.item)
-rest('/medias/:id/messages', medias.messages)
+require('./medias')
 
 // Only super user can create/delete user
 rest('/users', Collection(User))
@@ -32,12 +32,19 @@ rest('/users/:id', Resource(User))
   assert(user.isSuper() || user.id == user_id, 403, ERRORS.NOT_ALLOWED)
 })
 
-var MessageCollection = Collection(Message)
-rest('/messages', MessageCollection)
-rest('/messages/:id', Resource(Message))
+//rest('/messages', Collection(Message))
+//rest('/messages/:id', Resource(Message))
+//rest('/subscribers', Collection(Subscriber))
+//rest('/subscribers/:id', Resource(Subscriber))
 
 rest('/webot/:media_id', require('./webot'))
 
+delete global.assert
+delete global.ERRORS
+delete global.rest
+delete global.auth
+delete global.Resource
+delete global.Collection
 
 // the jugglingdb's database migration method
 User.schema.autoupdate()

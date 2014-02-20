@@ -1,4 +1,4 @@
-var debug = require('debug')('curio:webot')
+var debug = require_('lib/utils/logger').debug('webot')
 var Responder = require('./responder')
 var Media = require('./media')
 var Webot = require('weixin-robot').Webot
@@ -33,6 +33,7 @@ function *loadResponders(media, robot) {
   // custom respond rules
   yield media.load('responder')
   var responder = media.responder
+  robot.set(media, robot, responder)
   if (responder) {
     responder.webotfy().forEach(function(item) {
       robot.set(item)
@@ -52,7 +53,7 @@ Webot.get = function *(media) {
   if (robot) {
     return robot
   }
-  debug('Cache miss: %s', media_id)
+  debug('webot cache miss: %s', media_id)
   robot = new Webot()
 
   yield loadResponders(media, robot)
