@@ -8,11 +8,15 @@ var exec = require('child_process').exec
 var Media = require_('models/media')
 
 var msg_args = [
-  '--user moanfasfas text "hello! 你好！这是一条测试信息"',
-  '--user MOfafag text "function test"',
+  'text "hello! 你好！这是一条测试信息"',
+  'text "function test"',
   'text Hello',
+  'text news1',
+  'text news2',
+  'text news3',
   'text "abc is a good name"',
   'image http://www.baidu.com/img/bdlogo.gif',
+  '--user blahblah image http://www.baidu.com/img/bdlogo.gif',
   '--user user3 image http://www.baidu.com/img/bdlogo.gif',
   'loc 39.941004 116.41680 "This is a label"',
   'event click Hello',

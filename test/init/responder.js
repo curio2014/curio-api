@@ -14,12 +14,38 @@ var rules = [{
   },
   handler: 'thank your for your subscribe'
 }, {
-  pattern: 'hello',
+  pattern: 'news2',
   handler: {
     type: 'news',
     content: [{
-      title: 'abc',
-      url: '/curio',
+      title: 'Multiple news in one',
+      picUrl: 'http://news.baidu.com/z/resource/r/image/2014-02-20/654a9ee49520c0e5b40ffc413e2fbd2d.jpg',
+      url: '/',
+    }, {
+      title: 'this is another title',
+      picUrl: 'http://news.baidu.com/z/resource/r/image/2014-02-20/654a9ee49520c0e5b40ffc413e2fbd2d.jpg',
+      url: '/',
+    }],
+  },
+}, {
+  pattern: 'news1',
+  handler: {
+    type: 'news',
+    content: [{
+      title: 'Cool, you got it!',
+      picUrl: 'http://news.baidu.com/z/resource/r/image/2014-02-20/654a9ee49520c0e5b40ffc413e2fbd2d.jpg',
+      url: '/',
+    }],
+  },
+}, {
+  pattern: 'news3',
+  handler: {
+    type: 'news',
+    content: [{
+      title: '这是一条图文消息',
+      picUrl: 'http://news.baidu.com/z/resource/r/image/2014-02-20/654a9ee49520c0e5b40ffc413e2fbd2d.jpg',
+      url: '/',
+      description: 'Hello, this is me!'
     }],
   },
 }, {
@@ -31,15 +57,15 @@ var rules = [{
     picUrl: 'http://news.baidu.com/z/resource/r/image/2014-02-20/654a9ee49520c0e5b40ffc413e2fbd2d.jpg'
   },
 }, {
-  pattern: 'abc',
-  handler: 'def',
+  pattern: 'hello',
+  handler: 'Got ya!',
 }, {
   pattern: { type: 'image' },
   handler: 'got your image'
 }, {
   pattern: 'function test',
   handler: function (info) {
-    return JSON.stringify(info.raw)
+    return 'Current time:' + (new Date().toLocaleString())
   },
 }]
 

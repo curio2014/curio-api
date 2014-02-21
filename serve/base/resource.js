@@ -39,18 +39,14 @@ function defaultHandler(method, model) {
       var err = item.validate()
       assert(!err, 401, err)
       var ret = {}
-      this.body = {
-        item: item
-      }
+      this.body = item
     }
   } else if (method == 'read') {
     return function *read() {
       var item = this.item || (yield model.getOne(this.params))
       if (!item) this.throw(404)
       var ret = {}
-      this.body = {
-        item: item
-      }
+      this.body = item
     }
   } else if (method == 'destroy') {
     return function *destroy() {
@@ -75,9 +71,7 @@ function defaultHandler(method, model) {
         assert(!item.errors, 400, 'bad fields', item.errors)
         throw e
       }
-      this.body = {
-        item: item
-      }
+      this.body = item
     }
   }
 }
@@ -127,7 +121,7 @@ Resource.prototype.init = function(handlers) {
         }
       }
       yield handler
-      yield _.sleep(.5) // slow request debug
+      //yield _.sleep(.5) // slow request debug
       if (next) yield next
     }
   })

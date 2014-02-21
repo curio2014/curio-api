@@ -3,8 +3,6 @@ var db = require_('lib/db')
 var leveldb = require_('lib/leveldb')
 var sub = leveldb.sublevel('subscriber_oid2id')
 
-var DEFAULT_AVATAR_URL = '/images/user_default.jpg'
-
 /**
  * Subscriber of a cirtain wechat media account
  */
@@ -37,7 +35,7 @@ Subscriber.registerProps({
   country: null,
   province: null,
   language: null,
-  headimgurl: DEFAULT_AVATAR_URL,
+  headimgurl: null,
   subscribe_time: null,
 })
 
