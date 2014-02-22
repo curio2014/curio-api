@@ -7,7 +7,6 @@ var co = require('co')
 require('colors')
 
 process.env.DEBUG = 'curio* cached* -*:debug'
-process.env.NODE_ENV = 'test'
 
 // application level absolute require
 global.require_ = function(path) {

@@ -18,6 +18,7 @@ createdb:
 
 init_db:
 	rm -rf ./var/leveldb
+	export NODE_ENV=test
 	./bin/curio init_db
 
 fillup:
