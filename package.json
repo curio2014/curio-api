@@ -31,18 +31,18 @@
     "methods": "latest",
     "lodash": "latest",
     "co": "latest",
-    "co-body": "visionmedia/co-body",
     "lru-cache": "latest",
+    "co-body": "visionmedia/co-body",
     "weixin-robot": "node-webot/weixin-robot",
     "debug": "~0.7.x",
     "bcryptjs": "~0.7.10",
     "buffer-crc32": "~0.2.1",
-    "batcher": "0.0.2"
-  },
-  "devDependencies": {
-    "colors": "*",
-    "mocha": "*",
+    "batcher": "0.0.2",
+    "colors": "latest",
     "co-prompt": "latest",
     "nomnom": "latest"
+  },
+  "devDependencies": {
+    "mocha": "*"
   }
 }
