@@ -9,7 +9,6 @@
     "test": "./node_modules/.bin/mocha"
   },
   "dependencies": {
-    "gnode": ">= 0.0.6",
     "koa": "~0.4.0",
     "koa-trie-router": "koajs/trie-router",
     "koa-logger": "koajs/logger",
