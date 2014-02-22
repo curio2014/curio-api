@@ -1049,48 +1049,6 @@
             }
           }
         },
-        "jscover": {
-          "version": "0.2.4",
-          "from": "jscover@*",
-          "dependencies": {
-            "fs-extra": {
-              "version": "0.3.1",
-              "from": "fs-extra@0.3.1",
-              "dependencies": {
-                "rimraf": {
-                  "version": "2.0.3",
-                  "from": "rimraf@~2.0.2",
-                  "dependencies": {
-                    "graceful-fs": {
-                      "version": "1.1.14",
-                      "from": "graceful-fs@~1.1"
-                    }
-                  }
-                },
-                "ncp": {
-                  "version": "0.2.7",
-                  "from": "ncp@0.2.x"
-                },
-                "mkdirp": {
-                  "version": "0.3.5",
-                  "from": "mkdirp@0.3.x"
-                },
-                "jsonfile": {
-                  "version": "0.0.1",
-                  "from": "jsonfile@0.0.x"
-                }
-              }
-            },
-            "debug": {
-              "version": "0.7.0",
-              "from": "debug@0.7.0"
-            },
-            "ndir": {
-              "version": "0.1.5",
-              "from": "ndir@0.1.5"
-            }
-          }
-        },
         "mocha": {
           "version": "1.16.2",
           "from": "mocha@~1.16.2",
@@ -1153,6 +1111,48 @@
                   "from": "inherits@2"
                 }
               }
+            }
+          }
+        },
+        "jscover": {
+          "version": "0.2.4",
+          "from": "jscover@*",
+          "dependencies": {
+            "fs-extra": {
+              "version": "0.3.1",
+              "from": "fs-extra@0.3.1",
+              "dependencies": {
+                "rimraf": {
+                  "version": "2.0.3",
+                  "from": "rimraf@~2.0.2",
+                  "dependencies": {
+                    "graceful-fs": {
+                      "version": "1.1.14",
+                      "from": "graceful-fs@~1.1"
+                    }
+                  }
+                },
+                "ncp": {
+                  "version": "0.2.7",
+                  "from": "ncp@0.2.x"
+                },
+                "mkdirp": {
+                  "version": "0.3.5",
+                  "from": "mkdirp@0.3.x"
+                },
+                "jsonfile": {
+                  "version": "0.0.1",
+                  "from": "jsonfile@0.0.x"
+                }
+              }
+            },
+            "debug": {
+              "version": "0.7.0",
+              "from": "debug@0.7.0"
+            },
+            "ndir": {
+              "version": "0.1.5",
+              "from": "ndir@0.1.5"
             }
           }
         },
