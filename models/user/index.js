@@ -1,3 +1,4 @@
+var log = require_('lib/utils/logger').log('user')
 var cached = require_('lib/cached')
 var db = require_('lib/db')
 var _ = require_('lib/utils')
@@ -22,19 +23,35 @@ module.exports = User
 var Passport = require('./passport')
 var Media = require_('models/media')
 
-User.prototype.setPassword = function(password) {
-  return Passport.upsert(this.id, { password: Passport.hash(password) })
+
+User.getByPassword = function *(uid, password) {
+  var user = yield User.get(uid)
+  if (!user) {
+    log('user "%s" doesnt exit', uid)
+    return false
+  }
+  var ok = yield user.comparePassword(password)
+  if (!ok) {
+    log('user "%s" password missmatch.', uid)
+    return false
+  }
+  return user
+}
+
+
+
+User.prototype.setPassword = function *(password) {
+  var passwd = yield Passport.hash(password)
+  return yield Passport.upsert(this.id, { password: passwd })
 }
 
 /**
  * Compare password as a yieldable function
  */
-User.prototype.comparePassword = function(raw) {
+User.prototype.comparePassword = function *(raw) {
   var self = this
-  return function *() {
-    var pass = yield Passport.get(self.id)
-    return pass.compare(raw)
-  }
+  var pass = yield Passport.get(self.id)
+  return yield pass.compare(raw)
 }
 
 

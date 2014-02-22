@@ -1,9 +1,10 @@
 var util = require('util')
 var co = require('co')
 var log = require('debug')('curio:auth:log')
-var passport = require('koa-passport')
-
 var User = require_('models/user')
+var passport = require('passport')
+
+passport.framework(require('koa-passport-fw'))
 
 
 function LocalStrategy(verify) {
@@ -30,29 +31,13 @@ LocalStrategy.prototype.authenticate = function(req, options) {
   })
 }
 
-
 // add Passport Strategies
-passport.use(new LocalStrategy(co(function *(uid, password) {
-  var user = yield User.get(uid)
-  if (!user) {
-    log('user "%s" doesnt exit', uid)
-    return false
-  }
-  var ok = yield user.comparePassword(password)
-  if (!ok) {
-    log('user "%s" password missmatch.', uid)
-    return false
-  }
-  return user
-})))
+passport.use(new LocalStrategy(co(User.getByPassword)))
 
 passport.serializeUser(function(user, done) {
   done(null, user.id)
 })
-
 passport.deserializeUser(User.find_.bind(User))
-
-passport.localAuth = passport.authenticate('local', {})
 
 module.exports = passport
 

@@ -5,18 +5,17 @@ var assert = require_('serve/utils').assert
 var ERRORS = require_('serve/consts').ERRORS
 
 // Exports common utilities as globals
-global.rest = require('./base/rest')(app)
-global.auth = require('./auth')
 global.Resource = require('./base/resource')
 global.Collection = require('./base/collection')
+global.rest = require('./base/rest')(app)
+global.auth = require('./auth')
 
 
 var User = require_('models/user')
 var Message = require_('models/message')
 var Subscriber = require_('models/subscriber')
 
-rest('/auth', auth)
-
+require('./auth/handlers')
 require('./medias')
 
 // Only super user can create/delete user
@@ -39,8 +38,6 @@ rest('/users/:id', Resource(User))
 
 rest('/webot/:media_id', require('./webot'))
 
-delete global.assert
-delete global.ERRORS
 delete global.rest
 delete global.auth
 delete global.Resource

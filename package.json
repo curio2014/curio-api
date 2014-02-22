@@ -22,7 +22,7 @@
     "cacheable": "ktmud/cacheable",
     "redis": "latest",
     "thunkify": "latest",
-    "koa-passport": "rkusa/koa-passport",
+    "passport": "jaredhanson/passport",
     "jugglingdb": "1602/jugglingdb",
     "jugglingdb-postgres": "jugglingdb/postgres-adapter",
     "pg": "latest",
