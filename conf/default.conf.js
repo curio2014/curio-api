@@ -22,7 +22,7 @@ module.exports = {
     // host: ..
     // port: ..
     database: 'curio',
-    user: 'curio',
+    username: 'curio',
     password: 'curio',
     charset: 'utf8'
     // ssl: ..
