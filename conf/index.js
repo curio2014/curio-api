@@ -10,6 +10,9 @@ module.exports = readConfig()
 */
 function readConfig() {
   var NODE_ENV = global.process.env.NODE_ENV || 'development'
+  console.log()
+  console.log('loading config: conf/%s.conf.js', NODE_ENV)
+  console.log()
   var defaultConf = require('./default.conf.js')
   var conf = require('./' + NODE_ENV + '.conf.js')
 
