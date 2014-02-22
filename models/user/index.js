@@ -51,6 +51,9 @@ User.prototype.setPassword = function *(password) {
 User.prototype.comparePassword = function *(raw) {
   var self = this
   var pass = yield Passport.get(self.id)
+  if (!pass) {
+    return false
+  }
   return yield pass.compare(raw)
 }
 

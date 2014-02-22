@@ -23,3 +23,6 @@ init_db:
 
 fillup:
 	./bin/curio fillup
+
+shrink:
+	npm shrinkwrap

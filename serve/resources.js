@@ -43,7 +43,12 @@ delete global.auth
 delete global.Resource
 delete global.Collection
 
-// the jugglingdb's database migration method
-User.schema.autoupdate()
+var schema = User.schema
+schema.isActual(function(err, actual) {
+  // the jugglingdb's database migration method
+  if (!actual) {
+    schema.autoupdate()
+  }
+})
 
 }
