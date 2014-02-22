@@ -9,6 +9,6 @@ function boot(port) {
 
 module.exports = boot
 
-if (!module.parent) {
+if (!module.parent || ~module.parent.filename.indexOf('/pm2/')) {
   boot()
 }
