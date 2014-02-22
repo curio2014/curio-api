@@ -1,5 +1,6 @@
 npm-debug.log
 node_modules/
 dump.rdb
+conf/*
 var/
 *.bak

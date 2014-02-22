@@ -2,6 +2,9 @@ start:
 	@export DEBUG="curio:* cached:*" && supervisor -w 'lib,serve,models,app.js,server.js,conf' \
 		-p 1000 -n error -- --debug --harmony-generators server.js 
 
+build:
+	echo "Pass.."
+
 debug:
 	@export DEBUG="curio:*" && gnode --debug server.js
 
