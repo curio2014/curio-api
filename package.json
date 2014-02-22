@@ -9,7 +9,7 @@
     "test": "./node_modules/.bin/mocha"
   },
   "dependencies": {
-    "koa": "~0.4.0",
+    "koa": "koajs/koa",
     "koa-trie-router": "koajs/trie-router",
     "koa-logger": "koajs/logger",
     "koa-etag": "koajs/etag",
@@ -19,14 +19,12 @@
     "koa-redis": "ktmud/koa-redis",
     "koa-mount": "koajs/mount",
     "koa-wechat": "ktmud/koa-wechat",
+    "cacheable": "ktmud/cacheable",
     "redis": "latest",
-    "cacheable": "latest",
     "thunkify": "latest",
-    "bcryptjs": "~0.7.10",
-    "debug": "~0.7.4",
     "koa-passport": "rkusa/koa-passport",
     "jugglingdb": "1602/jugglingdb",
-    "jugglingdb-postgres": "latest",
+    "jugglingdb-postgres": "jugglingdb/postgres-adapter",
     "pg": "latest",
     "level": "latest",
     "level-sublevel": "latest",
@@ -35,8 +33,10 @@
     "co": "latest",
     "co-body": "visionmedia/co-body",
     "lru-cache": "latest",
+    "weixin-robot": "node-webot/weixin-robot",
+    "debug": "~0.7.x",
+    "bcryptjs": "~0.7.10",
     "buffer-crc32": "~0.2.1",
-    "weixin-robot": "latest",
     "batcher": "0.0.2"
   },
   "devDependencies": {
