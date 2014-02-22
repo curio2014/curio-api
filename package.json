@@ -23,6 +23,7 @@
     "redis": "latest",
     "thunkify": "latest",
     "passport": "jaredhanson/passport",
+    "koa-passport-fw": "ktmud/koa-passport-fw",
     "jugglingdb": "1602/jugglingdb",
     "jugglingdb-postgres": "jugglingdb/postgres-adapter",
     "pg": "latest",
