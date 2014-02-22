@@ -3,7 +3,8 @@ start:
 		-p 1000 -n error -- --debug --harmony-generators server.js 
 
 build:
-	echo "Pass.."
+	@export NODE_ENV=production && \
+		npm install --production
 
 debug:
 	@export DEBUG="curio:*" && gnode --debug server.js
