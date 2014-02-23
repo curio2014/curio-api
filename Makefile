@@ -13,8 +13,8 @@ inspector:
 	@node-inspector --web-port=3001
 
 createdb:
-	@createuser -P -e curio
-	@createdb -e -O curio curio 'The wechat app Curio'
+	createuser -P -e curio
+	createdb -e -O curio curio 'The wechat app Curio'
 
 init_db:
 	rm -rf ./var/leveldb

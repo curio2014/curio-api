@@ -4,18 +4,23 @@ var db = require_('lib/db')
 var _ = require_('lib/utils')
 var consts = require_('models/consts')
 var USER_LEVEL = consts.USER_LEVEL
-var RE_EMAIL = /^[\w\.\-]+\@([\w\-]+\.){1,}[\w]+$/i;
 
 var User = db.define('user', {
   created_at: Date,
   updated_at: Date,
-  email: { type: String, unique: true },
+  email: { type: String, },
   uid: { type: String, null: false, unique: true },
   name: { type: String, default: '' },
   desc: String,
 })
 USER_LEVEL.bind(User, 'level')
 User.LEVEL = USER_LEVEL
+
+User.validatesUniquenessOf('uid', {message: 'conflict'})
+//User.validatesUniquenessOf('email', {message: 'conflict'})
+//User.validate('email', function(err) {
+  //if (!RE_EMAIL.test(this.email)) err()
+//}, {message: 'bad'})
 
 
 module.exports = User
@@ -106,11 +111,6 @@ User.prototype.permitted = function(action) {
 User.prototype.isSuper = function() {
   return this.permitted('super')
 }
-
-//User.validatesUniquenessOf('email', {message: 'conflict'})
-//User.validate('email', function(err) {
-  //if (!RE_EMAIL.test(this.email)) err()
-//}, {message: 'bad'})
 
 cached.register(User)
 User.enableCache('get_', '{_model_}:{0}')

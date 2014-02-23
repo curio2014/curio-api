@@ -1,4 +1,5 @@
 var cached = require_('lib/cached')
+var validators = require_('lib/utils/validators')
 var db = require_('lib/db')
 var crc32 = require_('lib/utils').crc32
 
@@ -14,6 +15,16 @@ var Media = db.define('media', {
   wx_secret: String,
 }, {
 })
+
+Media.validatesPresenceOf('name')
+Media.validatesUniquenessOf('oid', {message: 'conflict'})
+Media.validatesUniquenessOf('uid', {message: 'conflict'})
+Media.validate('uid', function(err) {
+  if (validators.hasUppercase(this.uid)) err()
+}, {message: 'must lowercase'})
+Media.validate('uid', function(err) {
+  if (!validators.isWord(this.uid)) err()
+}, {message: 'not word'})
 
 // wx_token will always has a value
 Media.getter.wx_token = function() {

@@ -35,10 +35,10 @@ function defaultHandler(method, model) {
     }
   } else if (method == 'create') {
     return function *create() {
-      var item = model.forge(_.assign(this.body, this.params))
-      var err = item.validate()
-      assert(!err, 401, err)
-      var ret = {}
+      var item = new model(_.assign(this.req.body, this.params))
+      var valid = yield item.validate()
+      assert(valid, 400, 'bad fields', item.errors)
+      yield item.save()
       this.body = item
     }
   } else if (method == 'read') {
