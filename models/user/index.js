@@ -8,14 +8,15 @@ var USER_LEVEL = consts.USER_LEVEL
 var User = db.define('user', {
   created_at: Date,
   updated_at: Date,
-  email: { type: String, },
+  email: String,
   uid: { type: String, null: false, unique: true },
-  name: { type: String, default: '' },
+  name: String,
   desc: String,
 })
 USER_LEVEL.bind(User, 'level')
 User.LEVEL = USER_LEVEL
 
+User.validatesPresenceOf('name')
 User.validatesUniquenessOf('uid', {message: 'conflict'})
 //User.validatesUniquenessOf('email', {message: 'conflict'})
 //User.validate('email', function(err) {

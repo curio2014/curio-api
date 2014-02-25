@@ -37,6 +37,38 @@ Media.fetcher.admins = function *() {
   })
 }
 
+/**
+ * Put to remote
+ */
+Media.putter.admins = function *(items) {
+  if (!Array.isArray(items)) {
+    return
+  }
+  var media_id = this.id
+  var result = []
+  items.map(function(item) {
+    var role = MEDIA_ADMIN.get(item.role)
+    if (role) {
+      result.push({
+        media_id: media_id,
+        user_id: item.id,
+        role: role,
+      })
+      // item is a user object with an extra `role` attribute
+    }
+  })
+  if (result.length) {
+    var admins = yield MediaAdmin.findByMedia(this.id)
+    // delete all admins first
+    yield admins.map(function(item) {
+      return item.destroy()
+    })
+    console.log(result)
+    yield MediaAdmin.create(result)
+  }
+  yield this.load('admins')
+}
+
 
 module.exports = MediaAdmin
 
