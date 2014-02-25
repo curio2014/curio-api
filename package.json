@@ -19,7 +19,7 @@
     "koa-redis": "ktmud/koa-redis",
     "koa-mount": "koajs/mount",
     "koa-wechat": "ktmud/koa-wechat",
-    "cacheable": "ktmud/cacheable",
+    "cacheable": "~0.2.1",
     "redis": "latest",
     "thunkify": "latest",
     "passport": "jaredhanson/passport",
