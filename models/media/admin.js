@@ -63,7 +63,6 @@ Media.putter.admins = function *(items) {
     yield admins.map(function(item) {
       return item.destroy()
     })
-    console.log(result)
     yield MediaAdmin.create(result)
   }
   yield this.load('admins')

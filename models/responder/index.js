@@ -5,15 +5,18 @@
  */
 var log = require_('lib/utils/logger').log('responder')
 var sandbox = require_('lib/utils/sandbox')
-var store = require_('lib/store')('responder')
 
-store.pickle = function(val) {
+var store = require_('lib/store')('responder', {
+  encode: pickle,
+  decode: unpickle
+})
+
+function pickle(val) {
   return JSON.stringify(val, replacer)
 }
-store.unpickle = function(val) {
+function unpickle(val) {
   return new Responder(val)
 }
-
 
 function Responder(raw) {
   this._raw = raw

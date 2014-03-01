@@ -1,7 +1,6 @@
 //var debug = require_('lib/utils/logger').debug('subscriber')
 var db = require_('lib/db')
-var leveldb = require_('lib/leveldb')
-var sub = leveldb.sublevel('subscriber_oid2id')
+var cached = require_('lib/cached').create('subscriber_oid2id')
 
 /**
  * Subscriber of a cirtain wechat media account
@@ -56,7 +55,7 @@ Subscriber.prototype.getId = function *() {
   if (!id) {
     var key = this.key()
     try {
-      id = yield sub.get(key)
+      id = yield cached.get(key)
       // give the id to current instance,
       this.id = id
     } catch (e) {
@@ -67,7 +66,7 @@ Subscriber.prototype.getId = function *() {
       // save operation will give this an id
       var stored = yield Subscriber.upsert(this.oid, this.media_id)
       this.id = stored.id
-      yield sub.put(key, this.id)
+      yield cached.set(key, this.id)
     }
   }
   return id

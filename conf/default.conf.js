@@ -5,9 +5,7 @@ module.exports = {
   corsOrigin: 'http://www.curio.com',
   secret: 'say hello',
   salt: 'hello again',
-  leveldb: {
-    default: './var/leveldb',
-  },
+  dbstore: './var/dbstore',
   redis: {
     prefix: 'curio:',
     // database: 3

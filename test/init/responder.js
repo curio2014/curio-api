@@ -82,6 +82,7 @@ exports.fillup = function *(next) {
 
   var medias = yield Media.all()
 
+  log('Got %s medias...', medias.length)
   yield medias.map(responderGenerator)
 
   log('Fill up responder done.')
