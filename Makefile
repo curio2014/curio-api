@@ -17,8 +17,7 @@ createdb:
 	createdb -e -O curio curio 'The wechat app Curio'
 
 init_db:
-	rm -rf ./var/leveldb
-	export NODE_ENV=test
+	rm -rf ./var/dbstore/
 	./bin/curio init_db
 
 fillup:

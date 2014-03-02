@@ -54,19 +54,15 @@ Subscriber.prototype.getId = function *() {
   var id = this.id
   if (!id) {
     var key = this.key()
-    try {
-      id = yield cached.get(key)
+    id = yield cached.get(key)
+    if (id) {
       // give the id to current instance,
       this.id = id
-    } catch (e) {
-      if (!e.notFound) {
-        throw e
-      }
-      // when sublevel get failed,
-      // save operation will give this an id
+    } else {
+      // if id is not in cache, try getOrCreate this subscriber
       var stored = yield Subscriber.upsert(this.oid, this.media_id)
-      this.id = stored.id
-      yield cached.set(key, this.id)
+      id = this.id = stored.id
+      yield cached.set(key, id)
     }
   }
   return id

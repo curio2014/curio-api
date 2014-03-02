@@ -119,7 +119,7 @@ Resource.prototype.init = function(handlers) {
         }
       }
       yield handler
-      yield _.sleep(.5) // slow request debug
+      //yield _.sleep(.5) // slow request debug
       if (next) yield next
     }
   })

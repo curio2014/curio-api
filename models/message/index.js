@@ -18,6 +18,8 @@ var Message = db.define('message', {
 TYPES.bind(Message, 'type')
 CONTENT_TYPES.bind(Message, 'contentType')
 
+module.exports = Message
+
 // from whom to whom
 Message.belongsTo('media', {foreignKey: 'media_id'})
 Message.belongsTo('subscriber', {foreignKey: 'subscriber_id'})
@@ -30,6 +32,20 @@ Message.scolumns = {
 }
 
 
+/**
+ * Get subscriber, if not exists, create one
+ */
+Message.fetcher.subscriber = function *() {
+  var item = yield Subscriber.get(this.subscriber_id)
+  if (!item) {
+    item = yield Subscriber.create({
+      oid: this.content.user_oid,
+      media_id: this.content.media_id
+    })
+  }
+  return item
+}
+
 function batchSave(items) {
   var b = this
   debug('Starting batch write %s messages..', items.length)
@@ -38,11 +54,11 @@ function batchSave(items) {
     // findout the subscriber_id
     for (var i = 0, l = items.length; i < l; i++) {
       item = items[i]
-      key = item.content.uid + ':' + item.media_id
+      key = item.content.user_oid + ':' + item.media_id
       user = users[key]
       if (!user) {
         users[key] = user = new Subscriber({
-          oid: item.content.uid,
+          oid: item.content.user_oid,
           media_id: item.media_id
         })
         debug('getting user id: %s', user.oid)
@@ -82,7 +98,7 @@ Message.prototype.isIncoming = function() {
 }
 
 /**
- * Save a new message asynchronously
+ * Incoming message from wechat server
  */
 Message.incoming = function(media_id, content) {
   var contentType = content.type.toUpperCase()
@@ -95,19 +111,23 @@ Message.incoming = function(media_id, content) {
   } else {
     contentType = CONTENT_TYPES.UNKOWN
   }
+  // Save a new message asynchronously
   buffer.write({
     type: TYPES.INCOMING,
     created_at: content.createTime,
     media_id: media_id,
     contentType: contentType,
     content: {
-      raw: content.raw,
-      uid: content.uid,
+      user_oid: content.uid,
       content: Object.keys(content.param).length ? content.param : content.text,
+      raw: content.raw,
     }
   })
 }
 
+/**
+ * The response we are giving to wechat & end user
+ */
 Message.outgoing = function(media_id, content, type) {
   var contentType = content.msgType.toUpperCase()
   if (contentType in CONTENT_TYPES) {
@@ -122,14 +142,12 @@ Message.outgoing = function(media_id, content, type) {
     media_id: media_id,
     contentType: contentType,
     content: {
-      uid: content.uid,
+      user_oid: content.uid,
       content: content.content,
     }
   })
 }
 
-
-module.exports = Message
 
 Message.TYPES = TYPES
 Message.CONTENT_TYPES = CONTENT_TYPES

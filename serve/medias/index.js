@@ -13,6 +13,7 @@ function *checkPermission() {
 }
 function *idOverride() {
   this.params.media_id = this.params.id
+  delete this.params.id
 }
 
 media.use(checkPermission)
