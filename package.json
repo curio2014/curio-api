@@ -20,7 +20,7 @@
     "koa-mount": "koajs/mount",
     "koa-wechat": "ktmud/koa-wechat",
     "cacheable": "~0.2.2",
-    "storeman": "~0.0.1",
+    "storeman": "~0.0.3",
     "redis": "latest",
     "thunkify": "latest",
     "passport": "jaredhanson/passport",

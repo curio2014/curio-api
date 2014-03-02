@@ -1,3 +1,7 @@
+//
+// This file is OBSOLETE.
+//
+
 var db = require('../lib/db')
 var debug = require('debug')('curio:db_schema')
 var knex = db.knex
