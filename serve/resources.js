@@ -12,6 +12,7 @@ global.auth = require('./auth')
 
 
 var User = require_('models/user')
+var Passport = require_('models/user/passport')
 var Message = require_('models/message')
 var Subscriber = require_('models/subscriber')
 
@@ -25,11 +26,11 @@ rest('/users', Collection(User))
 // Only super user or self can view/edit user
 rest('/users/:id', Resource(User))
 .use(auth.need('login'))
-.use(function *() {
-  user = this.req.user
-  user_id = this.params.id
-  assert(user.isSuper() || user.id == user_id, 403, ERRORS.NOT_ALLOWED)
-})
+.use(auth.need('self'))
+
+rest('/passports/:id', Resource(Passport))
+.use(auth.need('login'))
+.use(auth.need('self'))
 
 //rest('/messages', Collection(Message))
 //rest('/messages/:id', Resource(Message))

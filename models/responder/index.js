@@ -5,7 +5,6 @@
  */
 var log = require_('lib/utils/logger').log('responder')
 var sandbox = require_('lib/utils/sandbox')
-
 var store = require_('lib/store')('responder', {
   encode: pickle,
   decode: unpickle

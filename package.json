@@ -29,7 +29,7 @@
     "jugglingdb-postgres": "jugglingdb/postgres-adapter",
     "pg": "latest",
     "levelup": "latest",
-    "lmdb": "latest",
+    "lmdb": "ktmud/lmdb#node-devel",
     "level-sublevel": "latest",
     "methods": "latest",
     "lodash": "latest",

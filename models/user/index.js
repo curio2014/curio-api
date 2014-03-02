@@ -1,4 +1,5 @@
 var log = require_('lib/utils/logger').log('user')
+var validators = require_('lib/utils/validators')
 var cached = require_('lib/cached')
 var db = require_('lib/db')
 var _ = require_('lib/utils')
@@ -18,6 +19,12 @@ User.LEVEL = USER_LEVEL
 
 User.validatesPresenceOf('name')
 User.validatesUniquenessOf('uid', {message: 'conflict'})
+User.validate('uid', function(err) {
+  if (validators.hasUppercase(this.uid)) err()
+}, {message: 'must lowercase'})
+User.validate('uid', function(err) {
+  if (!validators.isWord(this.uid)) err()
+}, {message: 'not word'})
 //User.validatesUniquenessOf('email', {message: 'conflict'})
 //User.validate('email', function(err) {
   //if (!RE_EMAIL.test(this.email)) err()
@@ -30,7 +37,7 @@ var Passport = require('./passport')
 var Media = require_('models/media')
 
 
-User.getByPassword = function *(uid, password) {
+User.getByPassword = function *getByPassword(uid, password) {
   var user = yield User.get(uid)
   if (!user) {
     log('user "%s" doesnt exit', uid)
@@ -44,17 +51,18 @@ User.getByPassword = function *(uid, password) {
   return user
 }
 
-
-
-User.prototype.setPassword = function *(password) {
-  var passwd = yield Passport.hash(password)
-  return yield Passport.upsert(this.id, { password: passwd })
+/**
+ * set password for user directly, will not validate
+ */
+User.prototype.setPassword = function *setPassword(password) {
+  var password = yield Passport.hash(password)
+  return yield Passport.upsert(this.id, { password: password })
 }
 
 /**
  * Compare password as a yieldable function
  */
-User.prototype.comparePassword = function *(raw) {
+User.prototype.comparePassword = function *comparePassword(raw) {
   var self = this
   var pass = yield Passport.get(self.id)
   if (!pass) {
@@ -67,7 +75,7 @@ User.prototype.comparePassword = function *(raw) {
 /**
  * Get user's role on given media
  */
-User.prototype.mediaRole = function *(media_id) {
+User.prototype.mediaRole = function *mediaRole(media_id) {
   var user = this
   if (user._roles) {
     return user._roles[media_id]
@@ -81,7 +89,7 @@ User.prototype.mediaRole = function *(media_id) {
   return admin.role
 }
 
-User.prototype.canAdmin = function *(media_id) {
+User.prototype.canAdmin = function *canAdmin(media_id) {
   if (this.permitted('admin')) {
     return true
   }

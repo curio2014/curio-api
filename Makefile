@@ -1,6 +1,6 @@
 start:
 	@export DEBUG="curio:* cache* store*" && supervisor -w 'lib,serve,models,app.js,server.js,conf' \
-		-p 1000 -n error -- `which gnode` server.js
+	--harmony	-p 1000 -n error -- --debug server.js
 
 build:
 	@export NODE_ENV=production && \

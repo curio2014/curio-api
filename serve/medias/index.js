@@ -29,6 +29,7 @@ var subscriber = Resource(Subscriber)
 .use(checkPermission)
 .use(function *() {
   this.params.media_id = this.params.id
+  // still, get subscriber by id
   this.params.id = this.params.subscriber_id
 })
 

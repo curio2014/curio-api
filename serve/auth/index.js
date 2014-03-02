@@ -20,6 +20,11 @@ var checks = {
     }
     assert(admins.length || user.permitted('admin'), 403, ERRORS.NOT_ALLOWED)
     if (next) yield next
+  },
+  self: function *() {
+    user = this.req.user
+    user_id = this.params.id || this.params.user_id
+    assert(user.isSuper() || user.id == user_id, 403, ERRORS.NOT_ALLOWED)
   }
 }
 

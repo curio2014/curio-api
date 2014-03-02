@@ -8,6 +8,7 @@ var conf = require_('conf')
  */
 exports.assert = function(value, status, message, detail) {
   if (value) return
+  message = message || http.STATUS_CODES[status]
   var msg = 'string' == typeof message ? message : message.message
   var err = new Error(msg)
   err.status = status || 500

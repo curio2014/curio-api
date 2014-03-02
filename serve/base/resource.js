@@ -44,7 +44,7 @@ function defaultHandler(method, model) {
   } else if (method == 'read') {
     return function *read() {
       var item = this.item || (yield model.getOne(this.params))
-      if (!item) this.throw(404)
+      assert(item, 404)
       var ret = {}
       this.body = item
     }
@@ -62,9 +62,7 @@ function defaultHandler(method, model) {
   } else if (method == 'update') {
     return function *update() {
       var item = this.item || (yield model.getOne(this.params))
-      if (!item) {
-        assert(item, 404)
-      }
+      assert(item, 404)
       try {
         yield item.updateAttributes(this.req.body)
       } catch (e) {
@@ -121,7 +119,7 @@ Resource.prototype.init = function(handlers) {
         }
       }
       yield handler
-      //yield _.sleep(1.5) // slow request debug
+      yield _.sleep(.5) // slow request debug
       if (next) yield next
     }
   })
@@ -171,6 +169,7 @@ Resource.prototype.spawn = function(subResouce) {
   function *getItem() {
     this[model.modelName] = yield model.getOne(this.params)
   }
+  // befores is indexed by http method
   for (var k in this.befores) {
     befores[k] = this.befores[k].concat(getItem)
   }

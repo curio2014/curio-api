@@ -30,7 +30,7 @@ app.use(require('koa-etag')())
 
 // cross origin request
 app.use(cors({
-  methods: 'GET,PUT,HEAD,POST,DELETE',
+  methods: 'GET,PUT,HEAD,POST,DELETE,OPTIONS',
   headers: 'accept, x-csrf-token, content-type',
   credentials: true,
   origin: conf.corsOrigin
