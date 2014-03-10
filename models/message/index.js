@@ -1,5 +1,5 @@
 var co = require('co')
-var Batcher = require('batcher')
+var BatchStream = require('batch-stream2')
 var debug = require_('lib/utils/logger').debug('message')
 var error = require_('lib/utils/logger').error('message')
 var db = require_('lib/db')
@@ -46,7 +46,7 @@ Message.fetcher.subscriber = function *() {
   return item
 }
 
-function batchSave(items) {
+function batchSave(items, callback) {
   var b = this
   debug('Starting batch write %s messages..', items.length)
   var send = function *() {
@@ -74,17 +74,16 @@ function batchSave(items) {
       error('Save messages failed. %j', items)
       //setTimeout(co(send), 1000)
     }
-    b.resume()
+    callback()
     debug('batch write %s messages done.', items.length)
   }
-  b.pause()
   co(send)()
 }
 
-var buffer = new Batcher({
-  batchSize: 50,
-  batchTimeMs: 3000, // try batch write every 3 seconds
-  encoder: batchSave
+var buffer = new BatchStream({
+  size: 100,
+  batchTimeMs: 2000, // try batch write every 2 seconds
+  transform: batchSave
 })
 
 // manually start the stream

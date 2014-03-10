@@ -4,7 +4,7 @@ The backend for [curio](http://github.com/CuriousityChina/curio) web app, built 
 
 Requires `node --harmony-generators` enabaled, which means `node >= 0.11.7` or [gnode](https://github.com/TooTallNate/gnode).
 
-Currently, `node v0.11.10` is recommended.
+Currently, `node v0.11.10` is recommended. (Since node v0.11.11 has issue building c++ binding modules).
 
 ## Start
 

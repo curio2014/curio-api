@@ -8,8 +8,8 @@ module.exports = {
   }),
   USER_LEVEL: Named({
     NORMAL: 0,
-    ADMIN: 5,
-    SUPER: 9,
+    ADMIN: 10,
+    SUPER: 16,
   }),
   MEDIA_ADMIN: Named({
     CHIEF: 0,
