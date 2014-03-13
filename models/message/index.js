@@ -50,22 +50,6 @@ function batchSave(items, callback) {
   var b = this
   debug('Starting batch write %s messages..', items.length)
   var send = function *() {
-    var users = {}, item, user_id, key
-    // findout the subscriber_id
-    for (var i = 0, l = items.length; i < l; i++) {
-      item = items[i]
-      key = item.content.user_oid + ':' + item.media_id
-      user = users[key]
-      if (!user) {
-        users[key] = user = new Subscriber({
-          oid: item.content.user_oid,
-          media_id: item.media_id
-        })
-        debug('getting user id: %s', user.oid)
-        yield user.getId()
-      }
-      item.subscriber_id = user.id
-    }
     try {
       // batch create message items
       yield Message.create(items)
@@ -99,7 +83,7 @@ Message.prototype.isIncoming = function() {
 /**
  * Incoming message from wechat server
  */
-Message.incoming = function(media_id, content) {
+Message.incoming = function(media_id, subscriber_id, content) {
   var contentType = content.type.toUpperCase()
   if (contentType == 'EVENT') {
     var param = content.param || {}
@@ -115,11 +99,10 @@ Message.incoming = function(media_id, content) {
     type: TYPES.INCOMING,
     created_at: content.createTime,
     media_id: media_id,
+    subscriber_id: subscriber_id,
     contentType: contentType,
     content: {
-      user_oid: content.uid,
       content: Object.keys(content.param).length ? content.param : content.text,
-      raw: content.raw,
     }
   })
 }
@@ -127,7 +110,7 @@ Message.incoming = function(media_id, content) {
 /**
  * The response we are giving to wechat & end user
  */
-Message.outgoing = function(media_id, content, type) {
+Message.outgoing = function(media_id, subscriber_id, content, type) {
   var contentType = content.msgType.toUpperCase()
   if (contentType in CONTENT_TYPES) {
     contentType = CONTENT_TYPES[contentType]
@@ -139,9 +122,9 @@ Message.outgoing = function(media_id, content, type) {
     type: type,
     created_at: content.createTime,
     media_id: media_id,
+    subscriber_id: subscriber_id,
     contentType: contentType,
     content: {
-      user_oid: content.uid,
       content: content.content,
     }
   })

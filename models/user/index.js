@@ -122,8 +122,8 @@ User.prototype.isSuper = function() {
 }
 
 cached.register(User)
-User.enableCache('get_', '{_model_}:{0}')
 User.enableCache('find_', '{_model_}:{0}')
+User.enableCache('findOne_', '{_model_}:{0.where.uid}')
 User.addCacheKey('{_model_}:{uid}')
 
 User.Passport = Passport

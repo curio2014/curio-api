@@ -7,7 +7,6 @@ var models = [
   require('../models/user/passport'),
   require('../models/media'),
   require('../models/media/admin'),
-  require('../models/channel'),
   require('../models/message'),
   require('../models/subscriber'),
 ]

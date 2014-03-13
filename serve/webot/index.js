@@ -7,6 +7,7 @@ var app = require('koa')()
 var conf = require_('conf')
 var Message = require_('models/message')
 var Media = require_('models/media')
+var Subscriber = require_('models/subscriber')
 var Webot = require_('models/webot')
 var session = require('koa-sess')
 var redisc =  require_('lib/redis')
@@ -27,8 +28,9 @@ app.use(function *(next) {
     this.throw(404)
   }
 
-  this.media_id = media.id
   this.wx_token = media.wx_token
+
+  this.media = media
   this.webot = webot
 
   yield next
@@ -44,16 +46,24 @@ app.use(session({
 
 // do the reply
 app.use(function *(next) {
-  var req, res
+  var req, res, media_id, subscriber_id
+
   req = this.req.body
+
+  // transform openId to our subscriber
+  req.subscriber = yield Subscriber.upsert(req.uid, this.media.id)
   req.session = this.session
+  req.media = this.media
+
+  media_id = this.media.id
+  subscriber_id = req.subscriber.id
 
   // log request
-  Message.incoming(this.media_id, req)
+  Message.incoming(media_id, subscriber_id, req)
   // do the reply
   res = yield this.webot.reply(req)
   // log response
-  Message.outgoing(this.media_id, res)
+  Message.outgoing(media_id, subscriber_id, res)
 
   this.body = res
   yield next

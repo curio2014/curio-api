@@ -38,7 +38,7 @@ function messageGenerator(media, i) {
 exports.fillup = function *(next) {
   log('Filling up message...')
 
-  var boot = require_('server')
+  var boot = require_('app')
   boot(PORT)
 
   var medias = yield Media.all({ limit: 5, order: 'id desc' })

@@ -1,6 +1,6 @@
 //var debug = require_('lib/utils/logger').debug('subscriber')
 var db = require_('lib/db')
-var cached = require_('lib/cached').create('subscriber_oid2id')
+var cached = require_('lib/cached')
 
 /**
  * Subscriber of a cirtain wechat media account
@@ -8,7 +8,7 @@ var cached = require_('lib/cached').create('subscriber_oid2id')
 var Subscriber = db.define('subscriber', {
   created_at: Date,
   updated_at: Date,
-  subscribe: { type: Boolean, null: false, default: true },
+  subscribe: { type: Boolean, null: false, default: true }, // subscription status
   credit: { type: Number, null: false, default: 0 }, // user activity credit
   oid: { type: String, null: false },
   phone: String,
@@ -46,31 +46,13 @@ Subscriber.upsert = Subscriber.upsertBy('oid', 'media_id')
 Subscriber.findByOpenId = Subscriber.finder('oid')
 Subscriber.findByMedia = Subscriber.finder('media_id')
 
-/**
- * Get database id from leveldb
- * identified by OpenId + media_id
- */
-Subscriber.prototype.getId = function *() {
-  var id = this.id
-  if (!id) {
-    var key = this.key()
-    id = yield cached.get(key)
-    if (id) {
-      // give the id to current instance,
-      this.id = id
-    } else {
-      // if id is not in cache, try getOrCreate this subscriber
-      var stored = yield Subscriber.upsert(this.oid, this.media_id)
-      id = this.id = stored.id
-      yield cached.set(key, id)
-    }
-  }
-  return id
-}
-
-Subscriber.prototype.key = function() {
+Subscriber.getter.key = function() {
   return this.oid + ':' + this.media_id
 }
 
+cached.register(Subscriber)
+
+Subscriber.enableCache('findOne_', '{_model_}:{0.where.oid}:{0.where.media_id}')
+Subscriber.addCacheKey('{_model_}:{this.oid}:{this.media_id}')
 
 module.exports = Subscriber

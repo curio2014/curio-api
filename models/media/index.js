@@ -19,9 +19,11 @@ var Media = db.define('media', {
 Media.validatesPresenceOf('name')
 Media.validatesUniquenessOf('oid', {message: 'conflict'})
 Media.validatesUniquenessOf('uid', {message: 'conflict'})
+// uid must be all lowercase
 Media.validate('uid', function(err) {
   if (validators.hasUppercase(this.uid)) err()
-}, {message: 'must lowercase'})
+}, {message: 'must lowercase' })
+// uid must be an English word
 Media.validate('uid', function(err) {
   if (!validators.isWord(this.uid)) err()
 }, {message: 'not word'})

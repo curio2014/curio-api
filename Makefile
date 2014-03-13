@@ -9,6 +9,10 @@ build:
 debug:
 	@export DEBUG="curio:*" && node --harmony --debug app.js
 
+webot:
+	# to debug webot
+	@webot send text --des=http://api.curio.com/webot/58 --token=token
+
 inspector:
 	@node-inspector --web-port=3001
 
