@@ -1,21 +1,26 @@
-module.exports = function(app) {
+// enable `app.rest` API
+require('./base/app')
 
-var utils = require('./utils')
-var passport = require('./auth/passport')
+var mount = require('koa-mount')
+var debug = require('debug')('curio:app')
+var conf = require_('conf')
+var app = require('koa')()
 
-app.use(utils.error())
-app.use(utils.parseBody())
-app.use(utils.flash())
+app.debug = debug
+app.name = 'curio-api'
+app.proxy = true;
 
-app.use(passport.initialize())
-app.use(passport.session())
-
-// router must goes last
-app.use(require('koa-trie-router')(app))
-
-app.get('/', require('./misc/bootstrap'))
-
-// server all resources
-require('./resources')(app)
-
+if (conf.debug) {
+  debug('DEBUG on')
+  app.outputErrors = true
+  app.use(require('koa-logger')())
 }
+
+app.keys = [conf.secret, conf.salt]
+
+app.use(mount('/webot', require('./webot')))
+app.use(mount('/wechat', require('./pages')))
+// must go at last, because it's on the root
+app.use(mount('/', require('./mesa')))
+
+module.exports = app

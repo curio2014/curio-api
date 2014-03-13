@@ -2,8 +2,8 @@
  * To serve a backbone compatible RESTful API
  */
 var _ = require_('lib/utils')
-var assert = require_('serve/utils').assert
-var ERRORS = require_('serve/consts').ERRORS
+var assert = require_('serve/base/utils').assert
+var ERRORS = require_('serve/base/consts').ERRORS
 
 
 function defaultHandler(method, model) {

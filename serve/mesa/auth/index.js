@@ -1,5 +1,5 @@
-var assert = require_('serve/utils').assert
-var ERRORS = require_('serve/consts').ERRORS
+var assert = require_('serve/base/utils').assert
+var ERRORS = require_('serve/base/consts').ERRORS
 
 var User = require_('models/user')
 

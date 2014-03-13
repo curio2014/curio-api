@@ -1,49 +1,21 @@
+//require('gnode')
+
 // define local require as a global
 global.require_ = function(path) {
   return require(__dirname + '/' + path)
 }
 
-var mount = require('koa-mount')
-var app = require('koa')()
-var cors = require('koa-cors')
-var session = require('koa-sess')
-var debug = require('debug')('curio:app')
-var conf = require_('conf')
-var utils = require_('lib/utils')
-var redisc =  require_('lib/redis')
-var RedisStore = require('koa-redis')
+var app = require('./serve')
 
-app.debug = debug
-app.name = 'curio-api'
-app.keys = [conf.secret, conf.salt]
-app.proxy = true;
-
-if (conf.debug) {
-  debug('DEBUG on')
-  app.outputErrors = true
-  app.use(require('koa-logger')())
+function boot(port) {
+  var conf = require('./conf')
+  port = port || conf.port
+  var server = app.listen(port)
+  app.debug('Listening at ' + port + ', url: ' + conf.root)
 }
 
-app.use(mount('/webot', require('./serve/webot')))
+module.exports = boot
 
-app.use(require('koa-etag')())
-
-// cross origin request
-app.use(cors({
-  methods: 'GET,PUT,HEAD,POST,DELETE,OPTIONS',
-  headers: 'accept, x-csrf-token, content-type',
-  credentials: true,
-  origin: conf.corsOrigin
-}))
-
-app.use(session({
-  store: new RedisStore({
-    prefix: conf.sessionStore.prefix,
-    client: redisc
-  })
-}))
-
-// load controllers
-require('./serve')(app)
-
-module.exports = app
+if (!module.parent || ~module.parent.filename.indexOf('/pm2/')) {
+  boot()
+}

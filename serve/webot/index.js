@@ -1,5 +1,6 @@
 /**
- * The webot Application to mount
+ * Wechat API interface, backed by webot
+ * see `/app.js`
  */
 var wechat = require('koa-wechat')
 var app = require('koa')()
@@ -45,19 +46,21 @@ app.use(session({
 app.use(function *(next) {
   var req, res
   req = this.req.body
+  req.session = this.session
+
   // log request
   Message.incoming(this.media_id, req)
-  req.session = this.session
   // do the reply
   res = yield this.webot.reply(req)
   // log response
   Message.outgoing(this.media_id, res)
+
   this.body = res
   yield next
 })
+
 // an empty handler to prevent any following middlewares
 app.use(wechat.close())
-
 
 
 module.exports = app

@@ -28,7 +28,7 @@ var cache = require('lru-cache')({
 
 function *loadResponders(media, robot) {
   // common respond rules goes here:
-  // Event, channel, subscribe, unsubscribe, etc...
+  // Event, Channel, subscribe, unsubscribe, etc...
 
   // custom respond rules
   yield media.load('responder')
@@ -39,6 +39,10 @@ function *loadResponders(media, robot) {
       robot.set(item)
     })
   }
+}
+
+Webot.clearCache = function(media_id) {
+  cache.del(media_id)
 }
 
 Webot.get = function *(media) {
@@ -66,6 +70,8 @@ Webot.get = function *(media) {
 Webot.prototype.reply_ = Webot.prototype.reply
 Webot.prototype.reply = function(info) {
   var self = this
+  // just so you can:
+  //   yield webot.reply(info)
   return function(next) {
     self.reply_(info, function(err, info) {
       if (err) return next(err)

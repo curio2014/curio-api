@@ -1,5 +1,5 @@
 var consts = require_('models/consts')
 
-module.exports = {
-  level: consts.USER_LEVEL.NORMAL
-}
+exports.level = consts.USER_LEVEL.NORMAL
+exports.routes = require('./routes')
+exports.hooks = require('./hooks')

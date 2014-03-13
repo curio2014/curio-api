@@ -1,9 +1,11 @@
-var assert = require_('serve/utils').assert
-var ERRORS = require_('serve/consts').ERRORS
+var assert = require_('serve/base/utils').assert
+var ERRORS = require_('serve/base/consts').ERRORS
 var passport = require('./passport')
 var localAuth = passport.authenticate('local')
 
-exports.index = function *authGET(next) {
+var handlers = {}
+
+handlers.index = function *authGET(next) {
   var user = this.req.user
   this.body = {
     ok: true,
@@ -11,7 +13,7 @@ exports.index = function *authGET(next) {
   }
 }
 
-exports.create = function *authPOST(next) {
+handlers.create = function *authPOST(next) {
   var form = this.req.body
 
   assert(form.username && form.password, 401, ERRORS.MISSING_FIELD)
@@ -26,7 +28,7 @@ exports.create = function *authPOST(next) {
   }
 }
 
-exports.destroy = function *authDELETE() {
+handlers.destroy = function *authDELETE() {
   // with passport initialized, we will have a logout functionn here
   this.req.logout()
   this.body = {
@@ -34,7 +36,4 @@ exports.destroy = function *authDELETE() {
   }
 }
 
-exports = Resource(exports)
-
-
-rest('/auth', exports)
+module.exports = handlers
