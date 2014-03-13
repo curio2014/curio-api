@@ -6,7 +6,7 @@ var conf = require_('conf')
 /**
  * do assertions, and expose error message
  */
-exports.assert = function(value, status, message, detail) {
+exports.assert = function assert(value, status, message, detail) {
   if (value) return
   message = message || http.STATUS_CODES[status]
   var msg = 'string' == typeof message ? message : message.message
@@ -24,6 +24,8 @@ exports.error = function(opts) {
   var env = process.env.NODE_ENV || 'development'
 
   return function *error(next){
+    // assign an assert function
+    this.assert = exports.assert
     try {
       yield next
       if (null == this.status) {
