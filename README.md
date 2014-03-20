@@ -68,3 +68,14 @@ the model layer or a seperated file under `serve/`.
 
 Each resource can be given an access control by use `auth.need('roleName')`.
 
+
+### Trouble shooting
+
+```
+Error: yield a function, promise, generator, array, or object
+```
+
+You may have passed an invalid value for `yield`, in most cases, the variable is `undefined`.
+Check the next call of your _yield chain_.
+
+

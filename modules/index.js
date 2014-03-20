@@ -5,14 +5,14 @@ var debug = require_('lib/utils/logger').debug('module')
 var PATH = require('path')
 var fs = require('fs')
 
-var MODULES_ROOT = 'modules'
+var ROOT = 'modules'
 
 function loadModule(name) {
   var routes, hooks
   try {
     // load routes and hooks
-    routes = require_(PATH.join(MODULES_ROOT, name, 'routes'))
-    hooks = require_(PATH.join(MODULES_ROOT, name, 'hooks'))
+    routes = require_(PATH.join(ROOT, name, 'routes'))
+    hooks = require_(PATH.join(ROOT, name, 'hooks'))
   } catch (e) {
     if (e.code !== 'MODULE_NOT_FOUND') {
       throw e
