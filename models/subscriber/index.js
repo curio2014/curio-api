@@ -38,9 +38,6 @@ Subscriber.registerProps({
   subscribe_time: null,
 })
 
-// source media account
-Subscriber.belongsTo('media', {foreignKey: 'media_id'})
-
 //Subscriber.get = Subscriber.finder('oid', 'media_id', true)
 Subscriber.upsert = Subscriber.upsertBy('oid', 'media_id')
 Subscriber.findByOpenId = Subscriber.finder('oid')
@@ -56,3 +53,7 @@ Subscriber.enableCache('findOne_', '{_model_}:{0.where.oid}:{0.where.media_id}')
 Subscriber.addCacheKey('{_model_}:{this.oid}:{this.media_id}')
 
 module.exports = Subscriber
+
+// source media account
+Subscriber.belongsTo('media', {foreignKey: 'media_id'})
+

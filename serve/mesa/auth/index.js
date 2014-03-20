@@ -12,20 +12,27 @@ var checks = {
   },
   mediaAdmin: function *(next) {
     var user = this.req.user
-    var admins = this.mediaAdmins
+    var media_id, role
+
+    // Must logged in
     this.assert(user, 401, ERRORS.NEED_LOGIN)
-    if (!Array.isArray(admins)) {
-      admins = this.mediaAdmins = yield user.mediaAdmins()
-    }
-    this.assert(admins.length || user.permitted('admin'), 403, ERRORS.NOT_ALLOWED)
+
+    media_id = this.params.media_id || this.params.id
+    role = yield this.req.user.canAdmin(media_id)
+
+    this.assert(role, 403, ERRORS.NOT_ALLOWED)
+
     if (next) yield next
   },
-  self: function *() {
+  self: function *(next) {
     user = this.req.user
     user_id = this.params.id || this.params.user_id
     this.assert(user.isSuper() || user.id == user_id, 403, ERRORS.NOT_ALLOWED)
+    if (next) yield next
   }
 }
+
+exports.checks = checks
 
 exports.need = function(act) {
   if (act in checks) {

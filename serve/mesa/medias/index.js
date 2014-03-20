@@ -7,41 +7,32 @@ var app = require('../index')
 
 var media, medias, messages, subscribers, subscriber
 
-function *checkPermission() {
-  var role = yield this.req.user.canAdmin(this.params.id)
-  this.assert(role, 403, ERRORS.NOT_ALLOWED)
-}
-function *idOverride() {
+function* idOverride() {
   this.params.media_id = this.params.id
   delete this.params.id
 }
 
-medias = Collection(Media)
+
+app.rest('/medias', Collection(Media))
+  // Only super user can create/delete media
   .use(app.auth.need('super'))
 
-// Only super user can create/delete media
-media = Resource(Media)
+app.rest('/medias/:id([\\w\\-]*)', Resource(media))
   .use(app.auth.need('mediaAdmin'))
-  .use(checkPermission)
 
-messages = Collection(Message)
-  .use(checkPermission)
+app.rest('/medias/:id/messages', Collection(Message))
+  .use(app.auth.need('mediaAdmin'))
   .use(idOverride)
 
-subscribers = Collection(Subscriber)
-  .use(checkPermission)
+app.rest('/medias/:id/subscribers', Collection(Subscriber))
+  .use(app.auth.need('mediaAdmin'))
   .use(idOverride)
 
-subscriber = Resource(Subscriber)
-  .use(checkPermission)
-  .use(function *() {
+app.rest('/medias/:id/subscribers/:subscriber_id', Resource(Subscriber))
+  .use(app.auth.need('mediaAdmin'))
+  .use(function* () {
     this.params = {
       id: this.params.subscriber_id
     }
   })
 
-app.rest('/medias', medias)
-app.rest('/medias/:id(\\w+)', media)
-app.rest('/medias/:id/messages', messages)
-app.rest('/medias/:id/subscribers', subscribers)
-app.rest('/medias/:id/subscribers/:subscriber_id', subscriber)

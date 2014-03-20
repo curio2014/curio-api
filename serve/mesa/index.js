@@ -16,7 +16,7 @@ app.rest('/users', Collection(User))
   .use(auth.need('super'))
 
 // Only super user or self can view/edit user
-app.rest('/users/:id', Resource(User))
+app.rest('/users/:id([\\w\\-]*)', Resource(User))
   .use(auth.need('login'))
   .use(auth.need('self'))
 

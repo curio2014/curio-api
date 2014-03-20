@@ -1,4 +1,5 @@
 // enable `app.rest` API
+// apply the monkey patch
 require('./base/app')
 
 var mount = require('koa-mount')
@@ -22,5 +23,7 @@ app.use(mount('/webot', require('./webot')))
 app.use(mount('/wechat', require('./pages')))
 // must go at last, because it's on the root
 app.use(mount('/', require('./mesa')))
+
+app.curio_modules = require_('modules').all()
 
 module.exports = app

@@ -1,6 +1,6 @@
 var debug = require_('lib/utils/logger').debug('webot')
-var Responder = require('./responder')
-var Media = require('./media')
+var Responder = require_('models/responder')
+var Media = require_('models/media')
 var Webot = require('weixin-robot').Webot
 var cache = require('lru-cache')({
   max: 20,
@@ -25,15 +25,13 @@ var cache = require('lru-cache')({
   //}
 //}
 
-
-function *loadResponders(media, robot) {
+function* loadResponders(media, robot) {
   // common respond rules goes here:
   // Event, Channel, subscribe, unsubscribe, etc...
 
   // custom respond rules
-  yield media.load('responder')
-  var responder = media.responder
-  robot.set(media, robot, responder)
+  var responder = yield media.load('responder')
+
   if (responder) {
     responder.webotfy().forEach(function(item) {
       robot.set(item)
@@ -45,7 +43,7 @@ Webot.clearCache = function(media_id) {
   cache.del(media_id)
 }
 
-Webot.get = function *(media) {
+Webot.get = function* (media) {
   if (!(media instanceof Media)) {
     media = yield Media.get(media)
     if (!media) {

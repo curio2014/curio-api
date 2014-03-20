@@ -58,12 +58,12 @@ Responder.prototype.webotfy = function(ctx) {
 function reviveFor(ctx) {
   return function reviver(k, v) {
     if (v && v.pickled) {
-      //try {
+      try {
         return sandbox(ctx, v.value)
-      //} catch (e) {
-        //log('Unpickle %j failed', v)
-        return ''
-      //}
+      } catch (e) {
+        log('Unpickle %j failed', v)
+        return
+      }
     }
     return v
   }

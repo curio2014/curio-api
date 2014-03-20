@@ -8,7 +8,7 @@ var ERRORS = require_('serve/base/consts').ERRORS
 
 function defaultHandler(method, model) {
   if (method == 'index') {
-    return function *list() {
+    return function* list() {
       var query = model.safeQuery(_.assign(this.query, this.params))
       var total = yield model.count(query.where)
       var runner = model.all(query)
@@ -34,7 +34,7 @@ function defaultHandler(method, model) {
       }
     }
   } else if (method == 'create') {
-    return function *create() {
+    return function* create() {
       var item = new model(_.assign(this.req.body, this.params))
       var valid = yield item.validate()
       assert(valid, 400, 'bad fields', item.errors)
@@ -42,14 +42,18 @@ function defaultHandler(method, model) {
       this.body = item
     }
   } else if (method == 'read') {
-    return function *read() {
+    return function* read() {
+      if (this.params.id === '') {
+        // empty ID string, remove trailing slash
+        return this.redirect(this.url.replace(/\/$/, ''))
+      }
       var item = this.item || (yield model.getOne(this.params))
       assert(item, 404)
       var ret = {}
       this.body = item
     }
   } else if (method == 'destroy') {
-    return function *destroy() {
+    return function* destroy() {
       var item = this.item || (yield model.getOne(this.params))
       if (item) {
         yield item.destroy()
@@ -60,7 +64,7 @@ function defaultHandler(method, model) {
       }
     }
   } else if (method == 'update') {
-    return function *update() {
+    return function* update() {
       var item = this.item || (yield model.getOne(this.params))
       assert(item, 404)
       try {
@@ -81,6 +85,7 @@ function Resource(model, handlers, befores) {
   }
   // first argument is not a constructor, then it is handlers
   if (typeof model == 'object') {
+    befores = handlers
     handlers = model
   }
   handlers = handlers || ['read', 'update', 'destroy']
@@ -106,12 +111,15 @@ Resource.prototype.init = function(handlers) {
   var handlers = this.handlers = handlers || {}
 
   methods.forEach(function(method, i) {
-    befores[method] = []
-    resource[method] = function *(next) {
+    befores[method] = befores[method] || []
+    resource[method] = function* (next) {
       var access = befores[method]
       var handler = resource.handlers[method]
       if (access.length) {
         for (var i = 0, l = access.length; i < l; i++) {
+          if (!access[i]) {
+            throw new Error('Unexpected Empty handler')
+          }
           // access function returned error, stop
           if (yield access[i]) {
             return
@@ -156,7 +164,8 @@ Resource.prototype.use = function(method, middleware, isAfter) {
  * Fork a new resource with the same middlewares and handlers
  */
 Resource.prototype.fork = function(handlers) {
-  return new Resource(this.model, _.assign({}, this.handlers, handlers), this.befores)
+  handlers = handlers || _.assign({}, this.handlers)
+  return new Resource(this.model, handlers, this.befores)
 }
 
 /**
@@ -166,8 +175,8 @@ Resource.prototype.spawn = function(subResouce) {
   var model = this.model
   var befores = subResouce.befores
 
-  function *getItem() {
-    this[model.modelName] = yield model.getOne(this.params)
+  function* getItem() {
+    this.parent = yield model.getOne(this.params)
   }
   // befores is indexed by http method
   for (var k in this.befores) {
@@ -177,4 +186,29 @@ Resource.prototype.spawn = function(subResouce) {
 }
 
 
+/**
+ * Get resource from `model.load`
+ */
+//Resource.prototype.relatedAll = function() {
+  //var resource = this.fork({
+    //index: function* (){
+    //},
+    //create: function* (){
+    //}
+  //});
+  //return resource
+//}
+
+//Resource.prototype.relatedOne = function() {
+//}
+
+function* idOverride() {
+  var id = this.params.related_id
+  this.params = {
+    media_id: this.params.id
+  }
+  if (id) {
+    this.params.id = id
+  }
+}
 module.exports = Resource

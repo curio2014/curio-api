@@ -2,7 +2,7 @@ var co = require('co')
 var bcrypt = require_('lib/utils/bcrypt')
 var db = require_('lib/db')
 
-var SALT_LENGTH = 10
+var SALT_ROUNDS = 10
 
 var Passport = db.define('passport', {
   password: String, // password hash
@@ -22,11 +22,11 @@ Passport.beforeSave = function(done, data) {
 }
 
 Passport.hash = function *(passwd) {
-  var salt = yield bcrypt.genSalt(SALT_LENGTH)
+  var salt = yield bcrypt.genSalt(SALT_ROUNDS)
   return yield bcrypt.hash(passwd, salt)
 }
 Passport.hashSync = function(passwd) {
-  var salt = bcrypt.genSaltSync(SALT_LENGTH)
+  var salt = bcrypt.genSaltSync(SALT_ROUNDS)
   return bcrypt.hashSync(passwd, salt)
 }
 
