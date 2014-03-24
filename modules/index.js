@@ -7,20 +7,35 @@ var fs = require('fs')
 
 var ROOT = 'modules'
 
-function loadModule(name) {
-  var routes, hooks
+
+function Module(name) {
+  this.name = name
+  this.dirname = PATH.join(__dirname, name)
+}
+
+
+Module.prototype.initialize = function() {
+  var self = this
+
+  debug('Initializing module %s..', self.name)
+
   try {
     // load routes and hooks
-    routes = require_(PATH.join(ROOT, name, 'routes'))
-    hooks = require_(PATH.join(ROOT, name, 'hooks'))
+    require(PATH.join(self.dirname, 'routes'))
+    require(PATH.join(self.dirname, 'hooks'))
   } catch (e) {
     if (e.code !== 'MODULE_NOT_FOUND') {
       throw e
     }
     console.log(e)
   }
-  return {
-  }
+  return self
+}
+
+function loadModule(name) {
+  var mod = new Module(name)
+  mod.initialize()
+  return mod
 }
 
 /**
@@ -31,7 +46,6 @@ function loadAll() {
   var names = fs.readdirSync(__dirname)
   names.forEach(function(name) {
     if (fs.statSync(__dirname + '/' + name).isDirectory()) {
-      debug('Loading module %s..', name)
       items[name] = loadModule(name)
     }
   })

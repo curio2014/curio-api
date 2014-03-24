@@ -16,7 +16,7 @@ var SubscriberTag = require_('models/subscriber/tag')
 var Channel = db.define('channel', {
   created_at: Date,
   updated_at: Date,
-  ticket: String, // ticket to get the QRCode
+  ticket: String, // ticket to get the QRCode image from weixin server
 })
 Channel.belongsTo(Media, {foreignKey: 'media_id'})
 Channel.belongsTo(SubscriberTag, {as: 'tag', foreignKey: 'tag_id'})
@@ -25,8 +25,9 @@ Channel.belongsTo(SubscriberTag, {as: 'tag', foreignKey: 'tag_id'})
  * Generate a unique scene_id for a media
  */
 Channel.hook('beforeCreate', function* (data) {
+  if (data.scene_id) return
   var count = yield Channel.count({ media_id: this.media_id })
-  data.scene_id = data.scene_id || count
+  data.scene_id = count + 1 // 1 ~ 10,000
 })
 
 Channel.prototype.qrcodeUrl = function() {

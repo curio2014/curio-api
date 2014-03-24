@@ -3,10 +3,12 @@ var BatchStream = require('batch-stream2')
 var debug = require_('lib/utils/logger').debug('message')
 var error = require_('lib/utils/logger').error('message')
 var db = require_('lib/db')
+var mediator = require_('lib/mediator')
 var consts = require_('models/consts')
 var Subscriber = require_('models/subscriber')
 var CONTENT_TYPES = consts.MESSSAGE_CONTENT_TYPES
 var TYPES = consts.MESSAGE_TYPES
+var EVTS = consts.GLOBAL_EVENTS
 
 /**
  * Messages (and interacts) between end user and media account
@@ -50,14 +52,18 @@ function batchSave(items, callback) {
   var b = this
   debug('Starting batch write %s messages..', items.length)
   var send = function *() {
+
     try {
       // batch create message items
-      yield Message.create(items)
+      items = yield Message.create(items)
     } catch (e) {
       // ignore ?
       error('Save messages failed. %j', items)
       //setTimeout(co(send), 1000)
     }
+    // global hook
+    mediator.emit(EVTS.SAVE_MESSAGES, items)
+
     callback()
     debug('batch write %s messages done.', items.length)
   }
@@ -89,11 +95,13 @@ Message.incoming = function(media_id, subscriber_id, content) {
     var param = content.param || {}
     contentType = (param.event || '').toUpperCase()
   }
+  // update content type to a INT consts
   if (contentType in CONTENT_TYPES) {
     contentType = CONTENT_TYPES[contentType]
   } else {
     contentType = CONTENT_TYPES.UNKOWN
   }
+
   // Save a new message asynchronously
   buffer.write({
     type: TYPES.INCOMING,
@@ -118,6 +126,7 @@ Message.outgoing = function(media_id, subscriber_id, content, type) {
     contentType = CONTENT_TYPES.UNKOWN
   }
   type = type || TYPES.REPLY
+
   buffer.write({
     type: type,
     created_at: content.createTime,

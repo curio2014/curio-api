@@ -1,6 +1,10 @@
 var Named = require_('lib/named')
 
 module.exports = {
+  // global events can do mediator.on('xxx')
+  GLOBAL_EVENTS: {
+    SAVE_MESSAGES: 'save-messages'
+  },
   AVAIL: Named({
     NORMAL: 0,
     DELETED: 1,
