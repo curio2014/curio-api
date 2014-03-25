@@ -30,7 +30,7 @@
     "levelup": "latest",
     "lmdb": "ktmud/lmdb#node-devel",
     "level-sublevel": "latest",
-    "timestreamdb": "brycebaril/timestreamdb",
+    "timestreamdb": "ktmud/timestreamdb",
     "methods": "latest",
     "lodash": "latest",
     "keyf": "ktmud/keyf",

@@ -91,6 +91,9 @@ function Resource(model, handlers, befores) {
   handlers = handlers || ['read', 'update', 'destroy']
   if (Array.isArray(handlers)) {
     handlers = _.zipObject(handlers)
+    if (!model) {
+      throw new Error('will use default handler, but model is not defined')
+    }
     for (var k in handlers) {
       handlers[k] = defaultHandler(k, model)
     }

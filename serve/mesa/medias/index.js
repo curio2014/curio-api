@@ -5,19 +5,16 @@ var Subscriber = require_('models/subscriber')
 
 var app = require('../index')
 
-var media, medias, messages, subscribers, subscriber
-
 function* idOverride() {
   this.params.media_id = this.params.id
   delete this.params.id
 }
 
-
 app.rest('/medias', Collection(Media))
   // Only super user can create/delete media
   .use(app.auth.need('super'))
 
-app.rest('/medias/:id([\\w\\-]*)', Resource(media))
+app.rest('/medias/:id([\\w\\-]*)', Resource(Media))
   .use(app.auth.need('mediaAdmin'))
 
 app.rest('/medias/:id/messages', Collection(Message))

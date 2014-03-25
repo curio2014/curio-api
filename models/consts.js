@@ -36,7 +36,7 @@ module.exports = {
     SUBSCRIBE: 20, // 关注此微信号
     UNSUBSCRIBE: 21, // 退订账号
     CLICK: 22, // 点击自定义菜单
-    LOCATION: 23, // 上报地理位置，用户每次打开会话窗口时调用
+    REPORT_LOC: 23, // 上报地理位置，用户每次打开会话窗口时调用
     SCAN: 24, // 扫描某个二维码
     NEWS: 30, // 图文消息(只可能是下发消息)
     MUSIC: 31, // 音乐消息

@@ -71,7 +71,7 @@ function batchSave(items, callback) {
 }
 
 var buffer = new BatchStream({
-  size: 100,
+  size: 500,
   timeout: 2000, // try batch write every 2 seconds
   transform: batchSave
 })

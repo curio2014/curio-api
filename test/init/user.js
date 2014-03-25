@@ -19,7 +19,7 @@ exports.fillup = function *() {
   // add super admin
   var admin = yield addUser('super', 'Super Admin', 'test', User.LEVEL.SUPER)
 
-  yield _.range(0, 30).map(function(i) {
+  yield _.range(0, 20).map(function(i) {
     return addUser('test' + i, 'Test ' + i, 'test')
   })
 

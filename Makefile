@@ -1,5 +1,5 @@
 start:
-	@export DEBUG="curio:* cache* store*" && supervisor -w 'lib,serve,models,app.js,conf' \
+	@export DEBUG="curio:* cache* store*" && supervisor -w 'lib,serve,modules,models,app.js,conf' \
 	--harmony	-p 1000 -n error -- --debug app.js
 
 build:
@@ -21,7 +21,8 @@ createdb:
 	createdb -e -O curio curio 'The wechat app Curio'
 
 init_db:
-	rm -rf ./var/dbstore/
+	rm -rf ./var/dbstore
+	mkdir ./var/dbstore
 	./bin/curio init_db
 
 fillup:
