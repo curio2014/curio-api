@@ -1,5 +1,6 @@
 var keyf = require('keyf')
 var _ = require_('lib/utils')
+var error = require_('lib/utils/logger').error('stats')
 var timestream = require_('lib/timestream')
 var MSG_TYPES = require_('models/consts').MESSAGE_TYPES
 var MSG_CONTENT_TYPES = require_('models/consts').MESSSAGE_CONTENT_TYPES
@@ -16,10 +17,38 @@ var ctype_filters = {
   },
   all: null
 }
-var interval_by_period = {
-  '7days': 'day',
-  '1day': 'hour',
+var ONE_MINUTE = 60 * 1000
+var ONE_HOUR = 60 * ONE_MINUTE
+var ONE_DAY = 24 * ONE_HOUR
+var deltas = {
+  '1hour': ONE_HOUR,
+  '1day': ONE_DAY,
+  '7days': 7 * ONE_DAY,
+  '30days': 30 * ONE_DAY,
 }
+var interval_by_period = {
+  '1hour': ONE_MINUTE,
+  '1day': ONE_HOUR,
+  '7days': ONE_DAY,
+  '30days': ONE_DAY,
+}
+
+function parsePeriod(period, end) {
+  var end = new Date(end || new Date())
+  if (isNaN(+end)) {
+    end = new Date()
+  }
+  if (!(period in deltas)) {
+    return
+  }
+  var start = new Date(end - deltas[period])
+  return {
+    minDate: start,
+    maxDate: end
+  }
+}
+
+
 
 function streamByType(type) {
   /**
@@ -32,7 +61,7 @@ function streamByType(type) {
     options = options || {}
 
     interval = options.interval
-    periods = options.periods || '7days,1day'
+    periods = options.periods || '1day,7days,30days'
     ctypes = options.types || 'messaging,subscribe,unsubscribe'
 
     if (!Array.isArray(periods)) {
@@ -43,8 +72,13 @@ function streamByType(type) {
     }
 
     var ret = {}
-    datums = periods.map(function(p) {
+    datums = periods.forEach(function(p) {
       var obj = {}
+      var dates = parsePeriod(p, options.maxDate)
+      if (!dates) {
+        error('Invalid period: %s, skip', p)
+        return
+      }
       ctypes.forEach(function(name) {
         var filter = ctype_filters[name]
         if (!filter) {
@@ -63,11 +97,18 @@ function streamByType(type) {
           media_id: media_id,
           _type: type,
         })
-        var stream = timestream(key, {period: p, maxDate: options.maxDate})
+        var opts = _.clone(dates)
+        var stream = timestream(key, opts)
+
+        opts.interval = interval || interval_by_period[p]
+        opts.key = 'hit'
+
         if (filter) {
           stream = stream.filter(filter)
         }
-        obj[name] = stream.numbers().keep('hit').count(interval || interval_by_period[p])
+        obj[name] = stream.numbers().keep(opts.key)
+          .fillup(opts)
+          .sum(opts.interval)
       })
       ret[p] = obj
     })

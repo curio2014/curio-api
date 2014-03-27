@@ -41,7 +41,7 @@ Message.fetcher.subscriber = function *() {
   var item = yield Subscriber.get(this.subscriber_id)
   if (!item) {
     item = yield Subscriber.create({
-      oid: this.content.user_oid,
+      oid: this.subscriber_id,
       media_id: this.content.media_id
     })
   }
@@ -94,6 +94,10 @@ Message.incoming = function(media_id, subscriber_id, content) {
   if (contentType == 'EVENT') {
     var param = content.param || {}
     contentType = (param.event || '').toUpperCase()
+    // message type "loation" is different with report location via an EVENT message
+    if (contentType == 'LOCATION') {
+      contentType = 'REPORT_LOC'
+    }
   }
   // update content type to a INT consts
   if (contentType in CONTENT_TYPES) {
