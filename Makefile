@@ -3,6 +3,7 @@ start:
 	--harmony	-p 1000 -n error -- --debug app.js
 
 init:
+	npm install -g gnode
 	cp -vi ./conf/development.conf.js.tmpl ./conf/development.conf.js
 
 build:
@@ -25,15 +26,12 @@ createdb:
 	createuser -P -e curio
 	createdb -e -O curio curio 'The wechat app Curio'
 
-setpath:
-	@export PATH=${PATH}:./bin
-
-init_db: setpath
+init_db:
 	rm -rf ./var/dbstore
 	mkdir ./var/dbstore
 	./bin/curio init_db
 
-fillup: setpath
+fillup:
 	./bin/curio fillup
 
 shrink:
