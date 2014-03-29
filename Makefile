@@ -3,7 +3,7 @@ start:
 	--harmony	-p 1000 -n error -- --debug app.js
 
 init:
-	cp -v ./conf/development.conf.js.tmpl ./conf/development.conf.js
+	cp -vi ./conf/development.conf.js.tmpl ./conf/development.conf.js
 
 build:
 	@export NODE_ENV=production && \
@@ -25,12 +25,15 @@ createdb:
 	createuser -P -e curio
 	createdb -e -O curio curio 'The wechat app Curio'
 
-init_db:
+setpath:
+	@export PATH=${PATH}:./bin
+
+init_db: setpath
 	rm -rf ./var/dbstore
 	mkdir ./var/dbstore
 	./bin/curio init_db
 
-fillup:
+fillup: setpath
 	./bin/curio fillup
 
 shrink:
