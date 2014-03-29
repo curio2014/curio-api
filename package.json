@@ -28,7 +28,7 @@
     "pg": "latest",
     "redis": "latest",
     "levelup": "latest",
-    "lmdb": "ktmud/lmdb#node-devel",
+    "leveldown": "latest",
     "level-sublevel": "latest",
     "floordate": "latest",
     "methods": "latest",
