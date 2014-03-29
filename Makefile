@@ -2,6 +2,9 @@ start:
 	@export DEBUG="curio:* cache* store*" && supervisor -w 'lib,serve,modules,models,app.js,conf' \
 	--harmony	-p 1000 -n error -- --debug app.js
 
+init:
+	cp -v ./conf/development.conf.js.tmpl ./conf/development.conf.js
+
 build:
 	@export NODE_ENV=production && \
 		npm install --production
