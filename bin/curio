@@ -58,9 +58,14 @@ program
 
 program
   .command('fillup')
+  .option('bench', {
+    abbr: 'b',
+    flag: true
+  })
   .callback(co(function *(opts) {
     if (opts[1]) {
-      yield require_('test/init/' + opts[1]).fillup
+      var fn = opts.bench ? 'benchfill' : 'fillup'
+      yield require_('test/init/' + opts[1])[fn]
     } else {
       yield require_('test/init').fillupAll
     }

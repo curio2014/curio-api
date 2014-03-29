@@ -23,7 +23,7 @@ var msg_args = [
   'event subscribe',
   '--user Wahaha event subscribe',
 ]
-var PORT = 12809
+var PORT = require_('conf').port
 
 function messageGenerator(media, i) {
   var args = ['--port', PORT, '--route', media.webotPath(), '--token', media.wx_token].join(' ')
@@ -35,6 +35,24 @@ function messageGenerator(media, i) {
   })
 }
 
+exports.benchfill = function *(next) {
+  log('Filling up many many messages...')
+  require_('test/common').bootApp(PORT)
+  var medias = yield Media.all({ limit: 2, order: 'id desc' })
+
+  var fns = _(medias.map(messageGenerator)).flatten().shuffle().value()
+
+  fns = fns.concat(fns, fns, fns, fns, fns)
+
+  for (var i = 0, l = fns.length; i < l;) {
+    yield fns.slice(i, i + 30)
+    i += 1
+  }
+
+  yield _.sleep(3)
+
+  log('Fill up message done.')
+}
 
 exports.fillup = function *(next) {
   log('Filling up message...')

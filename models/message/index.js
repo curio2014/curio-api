@@ -18,7 +18,7 @@ var Message = db.define('message', {
   content: db.JSON, // the raw json of wechat message
 })
 TYPES.bind(Message, 'type')
-CONTENT_TYPES.bind(Message, 'contentType')
+CONTENT_TYPES.bind(Message, 'content_type')
 
 module.exports = Message
 
@@ -26,10 +26,17 @@ module.exports = Message
 Message.belongsTo('media', {foreignKey: 'media_id'})
 Message.belongsTo('subscriber', {foreignKey: 'subscriber_id'})
 
+Subscriber.SCHEMA_SQL = [
+"CREATE INDEX ON message(media_id);",
+"CREATE INDEX ON message(content_type) where content_type in (" + [CONTENT_TYPES.SUBSCRIBE, CONTENT_TYPES.UNSUBSCRIBE] + ");",
+].join('\n')
+
+
 Message.scolumns = {
   'created_at': 'desc',
   'media_id': null,
   'subscriber_id': null,
+  'content_type': null,
   'type': null
 }
 
@@ -90,20 +97,20 @@ Message.prototype.isIncoming = function() {
  * Incoming message from wechat server
  */
 Message.incoming = function(media_id, subscriber_id, content) {
-  var contentType = content.type.toUpperCase()
-  if (contentType == 'EVENT') {
+  var content_type = content.type.toUpperCase()
+  if (content_type == 'EVENT') {
     var param = content.param || {}
-    contentType = (param.event || '').toUpperCase()
+    content_type = (param.event || '').toUpperCase()
     // message type "loation" is different with report location via an EVENT message
-    if (contentType == 'LOCATION') {
-      contentType = 'REPORT_LOC'
+    if (content_type == 'LOCATION') {
+      content_type = 'REPORT_LOC'
     }
   }
   // update content type to a INT consts
-  if (contentType in CONTENT_TYPES) {
-    contentType = CONTENT_TYPES[contentType]
+  if (content_type in CONTENT_TYPES) {
+    content_type = CONTENT_TYPES[content_type]
   } else {
-    contentType = CONTENT_TYPES.UNKOWN
+    content_type = CONTENT_TYPES.UNKOWN
   }
 
   // Save a new message asynchronously
@@ -112,7 +119,7 @@ Message.incoming = function(media_id, subscriber_id, content) {
     created_at: content.createTime,
     media_id: media_id,
     subscriber_id: subscriber_id,
-    contentType: contentType,
+    content_type: content_type,
     content: {
       content: Object.keys(content.param).length ? content.param : content.text,
     }
@@ -123,11 +130,11 @@ Message.incoming = function(media_id, subscriber_id, content) {
  * The response we are giving to wechat & end user
  */
 Message.outgoing = function(media_id, subscriber_id, content, type) {
-  var contentType = content.msgType.toUpperCase()
-  if (contentType in CONTENT_TYPES) {
-    contentType = CONTENT_TYPES[contentType]
+  var content_type = content.msgType.toUpperCase()
+  if (content_type in CONTENT_TYPES) {
+    content_type = CONTENT_TYPES[content_type]
   } else {
-    contentType = CONTENT_TYPES.UNKOWN
+    content_type = CONTENT_TYPES.UNKOWN
   }
   type = type || TYPES.REPLY
 
@@ -136,7 +143,7 @@ Message.outgoing = function(media_id, subscriber_id, content, type) {
     created_at: content.createTime,
     media_id: media_id,
     subscriber_id: subscriber_id,
-    contentType: contentType,
+    content_type: content_type,
     content: {
       content: content.content,
     }

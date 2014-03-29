@@ -5,7 +5,7 @@ module.exports = function *(next) {
   var user = this.req.user
   var admins
   if (user) {
-    admins = yield user.load('mediaAdmins')
+    admins = yield user.load('mediaAdmins', true)
   }
   this.body = {
     version: pkg.version,
