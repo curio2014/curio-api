@@ -21,7 +21,7 @@ var interval_by_period = {
   '1day': 'hour',
 }
 
-function streamByType(type) {
+function statsByType(type) {
   /**
    * Return message count timestream data for given media_id,
    * grouped by period and content_type
@@ -79,6 +79,6 @@ function streamByType(type) {
 /**
  * incoming message count
  */
-exports.incoming = streamByType(MSG_TYPES.INCOMING)
-exports.outgoing = streamByType(MSG_TYPES.OUTGOING)
+exports.incoming = statsByType(MSG_TYPES.INCOMING)
+exports.outgoing = statsByType(MSG_TYPES.OUTGOING)
 

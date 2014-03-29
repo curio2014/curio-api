@@ -20,7 +20,7 @@ if (conf.debug) {
 app.keys = [conf.secret, conf.salt]
 
 app.use(mount('/webot', require('./webot')))
-app.use(mount('/wechat', require('./pages')))
+app.use(mount('/pages', require('./pages')))
 // must go at last, because it's on the root
 app.use(mount('/', require('./mesa')))
 
