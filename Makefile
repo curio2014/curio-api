@@ -7,7 +7,9 @@ init:
 
 build:
 	@export NODE_ENV=production && \
-		npm install --production
+		npm install --production \
+		--registry=http://r.cnpmjs.org \
+		--cache=${HOME}/.npm/.cache/cnpm
 
 debug:
 	@export DEBUG="curio:*" && node --harmony --debug app.js
