@@ -6,12 +6,12 @@ var redisc =  require_('lib/redis')
 var RedisStore = require('koa-redis')
 
 app.use(require('koa-etag')())
-app.use(require('koa-cors')({
-  methods: 'GET,PUT,HEAD,POST,DELETE,OPTIONS',
-  headers: 'accept, x-csrf-token, content-type',
-  credentials: true,
-  origin: conf.corsOrigin
-}))
+//app.use(require('koa-cors')({
+  //methods: 'GET,PUT,HEAD,POST,DELETE,OPTIONS',
+  //headers: 'accept, x-csrf-token, content-type',
+  //credentials: true,
+  //origin: conf.corsOrigin
+//}))
 app.use(require('koa-sess')({
   store: new RedisStore({
     prefix: conf.sessionStore.prefix + 'mesa:',

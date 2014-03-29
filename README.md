@@ -24,7 +24,7 @@ And make sure you have a `redis-server` running.
 
 ### Update `conf/development.conf.js`
 
-Copy conf/development.conf.js.tmpl to `conf/development.conf.js`, edit it, add some of your own configs.
+Use `make init` to copy conf/development.conf.js.tmpl to `conf/development.conf.js`, edit it, add some of your own configs.
 
 For available options, see `conf/default.conf.js`
 
@@ -47,6 +47,21 @@ For available options, see `conf/default.conf.js`
 Try add this to your .bashrc:
 
     export PATH="./bin:$PATH"
+
+
+## Notes
+
+Url routes:
+
+    /api/               API for mesa.curio.im
+    /wx/                Urls sent to users, and may be share to Wechat
+    /webot/:media_id    Webot interface for Wechat messaging API
+
+
+Under `/api/`:
+
+    /api/media/:id     A wechat account info
+    /api/user/:id      A system user info
 
 
 ### Conventions
