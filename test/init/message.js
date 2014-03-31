@@ -16,11 +16,12 @@ var msg_args = [
   'text news3',
   'text "abc is a good name"',
   'image http://www.baidu.com/img/bdlogo.gif',
-  '--user BlahBlah image http://www.baidu.com/img/bdlogo.gif',
-  '--user Wakaka image http://www.baidu.com/img/bdlogo.gif',
-  'loc 39.941004 116.41680 "This is a label"',
   'event click Hello',
   'event subscribe',
+  'event unsubscribe',
+  'loc 39.941004 116.41680 "This is a label"',
+  '--user BlahBlah image http://www.baidu.com/img/bdlogo.gif',
+  '--user Wakaka image http://www.baidu.com/img/bdlogo.gif',
   '--user Wahaha event subscribe',
 ]
 var PORT = require_('conf').port
