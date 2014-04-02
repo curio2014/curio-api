@@ -6,6 +6,11 @@ var cache = require('lru-cache')({
   max: 20,
 })
 
+Webot.prototype.codeReplies = {
+  '404': ''
+}
+
+
 // webot rule pattern arrays as `or`
 //if (Array.isArray(item.pattern)) {
   //var pattern = item.pattern

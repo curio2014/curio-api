@@ -20,6 +20,7 @@
     "koa-sess": "dead-horse/koa-session",
     "koa-redis": "ktmud/koa-redis",
     "koa-wechat": "ktmud/koa-wechat",
+    "wechat-api": "ktmud/wechat-api",
     "thunkify": "latest",
     "passport": "jaredhanson/passport",
     "koa-passport-fw": "ktmud/koa-passport-fw",

@@ -12,17 +12,23 @@ Currently, `node v0.11.10` is recommended. (Since node v0.11.11 has issue buildi
 
 Run a PostgreSQL server, add your own user and database via `psql` or `createuser`:
 
-```bash
-createuser -P -e curio   # `-P` means prompt password(`--pwprompt`)
-createdb -e -O curio curio 'The wechat app Curio'  # `-O` means `--owner`.
-```
+    createuser -P -e curio   # `-P` means prompt password(`--pwprompt`)
+    createdb -e -O curio curio 'The wechat app Curio'  # `-O` means `--owner`.
+
 
 Or simply `make createdb`.
 
 And make sure you have a `redis-server` running.
 
+### Install dependencies
 
-### Update `conf/development.conf.js`
+
+	  npm install -g gnode
+	  npm install -g webot-cli
+
+
+
+### Create local configurations
 
 Use `make init` to copy conf/development.conf.js.tmpl to `conf/development.conf.js`, edit it, add some of your own configs.
 

@@ -16,6 +16,12 @@ var Subscriber = db.define('subscriber', {
 }, {
 })
 
+module.exports = Subscriber
+
+// source media account
+Subscriber.belongsTo('media', {foreignKey: 'media_id'})
+
+// searchable columns, then API can use ?media_id=xxx
 Subscriber.scolumns = {
   media_id: null,
   subscribe: null
@@ -46,14 +52,30 @@ Subscriber.findByMedia = Subscriber.finder('media_id')
 Subscriber.getter.key = function() {
   return this.oid + ':' + this.media_id
 }
-
 cached.register(Subscriber)
 
+// cache by openId + media_id
 Subscriber.enableCache('findOne_', '{_model_}:{0.where.oid}:{0.where.media_id}')
 Subscriber.addCacheKey('{_model_}:{this.oid}:{this.media_id}')
 
-module.exports = Subscriber
 
-// source media account
-Subscriber.belongsTo('media', {foreignKey: 'media_id'})
+/**
+ * Ensure advanced properties, if not exist,
+ * will fetch from wechat API
+ */
+Subscriber.prototype.ensureDetails = function* () {
+  var existing = yield this.fetchProps()
+  if (existing) {
+    return
+  }
+  yield this.getDetails()
+}
 
+/**
+ * Get detail account info from wechat
+ */
+Subscriber.prototype.getDetails = function* () {
+  var media = yield this.media()
+  var props = yield media.wx().getUserInfo(this.oid)
+  yield this.saveProps(props)
+}

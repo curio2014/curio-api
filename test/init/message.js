@@ -20,8 +20,10 @@ var msg_args = [
   'event subscribe',
   'event unsubscribe',
   'loc 39.941004 116.41680 "This is a label"',
-  '--user BlahBlah image http://www.baidu.com/img/bdlogo.gif',
-  '--user Wakaka image http://www.baidu.com/img/bdlogo.gif',
+  // subscriber for test account
+  '--user oYAmguC1RY9LPzCxUBflv5n3kyqs event subscribe',
+  '--user afasfaBlahBlah image http://www.baidu.com/img/bdlogo.gif',
+  '--user 29agmh0s823ht12t9aWakaka image http://www.baidu.com/img/bdlogo.gif',
   '--user Wahaha event subscribe',
 ]
 var PORT = require_('conf').port

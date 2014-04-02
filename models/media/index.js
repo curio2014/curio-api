@@ -7,7 +7,7 @@ var Media = db.define('media', {
   created_at: Date,
   updated_at: Date,
   uid: { type: String, null: false, unique: true },
-  oid: { type: String, null: false, unique: true },
+  oid: { type: String, null: false, unique: true }, // gh_xxxx
   name: String,
   desc: String,
   wx_token: String,
@@ -28,20 +28,13 @@ Media.validate('uid', function(err) {
   if (!validators.isWord(this.uid)) err()
 }, {message: 'not word'})
 
-// wx_token will always has a value
-Media.getter.wx_token = function() {
-  return this._wx_token || 'keyboardcat123'
-}
-
 cached.register(Media)
 Media.enableCache('get_', '{_model_}:{0}')
 Media.itemCacheKeys.push('{_model_}:{uid}')
 
 module.exports = Media
 
-
-//Media.prototype.
-
 // load mixins
 require('./admin')
 require('./webot')
+require('./wechat')

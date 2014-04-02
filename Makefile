@@ -4,6 +4,8 @@ start:
 
 init:
 	npm install -g gnode
+	npm install -g webot-cli
+	mkdir ./var/dbstore
 	cp -vi ./conf/development.conf.js.tmpl ./conf/development.conf.js
 
 build:
@@ -17,7 +19,7 @@ debug:
 
 webot:
 	# to debug webot
-	@webot send text --des=http://api.curio.com/webot/58 --token=token
+	@webot send text --des=http://api.curio.com/webot/58 --token=token --username=oYAmguC1RY9LPzCxUBflv5n3kyqs
 
 inspector:
 	@node-inspector --web-port=3001

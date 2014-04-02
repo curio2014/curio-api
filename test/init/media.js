@@ -6,12 +6,22 @@ var User = require_('models/user')
 var Media = require_('models/media')
 var MediaAdmin = Media.Admin
 
-function addMedia(uid, screenname) {
-  return Media.upsert(uid, {
-    oid: 'gh_' + uid,
-    name: screenname,
-    wx_token: 'token'
-  })
+var TEST_ACCOUNT = {
+  oid: 'gh_b1a083fb1739',
+  name: 'test account',
+  wx_appkey: 'wx7440bf7ff5f23a1a',
+  wx_secret: '972ba827a38121094268724ce0360f67'
+}
+
+function addMedia(uid, data) {
+  if ('string' == typeof data) {
+    data = {
+      oid: 'gh_' + uid,
+      name: data,
+      wx_token: 'token'
+    }
+  }
+  return Media.upsert(uid, data)
 }
 
 function addAdmin(media, user, role) {
@@ -41,8 +51,7 @@ exports.fillup = function *(next) {
 
   yield _.range(1, 60).map(mediaGenerater)
 
-  // Media1 should have multiple admins
-  var media1 = yield Media.get('media1')
+  var media1 = yield addMedia('test', TEST_ACCOUNT)
   var user1 = yield User.get('test1')
   var user2 = yield User.get('test2')
 

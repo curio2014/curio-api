@@ -55,7 +55,6 @@ program
   }))
   .help('init database')
 
-
 program
   .command('fillup')
   .option('bench', {
@@ -71,6 +70,15 @@ program
     }
     process.exit()
   }))
+
+
+// send test message with webot-cli
+program
+  .command('webot')
+  .callback(function(opts) {
+    // TODO: write this
+  })
+
 
 program.parse()
 

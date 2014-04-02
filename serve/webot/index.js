@@ -58,16 +58,29 @@ app.use(function *(next) {
   media_id = this.media.id
   subscriber_id = req.subscriber.id
 
+  // yield req.subscriber.ensureDetails()
+
   // log request
   Message.incoming(media_id, subscriber_id, req)
-  // do the reply
-  res = yield this.webot.reply(req)
-  // log response
-  Message.outgoing(media_id, subscriber_id, res)
-
-  this.body = res
+  try {
+    // do the reply
+    res = yield this.webot.reply(req)
+  } catch (e) {
+    console.error('Webot reply error:', e)
+    res = '' // use empty reply
+  }
+  if (!isEmpty(res)) {
+    // log response
+    Message.outgoing(media_id, subscriber_id, res)
+    this.body = res
+  }
   yield next
 })
+
+
+function isEmpty(msg) {
+  return !msg || (msg.msgType === 'text' && msg.content === '')
+}
 
 // an empty handler to prevent any following middlewares
 app.use(wechat.close())
