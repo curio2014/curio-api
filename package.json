@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "koa": "koajs/koa",
+    "koa-compose": "koajs/compose",
     "koa-trie-router": "koajs/trie-router",
     "koa-logger": "koajs/logger",
     "koa-etag": "koajs/etag",
@@ -23,6 +24,7 @@
     "wechat-api": "ktmud/wechat-api",
     "thunkify": "latest",
     "passport": "jaredhanson/passport",
+    "koa-passport": "rkusa/koa-passport",
     "koa-passport-fw": "ktmud/koa-passport-fw",
     "jugglingdb": "1602/jugglingdb",
     "jugglingdb-postgres": "jugglingdb/postgres-adapter",

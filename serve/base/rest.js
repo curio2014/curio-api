@@ -14,13 +14,16 @@ module.exports = function rest(rule, resource) {
   // A trie-router rule
   var route = this.route(rule)
   var method, handler, alias
-  // attach resource functions to route
-  (resource.methods || Object.keys(resource)).forEach(function(method) {
+
+  middlewares = resource.middlewares || resource
+
+  // attach middlewares functions to route
+  Object.keys(middlewares).forEach(function(method) {
     if (method in method_alias) {
-      route[method_alias[method]](resource[method])
+      route[method_alias[method]](middlewares[method])
     }
     if (method in route) {
-      route[method](resource[method])
+      route[method](middlewares[method])
     }
   })
   return resource

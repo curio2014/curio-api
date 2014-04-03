@@ -4,6 +4,7 @@
 var _ = require_('lib/utils')
 var assert = require_('serve/base/utils').assert
 var ERRORS = require_('serve/base/consts').ERRORS
+var compose = require('koa-compose')
 
 
 function defaultHandler(method, model) {
@@ -100,40 +101,32 @@ function Resource(model, handlers, befores) {
   }
   this.handlers = handlers
   this.befores = befores || {}
+  this.middlewares = {}
 
   this.init()
 }
 
 
 Resource.prototype.init = function(handlers) {
-  var resource = this
-  var befores = resource.befores
-  var handlers = resource.handlers
-
-  var methods = this.methods = Object.keys(handlers)
-  var handlers = this.handlers = handlers || {}
+  var self = this
+  var befores = self.befores
+  var handlers = self.handlers
+  var methods = self.methods = Object.keys(handlers)
 
   methods.forEach(function(method, i) {
+    // befores are all empty
     befores[method] = befores[method] || []
-    resource[method] = function* (next) {
-      var access = befores[method]
-      var handler = resource.handlers[method]
-      if (access.length) {
-        for (var i = 0, l = access.length; i < l; i++) {
-          if (!access[i]) {
-            throw new Error('Unexpected Empty handler')
-          }
-          // access function returned error, stop
-          if (yield access[i]) {
-            return
-          }
-        }
-      }
-      yield handler
-      //yield _.sleep(.5) // slow request debug
-      if (next) yield next
+    handlers[method] = [compose(befores)].concat(handlers[method])
+    self._compose(method)
+    // add middleware to handler
+    self[method] = function(fn) {
+      handlers[method].push(fn)
     }
   })
+}
+
+Resource.prototype._compose = function(method) {
+  this.middlewares[method] = compose(this.handlers[method])
 }
 
 /**
@@ -149,8 +142,7 @@ Resource.prototype.use = function(method, middleware, isAfter) {
     method = 'all'
   }
   var list = [method]
-  //var middlewares = isAfter ? afters : befores
-  var middlewares = this.befores
+  var befores = this.befores
   if (method === 'all') {
     list = this.methods
   } else if (method === 'write') {
@@ -158,7 +150,7 @@ Resource.prototype.use = function(method, middleware, isAfter) {
     list = _.intersection(this.methods, ['create', 'update', 'destroy'])
   }
   list.forEach(function(method) {
-    middlewares[method].push(middleware)
+    befores[method].push(middleware)
   })
   return this
 }

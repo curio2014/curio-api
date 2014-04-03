@@ -1,5 +1,5 @@
 start:
-	@export DEBUG="curio:* cache* store*" && supervisor -w 'lib,serve,modules,models,app.js,conf' \
+	@export DEBUG="curio:* cache* store* wechat*" && supervisor -w 'lib,serve,modules,models,app.js,conf' \
 	--harmony	-p 1000 -n error -- --debug app.js
 
 init:

@@ -9,6 +9,7 @@ var MediaAdmin = Media.Admin
 var TEST_ACCOUNT = {
   oid: 'gh_b1a083fb1739',
   name: 'test account',
+  wx_token: 'token',
   wx_appkey: 'wx7440bf7ff5f23a1a',
   wx_secret: '972ba827a38121094268724ce0360f67'
 }

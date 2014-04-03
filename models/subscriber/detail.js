@@ -1,7 +1,9 @@
-
+var error = require_('lib/utils/logger').error('subscriber')
+var co = require('co')
 var Subscriber = require('./index')
 
 Subscriber.registerProps({
+  nickname: null,
   sex: null,
   city: null,
   country: null,
@@ -12,7 +14,21 @@ Subscriber.registerProps({
   latlng: null, // result of a REPORT_LOC or LOCATION message
 })
 
-Subscriber.hook('afterCreate', function() {
+Subscriber.getter.name = function() {
+  return this._name || this.nickname
+}
+
+Subscriber.hook('afterInitialize', function() {
+  var self = this
+
+  // if user oid exists
+  // fetch detailed user info from API
+  if (self.oid) {
+    co(function *() {
+      yield self.ensureDetails()
+    })()
+  }
+
 })
 
 
@@ -23,16 +39,21 @@ Subscriber.hook('afterCreate', function() {
 Subscriber.prototype.ensureDetails = function* () {
   var existing = yield this.fetchProps()
   if (existing) return
-  yield this.getDetails()
+  try {
+    yield this.getDetails()
+  } catch (e) {
+    error('Get user info failed: ', e)
+  }
 }
 
 /**
  * Get detail account info from wechat
  */
 Subscriber.prototype.getDetails = function* () {
-  var media = yield this.media()
-  var wx = media.wx()
+  var media, props, wx
+  media = yield this.load('media')
+  wx = media.wx()
   if (!wx) return
-  yield wx.getUserInfo(this.oid)
+  props = yield wx.getUserInfo(this.oid)
   yield this.saveProps(props)
 }

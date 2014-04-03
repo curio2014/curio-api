@@ -47,9 +47,12 @@ Message.scolumns = {
 Message.fetcher.subscriber = function *() {
   var item = yield Subscriber.get(this.subscriber_id)
   if (!item) {
-    item = yield Subscriber.create({
-      oid: this.subscriber_id,
-      media_id: this.content.media_id
+    // XXX: If subscriber not exists, it is most likely
+    // a cache error, remember to clean message like this!
+    item = new Subscriber({
+      id: this.subscriber_id,
+      oid: 'N/A',
+      media_id: this.media_id
     })
   }
   return item

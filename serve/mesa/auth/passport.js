@@ -2,9 +2,8 @@ var util = require('util')
 var co = require('co')
 var log = require('debug')('curio:auth:log')
 var User = require_('models/user')
-var passport = require('passport')
-
-passport.framework(require('koa-passport-fw'))
+var passport = require('koa-passport')
+var ERRORS = require_('serve/base/consts').ERRORS
 
 
 function LocalStrategy(verify) {
@@ -21,13 +20,15 @@ LocalStrategy.prototype.authenticate = function(req, options) {
   var username = req.body.username
   var password = req.body.password
   if (!username || !password) {
-    return this.fail(new Error('Missing credentials'))
+    var error = new Error('Missing credentials')
+    error.statusCode = 401
+    return this.error(ERRORS.MISSING_FIELD)
   }
   var self = this
   this._verify(username, password, function done(err, user) {
     if (err) return self.error(err)
     if (user) return self.success(user)
-    self.fail()
+    self.error(ERRORS.LOGIN_FAILED)
   })
 }
 

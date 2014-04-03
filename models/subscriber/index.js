@@ -1,6 +1,7 @@
 //var debug = require_('lib/utils/logger').debug('subscriber')
 var db = require_('lib/db')
 var cached = require_('lib/cached')
+var Media = require_('models/media')
 
 /**
  * Subscriber of a cirtain wechat media account
@@ -19,7 +20,7 @@ var Subscriber = db.define('subscriber', {
 module.exports = Subscriber
 
 // source media account
-Subscriber.belongsTo('media', {foreignKey: 'media_id'})
+Subscriber.belongsTo(Media, {as: 'media', foreignKey: 'media_id'})
 
 // searchable columns, then API can use ?media_id=xxx
 Subscriber.scolumns = {

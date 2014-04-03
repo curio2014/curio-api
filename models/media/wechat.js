@@ -37,7 +37,7 @@ Media.validateAsync('wx_appkey', function(err, done) {
   var wx = this.wx()
   // left these two field blank is actually allowed
   if (!wx) {
-    done()
+    return done()
   }
   wx.refreshToken(function(err) {
     if (err && err.errcode === wx.INVALID_TOKEN) {

@@ -1,29 +1,36 @@
 ERRORS = {
   NEED_LOGIN: {
-    code: 4001,
+    status: 403,
+    code: 4031,
     message: 'login required'
   },
-  LOGIN_FAILED: {
-    code: 4002,
-    message: 'login failed'
-  },
   NOT_ALLOWED: {
-    code: 4004,
+    status: 403,
+    code: 4032,
     message: 'not allowed'
   },
-  BAD_REQUEST: {
+  LOGIN_FAILED: {
+    status: 401,
     code: 4010,
+    message: 'login failed'
+  },
+  BAD_REQUEST: {
+    status: 401,
+    code: 4011,
     message: 'bad request'
   },
   MISSING_FIELD: {
-    code: 4011,
+    status: 401,
+    code: 4012,
     message: 'required parameter missing'
   },
   INVALID_TOKEN: {
+    status: 500,
     code: 5001,
     message: 'invalid token'
   },
   NOT_FOUND: {
+    status: 404,
     code: 404
   },
 };
