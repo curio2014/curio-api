@@ -31,14 +31,10 @@ Webot.prototype.codeReplies = {
 //}
 
 function* loadResponders(media, robot) {
-  // common respond rules goes here:
-  // Event, Channel, subscribe, unsubscribe, etc...
-
   // custom respond rules
   var responder = yield media.load('responder')
-
   if (responder) {
-    responder.webotfy().forEach(function(item) {
+    responder.rules().forEach(function(item) {
       robot.set(item)
     })
   }

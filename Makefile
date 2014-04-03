@@ -19,7 +19,7 @@ debug:
 
 webot:
 	# to debug webot
-	@webot send text --des=http://api.curio.com/webot/58 --token=token --username=oYAmguC1RY9LPzCxUBflv5n3kyqs
+	@webot send text --des=http://api.curio.com/webot/test --token=token --user=oYAmguC1RY9LPzCxUBflv5n3kyqs
 
 inspector:
 	@node-inspector --web-port=3001

@@ -2,9 +2,15 @@ var db = require_('lib/db')
 
 var Place = db.define('place', {
   created_at: Date,
+  updated_at: Date,
   lat: Number,
   lng: Number,
   name: String,
+})
+
+
+Place.registerProps({
+  introduction: null
 })
 
 

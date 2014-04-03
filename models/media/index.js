@@ -13,7 +13,6 @@ var Media = db.define('media', {
   wx_token: String,
   wx_appkey: String,
   wx_secret: String,
-}, {
 })
 
 Media.validatesPresenceOf('name')

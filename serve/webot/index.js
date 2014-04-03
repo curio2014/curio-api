@@ -58,8 +58,6 @@ app.use(function *(next) {
   media_id = this.media.id
   subscriber_id = req.subscriber.id
 
-  // yield req.subscriber.ensureDetails()
-
   // log request
   Message.incoming(media_id, subscriber_id, req)
   try {

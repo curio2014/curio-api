@@ -34,16 +34,6 @@ Subscriber.SCHEMA_SQL = [
 "CREATE UNIQUE INDEX ON subscriber(oid, media_id);"
 ].join('\n')
 
-Subscriber.registerProps({
-  sex: null,
-  city: null,
-  country: null,
-  province: null,
-  language: null,
-  headimgurl: null,
-  subscribe_time: null,
-})
-
 //Subscriber.get = Subscriber.finder('oid', 'media_id', true)
 Subscriber.upsert = Subscriber.upsertBy('oid', 'media_id')
 Subscriber.findByOpenId = Subscriber.finder('oid')
@@ -59,23 +49,6 @@ Subscriber.enableCache('findOne_', '{_model_}:{0.where.oid}:{0.where.media_id}')
 Subscriber.addCacheKey('{_model_}:{this.oid}:{this.media_id}')
 
 
-/**
- * Ensure advanced properties, if not exist,
- * will fetch from wechat API
- */
-Subscriber.prototype.ensureDetails = function* () {
-  var existing = yield this.fetchProps()
-  if (existing) {
-    return
-  }
-  yield this.getDetails()
-}
 
-/**
- * Get detail account info from wechat
- */
-Subscriber.prototype.getDetails = function* () {
-  var media = yield this.media()
-  var props = yield media.wx().getUserInfo(this.oid)
-  yield this.saveProps(props)
-}
+// detail properties from wechat API
+require('./detail')

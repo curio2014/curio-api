@@ -22,10 +22,8 @@ And make sure you have a `redis-server` running.
 
 ### Install dependencies
 
-
 	  npm install -g gnode
 	  npm install -g webot-cli
-
 
 
 ### Create local configurations
@@ -35,7 +33,7 @@ Use `make init` to copy conf/development.conf.js.tmpl to `conf/development.conf.
 For available options, see `conf/default.conf.js`
 
 
-### Preparing for test data
+### Preparing test data
 
 1. Create database tables
 
@@ -48,7 +46,7 @@ For available options, see `conf/default.conf.js`
 3. Run `make` to start a development server (file changes watched by `Supervisor`)
 
 
-### Make the bin `curio` executable
+#### Make the bin `curio` executable
 
 Try add this to your .bashrc:
 
@@ -68,6 +66,31 @@ Under `/api/`:
 
     /api/media/:id     A wechat account info
     /api/user/:id      A system user info
+
+
+### ORM Relations
+
+We use [jugglingdb](https://github.com/1602/jugglingdb) as ORM, and added some handy methods for
+easily load relations in `koa`.
+
+Example:
+
+```javascript
+
+// to get the admin, and corresponding media for this admin info
+var mediaAdmin = yield MediaAdmin.get(1).attach('media')
+
+```
+
+See `lib/db/index.js` for details.
+
+
+### Model data storage
+
+Basic information that needs to be fastly queried are stored in PostgreSQL; Supplementary information
+are stored as key-value JSON in LevelDB, see `lib/db/cprops.js`.
+
+A `Model.get` will not load `cprops` by default. In most case, you will need to do `yield model.load('props')` or `yield model.loadProps()`.
 
 
 ### Conventions

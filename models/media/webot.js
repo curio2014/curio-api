@@ -10,7 +10,8 @@ Media.prototype.webotPath = function() {
 
 /**
  * Load webot reply rules
+ * (this is async, don't forget `yield`)
  */
 Media.fetcher.responder = function() {
-  return Responder.load(this.id)
+  return Responder.get(this.id)
 }
