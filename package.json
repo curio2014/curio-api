@@ -10,6 +10,7 @@
     "test": "./node_modules/.bin/mocha"
   },
   "dependencies": {
+    "kue": "~0.7.5",
     "koa": "koajs/koa",
     "koa-compose": "koajs/compose",
     "koa-trie-router": "koajs/trie-router",

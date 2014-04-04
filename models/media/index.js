@@ -37,3 +37,4 @@ module.exports = Media
 require('./admin')
 require('./webot')
 require('./wechat')
+require('./jobs')

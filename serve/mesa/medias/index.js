@@ -1,15 +1,8 @@
 var ERRORS = require_('serve/base/consts').ERRORS
 var Media = require_('models/media')
 var Message = require_('models/message')
-var Subscriber = require_('models/subscriber')
 
 var app = require('../index')
-
-function* idOverride(next) {
-  this.params.media_id = this.params.id
-  delete this.params.id
-  yield next
-}
 
 app.rest('/medias', Collection(Media))
   // Only super user can create/delete media
@@ -20,17 +13,9 @@ app.rest('/medias/:id([\\w\\-]*)', Resource(Media))
 
 app.rest('/medias/:id/messages', Collection(Message))
   .use(app.auth.need('mediaAdmin'))
-  .use(idOverride)
-
-app.rest('/medias/:id/subscribers', Collection(Subscriber))
-  .use(app.auth.need('mediaAdmin'))
-  .use(idOverride)
-
-app.rest('/medias/:id/subscribers/:subscriber_id', Resource(Subscriber))
-  .use(app.auth.need('mediaAdmin'))
   .use(function* idOverride(next) {
     this.params = {
-      id: this.params.subscriber_id
+      media_id: this.params.id
     }
     yield next
   })

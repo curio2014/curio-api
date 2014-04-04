@@ -20,7 +20,6 @@ Subscriber.getter.name = function() {
 
 Subscriber.hook('afterInitialize', function() {
   var self = this
-
   // if user oid exists
   // fetch detailed user info from API
   if (self.oid) {

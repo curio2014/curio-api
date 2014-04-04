@@ -6,6 +6,12 @@ var assert = require_('serve/base/utils').assert
 var ERRORS = require_('serve/base/consts').ERRORS
 var compose = require('koa-compose')
 
+var HTTP_ALIAS = {
+  'read': 'get',
+  'update': 'post',
+  'destroy': 'delete',
+  'create': 'put',
+}
 
 function defaultHandler(method, model) {
   if (method == 'index') {
@@ -120,11 +126,20 @@ Resource.prototype.init = function(handlers) {
     Object.defineProperty(handlers, method, {
       value: mw
     })
-    // add middleware to handler
+
+    // methods to add middleware
+    //
+    // resource.read(...)
+    //
     self[method] = function() {
       // append mws in arguments
       Array.prototype.push.apply(mw, arguments)
+      return self
     }
+    if (method in HTTP_ALIAS) {
+      self[HTTP_ALIAS[method]] = self[method]
+    }
+
     self._compose(method)
   })
 }
