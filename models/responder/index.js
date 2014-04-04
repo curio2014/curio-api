@@ -17,18 +17,20 @@ module.exports = Responder
 /**
  * A responder to manage all reply rules
  */
-function Responder(media_id) {
-  this._media_id = media_id
+function Responder(data) {
+  if (!isNaN(Number(data))) {
+    data = { media_id: data }
+  }
+  this._media_id = data.media_id
+  this._rules = data.rules || '[]' // the Array JSON text
   this._shared = []
-  this._customed = []
 }
 
 /**
  * Load customed rules
  */
 Responder.prototype.load = function* () {
-  var rules = yield store.get(this._media_id)
-  this._customed = rules || []
+  this._rules = yield store.get(this._media_id)
 }
 
 /**
@@ -42,7 +44,19 @@ Responder.prototype.clear = function() {
  * All rules
  */
 Responder.prototype.rules = function() {
-  return this._shared.concat(this._customed)
+  var revived = JSON.parse(this._rules, reviver)
+  return this._shared.concat(revived)
+}
+
+
+/**
+ * on dump customed rules when do toJSON
+ */
+Responder.prototype.toJSON = function() {
+  return {
+    media_id: this._media_id,
+    rules: JSON.parse(this._rules)
+  }
 }
 
 
@@ -53,7 +67,7 @@ function pickle(val) {
   return JSON.stringify(val, replacer)
 }
 function unpickle(val) {
-  return JSON.parse(val, reviver)
+  return val
 }
 
 function reviveFor(ctx) {

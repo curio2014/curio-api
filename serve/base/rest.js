@@ -5,6 +5,7 @@ var method_alias = {
   'update': 'put',
   'destroy': 'delete'
 }
+var Resource = require('./resource')
 
 
 /**
@@ -13,6 +14,10 @@ var method_alias = {
 module.exports = function rest(rule, resource) {
   // A trie-router rule
   var route = this.route(rule)
+
+  if (!resource) {
+    resource = Resource()
+  }
 
   process.nextTick(function() {
     var method, handler, alias

@@ -82,7 +82,7 @@ function defaultHandler(method, model) {
 
 function Resource(model, handlers, befores) {
   if (!(this instanceof Resource)) {
-    return new Resource(model, handlers)
+    return new Resource(model, handlers, befores)
   }
   // first argument is not a constructor, then it is handlers
   if (typeof model == 'object') {
@@ -92,11 +92,8 @@ function Resource(model, handlers, befores) {
   handlers = handlers || ['read', 'update', 'destroy']
   if (Array.isArray(handlers)) {
     handlers = _.zipObject(handlers)
-    if (!model) {
-      throw new Error('will use default handler, but model is not defined')
-    }
     for (var k in handlers) {
-      handlers[k] = defaultHandler(k, model)
+      handlers[k] = model ? defaultHandler(k, model) : []
     }
   }
   this.handlers = handlers
@@ -133,10 +130,6 @@ Resource.prototype.init = function(handlers) {
 }
 
 Resource.prototype._compose = function(method) {
-  var handlers = this.handlers[method]
-  setImmediate(function() {
-    console.log(handlers)
-  })
   this.middlewares[method] = compose(this.handlers[method])
 }
 

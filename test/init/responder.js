@@ -6,6 +6,11 @@ var Media = require_('models/media')
 
 
 var rules = [{
+  pattern: /function test/,
+  handler: function (info) {
+    return 'Current time:' + (new Date().toLocaleString())
+  },
+}, {
   pattern: {
     type: 'event',
     param: {
@@ -62,16 +67,11 @@ var rules = [{
 }, {
   pattern: { type: 'image' },
   handler: 'got your image'
-}, {
-  pattern: 'function test',
-  handler: function (info) {
-    return 'Current time:' + (new Date().toLocaleString())
-  },
 }]
 
 function responderGenerator(media, i) {
   return function*() {
-    yield Responder.dump(media.id, _.shuffle(rules))
+    yield Responder.dump(media.id, rules)
     log('Generated responder for %s.', media.uid)
   }
 }

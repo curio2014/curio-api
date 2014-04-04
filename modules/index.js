@@ -20,19 +20,20 @@ Module.prototype.initialize = function() {
   debug('Initializing module %s..', self.name)
 
   // load routes and hooks
-  var paths = ['routes', 'hooks'].map(function(name) {
+  var paths = ['index', 'routes', 'hooks'].map(function(name) {
     return PATH.join(self.dirname, name)
   })
 
-  try {
-    paths.forEach(function(filepath) {
+  paths.forEach(function(filepath) {
+    try {
       require(filepath)
-    })
-  } catch (e) {
-    if (e.code !== 'MODULE_NOT_FOUND' ||  e.toString().indexOf(self.dirname) == -1) {
-      throw e
+    } catch (e) {
+      if (e.code !== 'MODULE_NOT_FOUND' ||  e.toString().indexOf(self.dirname) == -1) {
+        throw e
+      }
     }
-  }
+  })
+
   return self
 }
 

@@ -1,5 +1,4 @@
 var mesa = require_('serve/mesa')
-var wx = require_('serve/wx')
 var Channel = require('./models')
 
 mesa.rest('/media/:id/channels', Collection(Channel))
