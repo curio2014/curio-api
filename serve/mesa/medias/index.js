@@ -5,9 +5,10 @@ var Subscriber = require_('models/subscriber')
 
 var app = require('../index')
 
-function* idOverride() {
+function* idOverride(next) {
   this.params.media_id = this.params.id
   delete this.params.id
+  yield next
 }
 
 app.rest('/medias', Collection(Media))
@@ -27,9 +28,10 @@ app.rest('/medias/:id/subscribers', Collection(Subscriber))
 
 app.rest('/medias/:id/subscribers/:subscriber_id', Resource(Subscriber))
   .use(app.auth.need('mediaAdmin'))
-  .use(function* () {
+  .use(function* idOverride(next) {
     this.params = {
       id: this.params.subscriber_id
     }
+    yield next
   })
 

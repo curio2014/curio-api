@@ -114,18 +114,29 @@ Resource.prototype.init = function(handlers) {
   var methods = self.methods = Object.keys(handlers)
 
   methods.forEach(function(method, i) {
-    // befores are all empty
-    befores[method] = befores[method] || []
-    handlers[method] = [compose(befores)].concat(handlers[method])
-    self._compose(method)
+    var access = befores[method] || []
+    var mw = [compose(access)].concat(handlers[method])
+    // by now, these two middleware arrays should not be changeable
+    Object.defineProperty(befores, method, {
+      value: access
+    })
+    Object.defineProperty(handlers, method, {
+      value: mw
+    })
     // add middleware to handler
-    self[method] = function(fn) {
-      handlers[method].push(fn)
+    self[method] = function() {
+      // append mws in arguments
+      Array.prototype.push.apply(mw, arguments)
     }
+    self._compose(method)
   })
 }
 
 Resource.prototype._compose = function(method) {
+  var handlers = this.handlers[method]
+  setImmediate(function() {
+    console.log(handlers)
+  })
   this.middlewares[method] = compose(this.handlers[method])
 }
 

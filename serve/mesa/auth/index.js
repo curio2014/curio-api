@@ -6,11 +6,11 @@ var User = require_('models/user')
  * User privilege middlewares
  */
 var checks = {
-  login: function *(next) {
+  login: function* requireLogin(next) {
     this.assert(this.req.user, 401, ERRORS.NEED_LOGIN)
     if (next) yield next
   },
-  mediaAdmin: function *(next) {
+  mediaAdmin: function* requireMediaAdmin(next) {
     var user = this.req.user
     var media_id, role
 
@@ -39,7 +39,7 @@ exports.need = function(act) {
     return checks[act]
   }
   // cache the middleware
-  checks[act] = function *(next) {
+  checks[act] = function* checkPermission(next) {
     this.assert(this.req.user, 401, ERRORS.NEED_LOGIN)
     this.assert(this.req.user.permitted(act), 403, ERRORS.NOT_ALLOWED)
     if (next) yield next
