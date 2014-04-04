@@ -5,7 +5,11 @@ var error = require_('lib/utils/logger').error('message')
 var db = require_('lib/db')
 var mediator = require_('lib/mediator')
 var consts = require_('models/consts')
+
+var Media = require_('models/media')
+var User = require_('models/user')
 var Subscriber = require_('models/subscriber')
+
 var CONTENT_TYPES = consts.MESSSAGE_CONTENT_TYPES
 var TYPES = consts.MESSAGE_TYPES
 var EVTS = consts.GLOBAL_EVENTS
@@ -23,12 +27,14 @@ CONTENT_TYPES.bind(Message, 'content_type')
 
 module.exports = Message
 
-// from whom to whom
-Message.belongsTo('media', {foreignKey: 'media_id'})
-Message.belongsTo('subscriber', {foreignKey: 'subscriber_id'})
+// "replier" sent a message to "subsciber", as "media"
+Message.belongsTo(Media, {as: 'media', foreignKey: 'media_id'})
+Message.belongsTo(Subscriber, {as: 'subscriber', foreignKey: 'subscriber_id'})
+Message.belongsTo(User, {as: 'replier', foreignKey: 'user_id'})
 
 Subscriber.SCHEMA_SQL = [
 "CREATE INDEX ON message(media_id);",
+"CREATE INDEX ON message(subscriber_id);",
 "CREATE INDEX ON message(content_type) where content_type in (" + [CONTENT_TYPES.SUBSCRIBE, CONTENT_TYPES.UNSUBSCRIBE] + ");",
 ].join('\n')
 
