@@ -58,8 +58,6 @@ app.use(function *(next) {
   media_id = this.media.id
   subscriber_id = req.subscriber.id
 
-  // log request
-  Message.incoming(media_id, subscriber_id, req)
   try {
     // do the reply
     res = yield this.webot.reply(req)
@@ -70,8 +68,11 @@ app.use(function *(next) {
   if (!isEmpty(res)) {
     // log response
     Message.outgoing(media_id, subscriber_id, res)
+    req.autoReplied = true
     this.body = res
   }
+  // log request
+  Message.incoming(media_id, subscriber_id, req)
   yield next
 })
 

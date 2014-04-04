@@ -15,6 +15,7 @@ var EVTS = consts.GLOBAL_EVENTS
  */
 var Message = db.define('message', {
   created_at: Date,
+  flag: { type: Boolean, default: false },
   content: db.JSON, // the raw json of wechat message
 })
 TYPES.bind(Message, 'type')
