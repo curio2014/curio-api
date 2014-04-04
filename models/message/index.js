@@ -110,7 +110,7 @@ Message.incoming = function(media_id, subscriber_id, content) {
       content_type = 'REPORT_LOC'
     }
   }
-  // update content type to a INT consts
+  // convert content type to a INT consts
   if (content_type in CONTENT_TYPES) {
     content_type = CONTENT_TYPES[content_type]
   } else {
@@ -120,6 +120,7 @@ Message.incoming = function(media_id, subscriber_id, content) {
   // Save a new message asynchronously
   buffer.write({
     type: TYPES.INCOMING,
+    flag: content.flag || false,
     created_at: content.createTime,
     media_id: media_id,
     subscriber_id: subscriber_id,
@@ -133,17 +134,17 @@ Message.incoming = function(media_id, subscriber_id, content) {
 /**
  * The response we are giving to wechat & end user
  */
-Message.outgoing = function(media_id, subscriber_id, content, type) {
+Message.outgoing = function(media_id, subscriber_id, content) {
   var content_type = content.msgType.toUpperCase()
   if (content_type in CONTENT_TYPES) {
     content_type = CONTENT_TYPES[content_type]
   } else {
     content_type = CONTENT_TYPES.UNKOWN
   }
-  type = type || TYPES.REPLY
 
   buffer.write({
-    type: type,
+    type: content.type || TYPES.REPLY,
+    flag: content.flag || false,
     created_at: content.createTime,
     media_id: media_id,
     subscriber_id: subscriber_id,

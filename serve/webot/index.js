@@ -68,8 +68,9 @@ app.use(function *(next) {
   if (!isEmpty(res)) {
     // log response
     Message.outgoing(media_id, subscriber_id, res)
-    req.autoReplied = true
     this.body = res
+  } else {
+    req.flag = true
   }
   // log request
   Message.incoming(media_id, subscriber_id, req)

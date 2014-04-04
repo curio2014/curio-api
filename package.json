@@ -20,7 +20,7 @@
     "koa-cors": "evert0n/koa-cors",
     "koa-sess": "dead-horse/koa-session",
     "koa-redis": "ktmud/koa-redis",
-    "koa-wechat": "ktmud/koa-wechat",
+    "koa-wechat": "~0.1.1",
     "wechat-api": "ktmud/wechat-api",
     "thunkify": "latest",
     "passport": "jaredhanson/passport",
