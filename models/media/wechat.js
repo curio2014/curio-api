@@ -2,7 +2,7 @@
  * Wechat advanced API integrations
  */
 var Media = require('./index')
-var Wechat = require('lib/wechat')
+var Wechat = require_('lib/wechat')
 // in memory cache of wx-client
 var cache = require('lru-cache')({
   max: 20,
