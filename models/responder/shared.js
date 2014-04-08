@@ -2,21 +2,18 @@
  * Common Shared rules across all media
  */
 var Responder = require('./index')
-
+var revive = require('./reviver')
 
 var shared_rules = []
 
 /**
- * Register a shared rule
+ * Register shared rules
+ *
+ *    registerRule(rule1, rule2...)
+ *
  */
-Responder.registerRule = function(rule) {
-  shared_rules.push(rule)
-}
-
-
-Responder.prototype.loadShared = function* () {
-  // clone
-  this._shared = shared_rules.slice()
+Responder.registerRule = function() {
+  shared_rules.push.apply(shared_rules, revive(arguments))
 }
 
 

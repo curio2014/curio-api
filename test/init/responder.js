@@ -11,12 +11,7 @@ var rules = [{
     return 'Current time:' + (new Date().toLocaleString())
   },
 }, {
-  pattern: {
-    type: 'event',
-    param: {
-      event: 'subscribe'
-    }
-  },
+  pattern: '$subscribe',
   handler: 'thank your for your subscribe'
 }, {
   pattern: 'news2',
@@ -54,9 +49,7 @@ var rules = [{
     }],
   },
 }, {
-  pattern: {
-    type: 'location'
-  },
+  pattern: '$location',
   handler: {
     type: 'image',
     picUrl: 'http://news.baidu.com/z/resource/r/image/2014-02-20/654a9ee49520c0e5b40ffc413e2fbd2d.jpg'
@@ -65,7 +58,7 @@ var rules = [{
   pattern: 'hello',
   handler: 'Got ya!',
 }, {
-  pattern: { type: 'image' },
+  pattern: '$image',
   handler: 'got your image'
 }]
 

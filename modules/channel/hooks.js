@@ -12,21 +12,22 @@ Responder.registerRule({
            info.param.event == 'subscribe' &&
            info.param.eventKey
   },
-  handler: function(info) {
-    info.scene_id = info.param.eventKey.replace('qrscene_')
-    addChannelTag(info)
-  }
-})
-
-Responder.registerRule({
+  handler: '$tag_qrcene'
+}, {
   name: 'subscribed scan',
   pattern: function(info) {
     return info.is('event') &&
            info.param.event == 'SCAN'
   },
-  handler: function(info) {
-    info.scene_id = info.param.eventKey
-    addChannelTag(info)
+  handler: '$tag_qrcene'
+})
+
+Responder.registerHandler({
+  '$tag_qrcene': function(info) {
+    info.scene_id = info.param.eventKey.replace('qrscene_', '')
+    if (info.scene_id) {
+      addChannelTag(info)
+    }
   }
 })
 

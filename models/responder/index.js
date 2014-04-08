@@ -5,7 +5,6 @@
  */
 var Media = require_('models/media')
 var log = require_('lib/utils/logger').log('responder')
-var sandbox = require_('lib/utils/sandbox')
 var store = require_('lib/store')('responder', {
   encode: pickle,
   decode: unpickle
@@ -13,6 +12,8 @@ var store = require_('lib/store')('responder', {
 
 module.exports = Responder
 
+
+var shared_rules = require('./shared')
 
 /**
  * A responder to manage all reply rules
@@ -22,8 +23,8 @@ function Responder(data) {
     data = { media_id: data }
   }
   this._media_id = data.media_id
-  this._rules = data.rules || '[]' // the Array JSON text
-  this._shared = []
+  this._rules = data.rules || [] // the Array JSON text
+  this._shared = shared_rules
 }
 
 /**
@@ -41,72 +42,22 @@ Responder.prototype.clear = function() {
 }
 
 /**
- * All rules
- */
-Responder.prototype.rules = function() {
-  var revived = JSON.parse(this._rules, reviver)
-  return this._shared.concat(revived)
-}
-
-
-/**
  * on dump customed rules when do toJSON
  */
 Responder.prototype.toJSON = function() {
   return {
     media_id: this._media_id,
-    rules: JSON.parse(this._rules)
+    rules: this._rules
   }
 }
 
-
-
-var reviver = reviveFor(Responder.context)
-
-function pickle(val) {
-  return JSON.stringify(val, replacer)
-}
-function unpickle(val) {
-  return val
-}
-
-function reviveFor(ctx) {
-  return function reviver(k, v) {
-    if (v && v.pickled) {
-      try {
-        return sandbox(ctx, v.value)
-      } catch (e) {
-        log('Unpickle %j failed', v)
-        return
-      }
-    }
-    return v
-  }
-}
-
-function replacer(k, v) {
-  if (v instanceof RegExp) {
-    return {
-      pickled: 'regexp',
-      value: v.toString()
-    }
-  }
-  if ('function' == typeof v) {
-    return {
-      pickled: 'function',
-      value: v.toString()
-    }
-  }
-  return v
-}
 
 /**
  * Get responder by media id
  */
 Responder.get = function* (media_id) {
   var responder = new Responder(media_id)
-  // load shared and customed rules parallelly
-  yield [responder.load(), responder.loadShared()]
+  yield responder.load()
   return responder
 }
 
@@ -129,4 +80,39 @@ Responder.clear = function(media_id) {
   return store.del(media_id)
 }
 
-require('./shared')
+
+/**
+ * Save a rule in a unified format
+ */
+function normalize(rule) {
+  // TODO:
+}
+
+
+function pickle(val) {
+  return JSON.stringify(val, replacer)
+}
+function unpickle(val) {
+  return JSON.parse(val)
+}
+// make sure rules in storage are plain text/object,
+// then you can write advanced rule in JavaScript
+function replacer(k, v) {
+  if (v instanceof RegExp) {
+    return {
+      pickled: 'regexp',
+      value: v.toString()
+    }
+  }
+  if ('function' == typeof v) {
+    return {
+      pickled: 'function',
+      value: v.toString()
+    }
+  }
+  return v
+}
+
+
+
+require('./reviver')
