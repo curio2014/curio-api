@@ -35,6 +35,7 @@ function* loadResponders(media, robot) {
   var responder = yield media.load('responder')
   if (responder) {
     responder.rules().forEach(function(item) {
+      //console.log(item)
       robot.set(item)
     })
   }

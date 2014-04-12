@@ -7,7 +7,7 @@ var Channel = require('./models')
 
 Responder.registerRule({
   name: 'unsubscribed scan',
-  pattern: function(info) {
+  pattern: function isUnsubscribedScan(info) {
     return info.is('event') &&
            info.param.event == 'subscribe' &&
            info.param.eventKey
@@ -15,7 +15,7 @@ Responder.registerRule({
   handler: '$tag_qrcene'
 }, {
   name: 'subscribed scan',
-  pattern: function(info) {
+  pattern: function isSubscribedScan(info) {
     return info.is('event') &&
            info.param.event == 'SCAN'
   },
@@ -23,7 +23,7 @@ Responder.registerRule({
 })
 
 Responder.registerHandler({
-  '$tag_qrcene': function(info) {
+  '$tag_qrcene': function addQRCodeTag(info) {
     info.scene_id = info.param.eventKey.replace('qrscene_', '')
     if (info.scene_id) {
       addChannelTag(info)

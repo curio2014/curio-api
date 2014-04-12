@@ -1,10 +1,11 @@
 /**
  * Common Shared rules across all media
  */
+var shared_rules = module.exports = []
+
+
 var Responder = require('./index')
 var revive = require('./reviver')
-
-var shared_rules = []
 
 /**
  * Register shared rules
@@ -15,6 +16,3 @@ var shared_rules = []
 Responder.registerRule = function() {
   shared_rules.push.apply(shared_rules, revive(arguments))
 }
-
-
-module.exports = shared_rules

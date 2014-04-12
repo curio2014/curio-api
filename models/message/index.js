@@ -69,7 +69,6 @@ function batchSave(items, callback) {
   var b = this
   debug('Starting batch write %s messages..', items.length)
   var send = function *() {
-
     try {
       // batch create message items
       items = yield Message.create(items)
@@ -131,9 +130,7 @@ Message.incoming = function(media_id, subscriber_id, content) {
     media_id: media_id,
     subscriber_id: subscriber_id,
     content_type: content_type,
-    content: {
-      content: Object.keys(content.param).length ? content.param : content.text,
-    }
+    content: content_type === CONTENT_TYPES.TEXT ? content.text : content.param
   })
 }
 
@@ -155,9 +152,7 @@ Message.outgoing = function(media_id, subscriber_id, content) {
     media_id: media_id,
     subscriber_id: subscriber_id,
     content_type: content_type,
-    content: {
-      content: content.content,
-    }
+    content: content.content,
   })
 }
 

@@ -3,15 +3,15 @@
  * Use leveldb to save the whole list for each media
  * Should be super fast!
  */
+module.exports = Responder
+
+
 var Media = require_('models/media')
 var log = require_('lib/utils/logger').log('responder')
 var store = require_('lib/store')('responder', {
   encode: pickle,
   decode: unpickle
 })
-
-module.exports = Responder
-
 
 var shared_rules = require('./shared')
 
