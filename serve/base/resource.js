@@ -118,7 +118,9 @@ Resource.prototype.init = function(handlers) {
 
   methods.forEach(function(method, i) {
     var access = befores[method] || []
+    // all middlewares
     var mw = [compose(access)].concat(handlers[method])
+
     // by now, these two middleware arrays should not be changeable
     Object.defineProperty(befores, method, {
       value: access
@@ -129,10 +131,12 @@ Resource.prototype.init = function(handlers) {
 
     // methods to add middleware
     //
-    // resource.read(...)
+    // resource
+    //   .read(...)
+    //   .post(...)
     //
     self[method] = function() {
-      // append mws in arguments
+      // append middlewares in arguments
       Array.prototype.push.apply(mw, arguments)
       return self
     }

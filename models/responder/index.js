@@ -35,7 +35,43 @@ Responder.prototype.load = function* () {
 }
 
 /**
+ * Save customed rules to storage
+ *
+ * @async
+ */
+Responder.prototype.save = function() {
+  if (this.errors) {
+    this.validate()
+    if (this.errors) {
+      throw new Error('Cannot save invalid rules')
+    }
+  }
+  return store.set(this._media_id, this._rules)
+}
+
+Responder.prototype.validate = function() {
+  var errors = [], rules = this._rules
+  rules.forEach(function(item, i) {
+    if (!item.handler) {
+      errors.push({
+        field: 'handler',
+        index: i,
+        error: 'is required',
+      })
+    }
+  })
+  if (errors.length) {
+    this.errors = errors
+  } else {
+    this.errors = null
+  }
+  return errors.length === 0
+}
+
+/**
  * Clear customed rules
+ *
+ * @async
  */
 Responder.prototype.clear = function() {
   return Responder.clear(this._media_id)
@@ -66,11 +102,15 @@ Responder.get = function* (media_id) {
  *
  * @param rules, an array of webot rules
  */
-Responder.dump = function(media_id, rules) {
-  if (!Array.isArray(rules)) {
-    throw new Error('Responder rules must be an array')
-  }
-  return store.set(media_id, rules)
+Responder.dump = function* (media_id, rules) {
+  var responder = new Responder({ media_id: media_id, rules: rules })
+  return yield responder.save()
+}
+
+/**
+ * Validate rules
+ */
+Responder.validate = function(rules) {
 }
 
 /**

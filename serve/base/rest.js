@@ -16,9 +16,17 @@ module.exports = function rest(rule, resource) {
   var route = this.route(rule)
 
   if (!resource) {
+    // create a new Resource if not exist
     resource = Resource()
   }
 
+  // Apply middlewares later,
+  // so we can write like:
+  //
+  //   app.rest('/path/to/resource')
+  //     .update(...)
+  //     .read(...)
+  //
   process.nextTick(function() {
     var method, handler, alias
 
