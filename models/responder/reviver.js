@@ -92,9 +92,10 @@ function unpickle(v, metas) {
   return v
 }
 
-function revivePattern(v, flag) {
+function revivePattern(v) {
   if (Array.isArray(v)) {
-    v = new RegExp(v.join('|'), flag)
+    // Array is always keyword
+    v = reviveKeywords(v)
   } else {
     v = unpickle(v, metaPattern)
   }
@@ -106,12 +107,30 @@ function reviveHandler(v) {
   return v
 }
 
+
+function reviveKeywords(words) {
+  var reg = []
+  words.forEach(function(item) {
+    if (!item.text) {
+      // ignore bad keyword
+      return
+    }
+    var text = escapeRegExpLiteral(item.text)
+    if (item.blur) {
+      reg.push(text)
+    } else {
+      reg.push('^' + text + '$')
+    }
+  })
+  // always ignore cases
+  return new RegExp(reg.join('|'), 'i')
+}
 function revive(rules) {
   var ret = []
   _.each(rules, function(rule, i) {
     rule = _.clone(rule)
     if ('pattern' in rule) {
-      rule.pattern = revivePattern(rule.pattern, rule.regFlag)
+      rule.pattern = revivePattern(rule.pattern)
     }
     if ('handler' in rule) {
       rule.handler = reviveHandler(rule.handler)
@@ -124,3 +143,7 @@ function revive(rules) {
   return ret
 }
 
+
+function escapeRegExpLiteral(text) {
+  return text.replace(/[\\\.\|\^\$\*\(\)\!]/g, '\\$&')
+}

@@ -6,6 +6,7 @@ var cache = require('lru-cache')({
   max: 20,
 })
 
+
 Webot.prototype.codeReplies = {
   '404': ''
 }
@@ -41,7 +42,11 @@ function* loadResponders(media, robot) {
   }
 }
 
-Webot.clearCache = function(media_id) {
+/**
+ * Clear cache, call this after reponder update
+ */
+Webot.purge = function(media_id) {
+  debug('clear webot cache for %s', media_id)
   cache.del(media_id)
 }
 
@@ -55,6 +60,7 @@ Webot.get = function* (media) {
   var media_id = media.id
   var robot = cache.get(media_id)
   if (robot) {
+    debug('got webot %s from cache', media_id)
     return robot
   }
   debug('webot cache miss: %s', media_id)

@@ -6,6 +6,7 @@
 module.exports = Responder
 
 
+var Webot = require_('models/webot')
 var Media = require_('models/media')
 var log = require_('lib/utils/logger').log('responder')
 var store = require_('lib/store')('responder', {
@@ -39,20 +40,27 @@ Responder.prototype.load = function* () {
  *
  * @async
  */
-Responder.prototype.save = function() {
+Responder.prototype.save = function* () {
   if (this.errors) {
     this.validate()
     if (this.errors) {
       throw new Error('Cannot save invalid rules')
     }
   }
-  return store.set(this._media_id, this._rules)
+  var ret = yield store.set(this._media_id, this._rules)
+  // must clear webot cache after save success
+  Webot.purge(this._media_id)
+  return ret
+}
+
+function canEmptyResponse(rule) {
+  return rule.pattern === '$any'
 }
 
 Responder.prototype.validate = function() {
   var errors = [], rules = this._rules
   rules.forEach(function(item, i) {
-    if (!item.handler) {
+    if (!canEmptyResponse(item) && !item.handler) {
       errors.push({
         field: 'handler',
         index: i,
