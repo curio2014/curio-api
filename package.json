@@ -22,7 +22,7 @@
     "koa-sess": "dead-horse/koa-session",
     "koa-redis": "ktmud/koa-redis",
     "koa-wechat": "~0.1.1",
-    "wechat-api": "0.0.3",
+    "wechat-api": "0.0.4",
     "thunkify": "latest",
     "passport": "jaredhanson/passport",
     "koa-passport": "rkusa/koa-passport",
