@@ -3,6 +3,7 @@ var co = require('co')
 var Subscriber = require('./index')
 
 Subscriber.registerProps({
+  invalid: null,
   nickname: null,
   sex: null,
   city: null,
@@ -20,6 +21,12 @@ Subscriber.getter.name = function() {
 
 Subscriber.hook('afterInitialize', function() {
   var self = this
+  if (this.subscribe == null) {
+    this.subscribe = true
+  }
+  if (this.credit == null) {
+    this.credit = 0
+  }
   // if user oid exists
   // fetch detailed user info from API
   if (self.oid) {
@@ -27,7 +34,6 @@ Subscriber.hook('afterInitialize', function() {
       yield self.ensureDetails()
     })()
   }
-
 })
 
 
@@ -53,6 +59,11 @@ Subscriber.prototype.getDetails = function* () {
   media = yield this.load('media')
   wx = media.wx()
   if (!wx) return
-  props = yield wx.getUserInfo(this.oid)
+  try {
+    props = yield wx.getUserInfo(this.oid)
+  } catch (e) {
+    props = { invalid: e }
+  }
   yield this.saveProps(props)
+  yield this.updateAttributes({ subscribe: Boolean(props.subscribe) })
 }

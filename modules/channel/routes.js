@@ -1,9 +1,9 @@
 var mesa = require_('serve/mesa')
 var Channel = require('./models')
 
-mesa.rest('/media/:id/channels', Collection(Channel))
+mesa.rest('/medias/:id/channels', Collection(Channel))
   .use(mesa.auth.need('mediaAdmin'))
 
-mesa.rest('/media/:id/channels/:channel_id', Resource(Channel))
+mesa.rest('/medias/:id/channels/:channel_id', Resource(Channel))
   .use(mesa.auth.need('mediaAdmin'))
 
