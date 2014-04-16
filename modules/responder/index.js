@@ -1,11 +1,12 @@
 var mesa = require_('serve/mesa')
 var Responder = require_('models/responder')
+var ERRORS = require_('models/errors')
 
 function* updateResponder() {
   data = this.req.body
   var responder = new Responder(data)
   var valid = responder.validate()
-  this.assert(valid, 400, 'bad fields', responder.errors)
+  this.assert(valid, ERRORS.BAD_REQUEST, responder.errors)
   yield responder.save()
   this.body = { ok: true }
 }

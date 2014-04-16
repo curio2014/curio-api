@@ -33,16 +33,28 @@ Media.prototype.wx = function() {
 
 
 // check appkey and secret against wechat api
-Media.validateAsync('wx_appkey', function(err, done) {
+Media.validateAsync('wx_appkey', function(error, done) {
+
+  // an in-memory cache contains exsiting key/secret info
+  // so we must delete it first
+  cache.del(this.id)
+
   var wx = this.wx()
   // left these two field blank is actually allowed
   if (!wx) {
     return done()
   }
-  wx.refreshToken(function(err) {
-    if (err && err.errcode === wx.INVALID_TOKEN) {
-      return err()
+  wx.refreshToken(function(e) {
+    if (e) {
+      // You don't have to `return error`
+      // jugglingdb's validate async is very funny
+      error(e.errmsg)
     }
     done()
   })
-}, {message: 'not valid'})
+}, {
+  message: {
+    'invalid appid': 'invalid',
+    'invalid credential': 'secret'
+  }
+})

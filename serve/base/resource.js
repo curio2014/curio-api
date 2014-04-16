@@ -3,7 +3,7 @@
  */
 var _ = require_('lib/utils')
 var assert = require_('serve/base/utils').assert
-var ERRORS = require_('serve/base/consts').ERRORS
+var ERRORS = require_('models/errors')
 var compose = require('koa-compose')
 
 var HTTP_ALIAS = {
@@ -44,7 +44,7 @@ function defaultHandler(method, model) {
     return function* create() {
       var item = new model(_.assign(this.req.body, this.params))
       var valid = yield item.validate()
-      assert(valid, 400, 'bad fields', item.errors)
+      assert(valid, 400, ERRORS.BAD_REQUEST, item.errors)
       yield item.save()
       this.body = item
     }
@@ -77,7 +77,7 @@ function defaultHandler(method, model) {
       try {
         yield item.updateAttributes(this.req.body)
       } catch (e) {
-        assert(!item.errors, 400, 'bad fields', item.errors)
+        assert(!item.errors, 400, ERRORS.BAD_REQUEST, item.errors)
         throw e
       }
       this.body = item
