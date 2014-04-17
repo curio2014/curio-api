@@ -5,9 +5,13 @@
 ```
 {
   pattern: [
-    'keyword1',
-    'keyword2',
-    '^keyword3$'
+    {
+      text: 'keyword1',
+      blur: true,
+    }, {
+      text: 'keyword2',
+      blur: false,
+    }
   ],
   handler: [
   ]

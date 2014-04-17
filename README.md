@@ -95,6 +95,26 @@ A `Model.get` will not load `cprops` by default. In most case, you will need to 
 
 ### Conventions
 
+#### Directories
+
+```
+.
+├── benchmark      # Benchmark test
+├── bin            # Helper CLI
+├── conf           # Configurations based on various environment
+├── database       # Database schemas, sync/update/downgrade tools
+├── lib            # Libraries
+├── models         # core models
+├── modules        # detachable modules
+├── serve          # Routers and Controllers
+├── templates      # templates for serve html pages
+├── test
+└── var
+```
+
+
+#### Routes
+
 RESTful API are all under serve/resources.js.
 Use a custom handler to override the API behavior .
 
