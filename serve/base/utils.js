@@ -3,6 +3,8 @@ var http = require('http')
 var consts = require('./consts')
 var conf = require_('conf')
 
+var utils = require_('lib/utils')
+
 /**
  * do assertions, and expose error message
  */
@@ -26,6 +28,10 @@ exports.error = function(opts) {
   return function *error(next){
     // assign an assert function
     this.assert = exports.assert
+
+    // DEBUG
+    // yield utils.sleep(.3)
+
     try {
       yield next
       if (null == this.status) {
@@ -58,9 +64,10 @@ exports.error = function(opts) {
           error: http.STATUS_CODES[this.status]
         }
       }
+      // error is always lowercase
+      this.body.error = this.body.error.toLowerCase()
     }
   }
-
 }
 
 exports.flash = function() {

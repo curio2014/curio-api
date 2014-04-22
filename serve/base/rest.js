@@ -1,5 +1,6 @@
 var method_alias = {
   'index': 'get',
+  'list': 'get',
   'read': 'get',
   'create': 'post',
   'update': 'put',
@@ -30,16 +31,13 @@ module.exports = function rest(rule, resource) {
   process.nextTick(function() {
     var method, handler, alias
 
-    middlewares = resource.middlewares || resource
+    middlewares = resource.handlers || resource
 
     // attach middlewares functions to route
     Object.keys(middlewares).forEach(function(method) {
-      if (method in method_alias) {
-        route[method_alias[method]](middlewares[method])
-      }
-      if (method in route) {
-        route[method](middlewares[method])
-      }
+      var http_method = method_alias[method]
+      // Trie-router must have this http method
+      route[http_method](middlewares[method])
     })
   })
 

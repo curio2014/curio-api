@@ -2,16 +2,10 @@
  * To serve a backbone compatible RESTful API
  */
 var _ = require_('lib/utils')
+var __push = Array.prototype.push
 var assert = require_('serve/base/utils').assert
 var ERRORS = require_('models/errors')
 var compose = require('koa-compose')
-
-var HTTP_ALIAS = {
-  'read': 'get',
-  'update': 'post',
-  'destroy': 'delete',
-  'create': 'put',
-}
 
 function defaultHandler(method, model) {
   if (method == 'index') {
@@ -42,7 +36,7 @@ function defaultHandler(method, model) {
     }
   } else if (method == 'create') {
     return function* create() {
-      var item = new model(_.assign(this.req.body, this.params))
+      var item = new model(this.req.body)
       var valid = yield item.validate()
       assert(valid, 400, ERRORS.BAD_REQUEST, item.errors)
       yield item.save()
@@ -86,139 +80,147 @@ function defaultHandler(method, model) {
 }
 
 
-function Resource(model, handlers, befores) {
+/**
+ *
+ * Resource for RESTful API,
+ * can be used for build default handlers for a Model,
+ * or just create a simple resource Object for adding
+ * access control and handlers easily.
+ *
+ * Examples:
+ *
+ *    Resource(Book)
+ *    Resource(Book, ['index', 'create'])
+ *    Resource({
+ *      index: function* () {},
+ *      ...
+ *    })
+ *
+ * @param {function}      model, a constructor function
+ * @param {Object|Array}  handlers
+ */
+function Resource(model, handlers) {
   if (!(this instanceof Resource)) {
-    return new Resource(model, handlers, befores)
+    return new Resource(model, handlers)
   }
-  // first argument is not a constructor, then it is handlers
+
+  // The handlers attach by `resource.read|update|destroy..` API
+  this.handlers = {}
+  // Access control middlewares added by `resource.use(method, *fn)` api
+  this.befores = {}
+
+  // first argument is not a constructor function, then it is handlers
   if (typeof model == 'object') {
-    befores = handlers
     handlers = model
   }
-  handlers = handlers || ['read', 'update', 'destroy']
-  if (Array.isArray(handlers)) {
-    handlers = _.zipObject(handlers)
-    for (var k in handlers) {
-      handlers[k] = model ? defaultHandler(k, model) : []
+  if (model || handlers) {
+    handlers = handlers || ['read', 'update', 'destroy']
+    // convert methods array to model's default handler
+    if (Array.isArray(handlers)) {
+      handlers = _.zipObject(handlers)
+      for (var k in handlers) {
+        handlers[k] = model ? [defaultHandler(k, model)] : []
+      }
     }
+    // apply handler middlewares
+    this._set(handlers)
   }
-  this.handlers = handlers
-  this.befores = befores || {}
-  this.middlewares = {}
-
-  this.init()
 }
 
 
-Resource.prototype.init = function(handlers) {
-  var self = this
-  var befores = self.befores
-  var handlers = self.handlers
-  var methods = self.methods = Object.keys(handlers)
-
-  methods.forEach(function(method, i) {
-    var access = befores[method] || []
-    // all middlewares
-    var mw = [compose(access)].concat(handlers[method])
-
-    // by now, these two middleware arrays should not be changeable
-    Object.defineProperty(befores, method, {
-      value: access
+/**
+ * get middleware for given method
+ *
+ * @return {Array} the middlewares array
+ */
+Resource.prototype._mw = function(category, method) {
+  if (!this[category][method]) {
+    // once defined, middleware arrays are not changeable
+    // so we can push functions into the array later,
+    // even after it is `composed`
+    Object.defineProperty(this[category], method, {
+      enumerable: true,
+      value: []
     })
-    Object.defineProperty(handlers, method, {
-      value: mw
-    })
-
-    // methods to add middleware
-    //
-    // resource
-    //   .read(...)
-    //   .post(...)
-    //
-    self[method] = function() {
-      // append middlewares in arguments
-      Array.prototype.push.apply(mw, arguments)
-      return self
-    }
-    if (method in HTTP_ALIAS) {
-      self[HTTP_ALIAS[method]] = self[method]
-    }
-
-    self._compose(method)
-  })
-}
-
-Resource.prototype._compose = function(method) {
-  this.middlewares[method] = compose(this.handlers[method])
+  }
+  return this[category][method]
 }
 
 /**
- * Add access control handlers
+ * Available method list based on methods added to handlers
+ */
+Resource.prototype.methods = function() {
+  return Object.keys(this.handlers)
+}
+
+/**
+ * Set handlers per method
+ *
+ * @param {Object} handlers, a (method->function) mapping
+ */
+Resource.prototype._set = function(handlers) {
+  var self = this
+  Object.keys(handlers).forEach(function(method) {
+    var fns = handlers[method]
+    if (!Array.isArray(fns)) {
+      fns = [fns]
+    }
+    self.handlers[method] = fns
+  })
+}
+
+var HTTP_ALIAS = {
+  'index': 'list',
+  'read': 'get',
+  'update': 'post',
+  'destroy': 'delete',
+  'create': 'put',
+}
+
+// Add http & alias methods for resource instance
+Object.keys(HTTP_ALIAS).forEach(function(method) {
+  var http_method = HTTP_ALIAS[method]
+  Resource.prototype[method] =
+  Resource.prototype[http_method] = function() {
+    var mw = this._mw('handlers', method)
+    // append middlewares in arguments
+    __push.apply(mw, arguments)
+    return this
+  }
+})
+
+/**
+ * Add access control
  *
  * @param {String|Array} method
  * @param {Function} middleware
  */
-Resource.prototype.use = function(method, middleware, isAfter) {
-  if ('function' == typeof method) {
-    isAfter = middleware
-    middleware = method
-    method = 'all'
+Resource.prototype.use = function(methods, middleware) {
+  if ('function' == typeof methods) {
+    middleware = methods
+    methods = 'all'
   }
-  var list = [method]
-  var befores = this.befores
-  if (method === 'all') {
-    list = this.methods
-  } else if (method === 'write') {
-    // only wirte methods
-    list = _.intersection(this.methods, ['create', 'update', 'destroy'])
+  if (methods === 'all') {
+    methods = ['create', 'update', 'destroy', 'read', 'index']
+  } else if (methods === 'write') {
+    methods = ['create', 'update', 'destroy']
+  } else if (methods === 'read') {
+    methods = ['read', 'index']
+  } else if (!Array.isArray(methods)) {
+    methods = [methods]
   }
-  list.forEach(function(method) {
-    befores[method].push(middleware)
+  var self = this
+  methods.forEach(function(method) {
+    var access = self._mw('befores', method)
+    access.push(middleware)
+    if (!access._stacked) {
+      // prepend access controllers to the real middleware list
+      self._mw('handlers', method).unshift(compose(access))
+      access._stacked = true
+    }
   })
-  return this
+  return self
 }
-
-/**
- * Fork a new resource with the same middlewares and handlers
- */
-Resource.prototype.fork = function(handlers) {
-  handlers = handlers || _.assign({}, this.handlers)
-  return new Resource(this.model, handlers, this.befores)
-}
-
-/**
- * Spawn a new resource requires the parent resource
- */
-Resource.prototype.spawn = function(subResouce) {
-  var model = this.model
-  var befores = subResouce.befores
-
-  function* getItem() {
-    this.parent = yield model.getOne(this.params)
-  }
-  // befores is indexed by http method
-  for (var k in this.befores) {
-    befores[k] = this.befores[k].concat(getItem)
-  }
-  return subResouce
-}
-
-
-/**
- * Get resource from `model.load`
- */
-//Resource.prototype.relatedAll = function() {
-  //var resource = this.fork({
-    //index: function* (){
-    //},
-    //create: function* (){
-    //}
-  //});
-  //return resource
-//}
-
-//Resource.prototype.relatedOne = function() {
-//}
 
 function* idOverride() {
   var id = this.params.related_id

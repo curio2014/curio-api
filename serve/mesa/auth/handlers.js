@@ -11,7 +11,7 @@ handlers.index = function *authGET(next) {
   }
 }
 
-handlers.create = [passport.authenticate('local'), function* (next) {
+handlers.create = [passport.authenticate('local'), function* authPOST(next) {
   this.body = {
     user: this.req.user,
     admins: yield this.req.user.mediaAdmins(true)
