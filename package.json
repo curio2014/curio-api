@@ -38,7 +38,7 @@
     "methods": "latest",
     "lodash": "latest",
     "keyf": "ktmud/keyf",
-    "cacheable": "ktmud/cacheable",
+    "cacheable": "0.2.5",
     "storeman": "ktmud/storeman",
     "lru-cache": "latest",
     "co": "latest",
