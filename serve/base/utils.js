@@ -49,9 +49,6 @@ exports.error = function(opts) {
         this.app.emit('error', err, this)
       }
 
-      if (conf.debug) {
-        //console.log(err)
-      }
       if (conf.debug || err.expose) {
         this.body = {
           code: err.code || this.status,
@@ -64,8 +61,10 @@ exports.error = function(opts) {
           error: http.STATUS_CODES[this.status]
         }
       }
-      // error is always lowercase
-      this.body.error = this.body.error.toLowerCase()
+      if (this.body.error) {
+        // error is always lowercase
+        this.body.error = this.body.error.toLowerCase()
+      }
     }
   }
 }

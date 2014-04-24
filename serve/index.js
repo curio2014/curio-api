@@ -5,6 +5,7 @@ require('./base/app')
 var mount = require('koa-mount')
 var debug = require('debug')('curio:app')
 var conf = require_('conf')
+var logError = require_('lib/utils/logger').error('app')
 var app = require('koa')()
 
 app.debug = debug
@@ -25,5 +26,10 @@ app.use(mount('/wx', require('./wx')))
 app.use(mount('/api', require('./mesa')))
 
 app.curio_modules = require_('modules').all()
+
+app.on('error', function(err, ctx) {
+  logError('REQUEST: %j', ctx.request)
+  logError(err.stack || err)
+})
 
 module.exports = app

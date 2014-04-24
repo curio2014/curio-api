@@ -7,23 +7,30 @@ var assert = require_('serve/base/utils').assert
 var ERRORS = require_('models/errors')
 var compose = require('koa-compose')
 
+
+/**
+ * Get a runner with all async data attached
+ */
+function getRunner(runner, includes) {
+  if (!includes) {
+    return runner
+  }
+  if (!Array.isArray(includes)) {
+    includes = includes.split(',')
+  }
+  includes = includes.filter(function(item) {
+    return runner.model.canAttach(item)
+  })
+  return runner.attach(includes)
+}
+
+
 function defaultHandler(method, model) {
   if (method == 'index') {
     return function* list() {
       var query = model.safeQuery(_.assign(this.query, this.params))
       var total = yield model.count(query.where)
-      var runner = model.all(query)
-      var includes = this.query.include
-      if (includes) {
-        if (!Array.isArray(includes)) {
-          includes = includes.split(',')
-        }
-        includes = includes.filter(function(item) {
-          return model.canAttach(item)
-        })
-        runner = runner.attach(includes)
-      }
-      var items = yield runner
+      var items = yield getRunner(model.all(query), this.query.include)
       var offset = query.offset || 0
       var limit = query.limit || 20
       //yield items[0].updateAttributes({ wx_secret: 'abaf' })
@@ -61,7 +68,10 @@ function defaultHandler(method, model) {
         // empty ID string, remove trailing slash
         return this.redirect(this.url.replace(/\/$/, ''))
       }
-      var item = this.item || (yield model.getOne(this.params))
+      var item = this.item
+      if (!item) {
+        item = yield getRunner(model.getOne(this.params), this.query.include)
+      }
       assert(item, 404)
       var ret = {}
       this.body = item
