@@ -40,9 +40,12 @@ Subscriber.upsert = Subscriber.upsertBy('oid', 'media_id')
 Subscriber.findByOpenId = Subscriber.finder('oid')
 Subscriber.findByMedia = Subscriber.finder('media_id')
 
+
 Subscriber.getter.key = function() {
   return this.oid + ':' + this.media_id
 }
+
+
 cached.register(Subscriber)
 
 // cache by openId + media_id

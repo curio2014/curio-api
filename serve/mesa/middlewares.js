@@ -36,13 +36,3 @@ app.use(require('koa-trie-router')(app))
 // Authenticate helpers
 app.auth = require('./auth')
 
-// Auto update database, remove this when in production
-// use `db-migrate` instead
-var schema = require_('models/user').schema
-schema.isActual(function(err, actual) {
-  // the jugglingdb's database migration method
-  if (!actual) {
-    schema.autoupdate()
-  }
-})
-

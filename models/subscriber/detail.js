@@ -19,6 +19,9 @@ Subscriber.getter.name = function() {
   return this._name || this.nickname
 }
 
+/**
+ * Get details from wechat, when initialize
+ */
 Subscriber.hook('afterInitialize', function() {
   var self = this
   if (this.subscribe == null) {

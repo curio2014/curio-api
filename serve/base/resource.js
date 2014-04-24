@@ -36,11 +36,24 @@ function defaultHandler(method, model) {
     }
   } else if (method == 'create') {
     return function* create() {
-      var item = new model(this.req.body)
-      var valid = yield item.validate()
-      assert(valid, 400, ERRORS.BAD_REQUEST, item.errors)
-      yield item.save()
-      this.body = item
+      var data = this.req.body
+      var list = Array.isArray(data) ? data : [data]
+      var result, error
+
+      var i, item, valid
+      for (i in list) {
+        item = new model(list[i])
+        valid = yield item.validate()
+        if (!valid) {
+          error = item.errors
+          // pass item index on
+          error.index = i
+        }
+        // will break on first error
+        assert(valid, 400, ERRORS.BAD_REQUEST, error)
+      }
+      result = yield model.create(data)
+      this.body = result
     }
   } else if (method == 'read') {
     return function* read() {

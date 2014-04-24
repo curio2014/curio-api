@@ -35,7 +35,7 @@ function mediaGenerater(i) {
     var user = yield User.get('test' + (i % 20))
     var media = yield addMedia(uid, 'Media No.' + i)
     log('added media: %s', uid)
-    var role = Media.ADMIN_ROLES._list[i % 3].value
+    var role = Media.Admin.ROLES._list[i % 3].value
     if (!user) {
       return
     }
@@ -57,10 +57,10 @@ exports.fillup = function *(next) {
   var user2 = yield User.get('test2')
 
   if (user1) {
-    yield addAdmin(media1, user1, Media.ADMIN_ROLES.CHIEF)
+    yield addAdmin(media1, user1, Media.Admin.ROLES.CHIEF)
   }
   if (user2) {
-    yield addAdmin(media1, user2, Media.ADMIN_ROLES.EDITOR)
+    yield addAdmin(media1, user2, Media.Admin.ROLES.EDITOR)
   }
 
   log('Fill up media done.')

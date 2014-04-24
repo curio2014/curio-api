@@ -13,8 +13,8 @@ var User = db.define('user', {
   uid: { type: String, null: false, unique: true },
   name: String,
   desc: String,
+  level: USER_LEVEL,
 })
-USER_LEVEL.bind(User, 'level')
 User.LEVEL = USER_LEVEL
 
 User.validatesPresenceOf('name')

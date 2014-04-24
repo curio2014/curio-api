@@ -1,14 +1,13 @@
 var db = require_('lib/db')
-var MEDIA_ADMIN = require_('models/consts').MEDIA_ADMIN
+var ADMIN_ROLES = require_('models/consts').MEDIA_ADMIN
 var User = require_('models/user')
 var Media = require_('models/media')
-
 var MediaAdmin = db.define('media_admin', {
   created_at: Date,
   user_id: { type: Number, null: false, index: true },
   media_id: { type: Number, null: false, index: true },
+  role: ADMIN_ROLES,
 })
-MEDIA_ADMIN.bind(MediaAdmin, 'role')
 
 MediaAdmin.belongsTo('user', {foreignKey: 'user_id'})
 MediaAdmin.belongsTo('media', {foreignKey: 'media_id'})
@@ -18,10 +17,13 @@ MediaAdmin.findByUser = MediaAdmin.finder('user_id')
 MediaAdmin.findByMedia = MediaAdmin.finder('media_id')
 MediaAdmin.upsert = MediaAdmin.upsertBy('media_id', 'user_id')
 
-MediaAdmin.ROLES = MEDIA_ADMIN
+MediaAdmin.ROLES = ADMIN_ROLES
+
+
+module.exports = MediaAdmin
+
 
 Media.Admin = MediaAdmin
-Media.ADMIN_ROLES = Media.Admin.ROLES
 
 Media.fetcher.admins = function *() {
   var admins = yield MediaAdmin.findByMedia(this.id).attach('user')
@@ -47,7 +49,7 @@ Media.putter.admins = function *(items) {
   var media_id = this.id
   var result = []
   items.map(function(item) {
-    var role = MEDIA_ADMIN.get(item.role)
+    var role = ADMIN_ROLES.get(item.role)
     if (role) {
       result.push({
         media_id: media_id,
@@ -67,7 +69,4 @@ Media.putter.admins = function *(items) {
   }
   yield this.load('admins')
 }
-
-
-module.exports = MediaAdmin
 

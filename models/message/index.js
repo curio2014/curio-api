@@ -20,10 +20,10 @@ var EVTS = consts.GLOBAL_EVENTS
 var Message = db.define('message', {
   created_at: Date,
   flag: { type: Boolean, default: false },
+  type: TYPES,
+  content_type: CONTENT_TYPES,
   content: db.JSON, // the raw json of wechat message
 })
-TYPES.bind(Message, 'type')
-CONTENT_TYPES.bind(Message, 'content_type')
 
 module.exports = Message
 

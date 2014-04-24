@@ -41,6 +41,7 @@ function addChannelTag(info) {
       media_id: info.media.id,
       scene_id: info.scene_id
     }
+    // find the channel, tag user with it
     var channel = yield Channel.upsert(info.media.id, info.scene_id)
     channel.tagUser(info.subscriber)
   })()

@@ -95,6 +95,11 @@ A `Model.get` will not load `cprops` by default. In most case, you will need to 
 
 ### Conventions
 
+#### Coding style
+
+1. Return early
+2. Do `module.exports` early
+
 #### Directories
 
 ```
