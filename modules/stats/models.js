@@ -1,6 +1,8 @@
 var keyf = require('keyf')
 var _ = require_('lib/utils')
 var error = require_('lib/utils/logger').error('stats')
+var cached = require_('lib/cached')
+
 var Message = require_('models/message')
 var MSG_TYPES = Message.TYPES
 var MSG_CONTENT_TYPES = Message.CONTENT_TYPES
@@ -82,3 +84,8 @@ function statsByType(type) {
 exports.incoming = statsByType(MSG_TYPES.INCOMING)
 exports.outgoing = statsByType(MSG_TYPES.OUTGOING)
 
+
+exports.homepage = function* (media_id, query) {
+  var data = yield exports.incoming(media_id, query)
+  return data
+}

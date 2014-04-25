@@ -38,7 +38,7 @@ Channel.upsert = Channel.upsertBy('media_id', 'scene_id')
 /**
  * Must be a validate media with advanced API
  */
-function mediaValidator(err, done) {
+function mediaValidator(error, done) {
   co(function* () {
     var media = this._media = yield Media.get(this.media_id)
     if (!media || !media.wx()) {
@@ -109,16 +109,30 @@ Channel.prototype.qrcodeUrl = function* () {
  * Get ticket code via Wechat API,
  */
 Channel.prototype.getTicket = function* () {
+  var key = this._ticket_cache_key()
+  var ticket = yield cached.get(key)
+  if (ticket) {
+    return ticket
+  }
   var media = yield this.load('media')
+  // get permnant qrcode from wechat server
   var ret = yield media.wx().createPermQRCode(this.scene_id)
-  return ret.ticket
+  var expires = ret.expire_seconds ? ret.expire_seconds - 5 : null
+  ticket = ret.ticket
+  // save to cache, with expire seconds
+  yield cached.set(key, ticket, expires)
+  return ticket
+}
+
+Channel.prototype._ticket_cache_key = function() {
+  return 'channel:ticket:' + this.scene_id
 }
 
 cached.register(Channel)
 
 // ticket will expire in 1800 seconds, so we don't need to save it
 // permanantly, just cache it is enough
-Channel.enableCache('.getTicket', 1790)
+//Channel.enableCache('.getTicket', 1790)
 
 
 SubscriberTag.registerType('channel', 101, Channel)
