@@ -73,15 +73,13 @@ function defaultHandler(method, model) {
         item = yield getRunner(model.getOne(this.params), this.query.include)
       }
       assert(item, 404)
-      var ret = {}
       this.body = item
     }
   } else if (method == 'destroy') {
     return function* destroy() {
       var item = this.item || (yield model.getOne(this.params))
-      if (item) {
-        yield item.destroy()
-      }
+      assert(item, 404)
+      yield item.destroy()
       this.status = 202
       this.body = {
         ok: true

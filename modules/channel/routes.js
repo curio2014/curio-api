@@ -1,5 +1,5 @@
 var mesa = require_('serve/mesa')
-var Channel = require('./models')
+var Channel = require('./channel')
 
 mesa.rest('/medias/:id/channels', Collection(Channel))
   .use(mesa.auth.need('mediaAdmin'))
@@ -22,6 +22,11 @@ mesa.rest('/medias/:id/channels', Collection(Channel))
 
 mesa.rest('/medias/:id/channels/:channel_id', Resource(Channel))
   .use(mesa.auth.need('mediaAdmin'))
+  .use(function *(next) {
+    // ID override
+    this.params = { id: this.params.channel_id }
+    yield next
+  })
   .use('read', function* (next) {
     // always include qrcodeUrl
     this.query.include = 'qrcodeUrl'

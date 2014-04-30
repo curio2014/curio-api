@@ -11,5 +11,6 @@ exports.fillupAll = function *() {
   yield fillup('user')
   yield fillup('media')
   yield fillup('responder')
+  yield fillup('channel')
   yield fillup('message')
 }

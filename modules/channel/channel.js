@@ -22,7 +22,6 @@ var Channel = db.define('channel', {
   media_id: { type: Number, null: false }, // media_id for channel, must not be null
   scene_id: { type: Number, null: false }, // scene_id for wechat
 })
-Channel.validatesPresenceOf('name')
 Channel.validateAsync('media_id', mediaValidator, { message: 'invalid' })
 
 Channel.belongsTo(Media, {foreignKey: 'media_id'})
@@ -54,6 +53,14 @@ Channel.hook('beforeCreate', function* () {
   if (!this.scene_id) {
     this.scene_id = yield Channel.nextSceneId(this.media_id)
   }
+  if (!this.name) {
+    this.name = 'Scene ' + this.scene_id
+  }
+})
+
+// get QRCode after create
+Channel.hook('afterCreate', function* () {
+  this.qrcodeUrl = yield this.qrcodeUrl()
 })
 
 /**

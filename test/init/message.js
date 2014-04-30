@@ -19,13 +19,18 @@ var msg_args = [
   'event click Hello',
   'event subscribe',
   'event unsubscribe',
+  'scan 1', // scan when not subscribed
+  'scan 1 true', // scan when subscribed
   'loc 39.941004 116.41680 "This is a label"',
   // subscriber for test account
+  '--user oYAmguC1RY9LPzCxUBflv5n3kyqs scan 2',
+  '--user oYAmguC1RY9LPzCxUBflv5n3kyqs scan 1',
   '--user oYAmguC1RY9LPzCxUBflv5n3kyqs event subscribe',
   '--user afasfaBlahBlah image http://www.baidu.com/img/bdlogo.gif',
   '--user 29agmh0s823ht12t9aWakaka image http://www.baidu.com/img/bdlogo.gif',
   '--user Wahaha event subscribe',
 ]
+
 var PORT = require_('conf').port
 
 function messageGenerator(media, i) {
@@ -40,9 +45,9 @@ function messageGenerator(media, i) {
 
 exports.benchfill = function *(next) {
   log('Filling up many many messages...')
-  require_('test/common').bootApp(PORT)
-  var medias = yield Media.all({ limit: 2, order: 'id desc' })
+  require_('test/common').bootApp()
 
+  var medias = yield Media.all({ limit: 2, order: 'id desc' })
   var fns = _(medias.map(messageGenerator)).flatten().shuffle().value()
 
   fns = fns.concat(fns, fns, fns, fns, fns)
@@ -60,7 +65,7 @@ exports.benchfill = function *(next) {
 exports.fillup = function *(next) {
   log('Filling up message...')
 
-  require_('test/common').bootApp(PORT)
+  require_('test/common').bootApp()
 
   var medias = yield Media.all({ limit: 5, order: 'id desc' })
   var fns = _(medias.map(messageGenerator)).flatten().shuffle().value()

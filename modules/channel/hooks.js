@@ -2,7 +2,7 @@ var debug = require_('lib/utils/logger').debug('channel')
 var co = require('co')
 
 var Responder = require_('models/responder')
-var Channel = require('./models')
+var Channel = require('./channel')
 
 
 Responder.registerRule({
@@ -24,8 +24,11 @@ Responder.registerRule({
 
 Responder.registerHandler({
   '$tag_qrcene': function addQRCodeTag(info) {
-    info.scene_id = info.param.eventKey.replace('qrscene_', '')
-    if (info.scene_id) {
+    var scene_id = info.param.eventKey.replace('qrscene_', '')
+    if (scene_id) {
+      // add scene id as parameter, so when save message content,
+      // content.scene_id will exist
+      info.scene_id = info.param.scene_id = scene_id
       addChannelTag(info)
     }
   }
@@ -43,6 +46,7 @@ function addChannelTag(info) {
     }
     // find the channel, tag user with it
     var channel = yield Channel.upsert(info.media.id, info.scene_id)
+    debug('Tag user %s with Scene %s', info.subscriber.id, info.scene_id)
     channel.tagUser(info.subscriber)
   })()
 }

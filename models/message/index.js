@@ -113,6 +113,13 @@ Message.incoming = function(media_id, subscriber_id, content) {
     // message type "loation" is different with report location via an EVENT message
     if (content_type == 'LOCATION') {
       content_type = 'REPORT_LOC'
+    } else if (content_type == 'SCAN') {
+      // clean a little bit
+      content.param = { scene_id: content.param.scene_id }
+    } else if (content_type == 'SUBSCRIBE') {
+      if (content.param.scene_id) {
+        content.param = { scene_id: content.param.scene_id }
+      }
     }
   }
   // convert content type to a INT consts
