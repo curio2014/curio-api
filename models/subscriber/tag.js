@@ -1,5 +1,7 @@
 var db = require_('lib/db')
 var Named = require_('lib/named')
+var Media = require_('models/media')
+var _ = require_('lib/utils')
 
 var TYPES = Named({
   NORM: 0,
@@ -8,11 +10,18 @@ var TYPES = Named({
 var SubscriberTag = db.define('subscriber_tag', {
   created_at: Date,
   updated_at: Date,
-  name: { type: String, unique: true },
-  // tag name in the URL
-  uid: { type: String, null: false },
+  media_id: Number,
+  object_id: Number, // related object
+  name: { type: String, null: false },
   type: TYPES,
 })
+// for a given media, the tag name is unique
+SubscriberTag.SCHEMA_SQL = [
+"CREATE UNIQUE INDEX ON subscriber_tag(media_id, name);",
+"CREATE UNIQUE INDEX ON subscriber_tag(type, object_id) WHERE object_id IS NOT NULL;"
+].join('\n')
+
+SubscriberTag.belongsTo(Media, {foreignKey: 'media_id'})
 
 SubscriberTag.getter.name = function() {
   return this._name || this.uid
@@ -31,19 +40,25 @@ SubscriberTag.registerType = function(name, value, model) {
   TYPES.add(name, { id: value, model: model })
 }
 
+SubscriberTag.upsert = SubscriberTag.upsertBy('media_id', 'name')
+
 /**
  * Create a tag based on related object's type & id
+ * @param {Model} obj, must be an instance
  */
-SubscriberTag.upsertByObject = function(obj) {
+SubscriberTag.upsertByObject = function(media_id, obj) {
   // find the type
-  var type = _.first(TYPES, function(item) {
-    return item.model === obj.constructor
+  var type = _.find(TYPES.all(), function(item) {
+    return item.value && item.value.model === obj.constructor
   })
   if (!type) {
     throw new Error('Don\'t know how to upsert a "' +  obj.constructor.modelName + '" tag')
   }
-  var uid = type.name + '-' + obj.id
-  return SubscriberTag.upsert(uid, { name: obj.name })
+  if (!obj.id) {
+    throw new Error('Object does not exist yet, save it first')
+  }
+  name = obj.name || (type.name + ' ' + (obj.uid || obj.id))
+  return SubscriberTag.upsert(media_id, name, { type: type.id, object_id: obj.id })
 }
 
 

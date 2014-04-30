@@ -20,10 +20,11 @@ Or simply `make createdb`.
 
 And make sure you have a `redis-server` running.
 
-### Install dependencies
+### Install debug tool globally
 
-	  npm install -g gnode
 	  npm install -g webot-cli
+    npm install -g supervisor
+    npm install -g node-inspector
 
 
 ### Create local configurations

@@ -12,9 +12,9 @@ var MediaAdmin = db.define('media_admin', {
 MediaAdmin.belongsTo('user', {foreignKey: 'user_id'})
 MediaAdmin.belongsTo('media', {foreignKey: 'media_id'})
 
-MediaAdmin.get = MediaAdmin.finder('media_id', 'user_id', true)
-MediaAdmin.findByUser = MediaAdmin.finder('user_id')
-MediaAdmin.findByMedia = MediaAdmin.finder('media_id')
+MediaAdmin.get = MediaAdmin.findBy('media_id', 'user_id', true)
+MediaAdmin.findByUser = MediaAdmin.findBy('user_id')
+MediaAdmin.findByMedia = MediaAdmin.findBy('media_id')
 MediaAdmin.upsert = MediaAdmin.upsertBy('media_id', 'user_id')
 
 MediaAdmin.ROLES = ADMIN_ROLES

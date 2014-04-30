@@ -35,10 +35,10 @@ Subscriber.SCHEMA_SQL = [
 "CREATE UNIQUE INDEX ON subscriber(oid, media_id);"
 ].join('\n')
 
-//Subscriber.get = Subscriber.finder('oid', 'media_id', true)
+//Subscriber.get = Subscriber.findBy('oid', 'media_id', true)
 Subscriber.upsert = Subscriber.upsertBy('oid', 'media_id')
-Subscriber.findByOpenId = Subscriber.finder('oid')
-Subscriber.findByMedia = Subscriber.finder('media_id')
+Subscriber.findByOpenId = Subscriber.findBy('oid')
+Subscriber.findByMedia = Subscriber.findBy('media_id')
 
 
 Subscriber.getter.key = function() {

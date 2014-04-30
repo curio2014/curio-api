@@ -39,14 +39,16 @@ function addChannelTag(info) {
   if (!info.scene_id) {
     return
   }
-  co(function* () {
-    var query = {
-      media_id: info.media.id,
-      scene_id: info.scene_id
-    }
-    // find the channel, tag user with it
-    var channel = yield Channel.upsert(info.media.id, info.scene_id)
-    debug('Tag user %s with Scene %s', info.subscriber.id, info.scene_id)
-    channel.tagUser(info.subscriber)
-  })()
+  setImmediate(function() {
+    co(function* () {
+      var query = {
+        media_id: info.media.id,
+        scene_id: info.scene_id
+      }
+      // find the channel, tag user with it,
+      // if not exist, will create one
+      var channel = yield Channel.upsert(info.media.id, info.scene_id)
+      yield channel.tagUser(info.subscriber)
+    })()
+  })
 }

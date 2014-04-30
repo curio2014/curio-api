@@ -1,4 +1,5 @@
 // use strict;
+var debug = require_('lib/utils/logger').debug('channel')
 var co = require('co')
 var cached = require_('lib/cached')
 var db = require_('lib/db')
@@ -22,7 +23,6 @@ var Channel = db.define('channel', {
   media_id: { type: Number, null: false }, // media_id for channel, must not be null
   scene_id: { type: Number, null: false }, // scene_id for wechat
 })
-Channel.validateAsync('media_id', mediaValidator, { message: 'invalid' })
 
 Channel.belongsTo(Media, {foreignKey: 'media_id'})
 
@@ -33,19 +33,6 @@ Channel.SCHEMA_SQL = [
 
 Channel.upsert = Channel.upsertBy('media_id', 'scene_id')
 
-
-/**
- * Must be a validate media with advanced API
- */
-function mediaValidator(error, done) {
-  co(function* () {
-    var media = this._media = yield Media.get(this.media_id)
-    if (!media || !media.wx()) {
-      error()
-    }
-    done()
-  }).call(this)
-}
 
 // Fillup data before validate
 Channel.hook('beforeCreate', function* () {
@@ -85,8 +72,8 @@ Channel.nextSceneId = function* (media_id) {
 // =========== Instance Methods ============
 //
 
-Channel.prototype.tag = function() {
-  return SubscriberTag.upsertByObject(this)
+Channel.prototype.tag = function(media_id) {
+  return SubscriberTag.upsertByObject(media_id, this)
 }
 
 /**
@@ -94,7 +81,7 @@ Channel.prototype.tag = function() {
  * if the `tag` does not exist, create it
  */
 Channel.prototype.tagUser = function* (subscriber) {
-  var tag = yield this.tag()
+  var tag = yield this.tag(subscriber.media_id)
   return yield function(next) {
     subscriber.tags.add(tag, next)
   }
@@ -108,7 +95,7 @@ Channel.prototype.qrcodeUrl = function* () {
   if (!ticket) {
     ticket = this.ticket = yield this.getTicket()
   }
-  return 'https://mp.weixin.qq.com/cgi-bin/showqrcode?ticket=' +
+  return ticket && 'https://mp.weixin.qq.com/cgi-bin/showqrcode?ticket=' +
           encodeURIComponent(ticket)
 }
 
@@ -122,6 +109,9 @@ Channel.prototype.getTicket = function* () {
     return ticket
   }
   var media = yield this.load('media')
+  if (!media || !media.wx()) {
+    return
+  }
   // get permnant qrcode from wechat server
   var ret = yield media.wx().createPermQRCode(this.scene_id)
   var expires = ret.expire_seconds ? ret.expire_seconds - 5 : null
