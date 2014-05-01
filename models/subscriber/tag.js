@@ -90,5 +90,5 @@ Subscriber.hasAndBelongsToMany(SubscriberTag, {as: 'tags', through: TagIndex})
  * Fetch all tags for user
  */
 Subscriber.fetcher.tags = function* () {
-  return yield this.tags.all()
+  return yield this.tags
 }

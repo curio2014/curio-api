@@ -1,4 +1,5 @@
 var debug = require_('lib/utils/logger').debug('channel')
+var BatchStream = require('batch-stream2')
 var co = require('co')
 
 var Responder = require_('models/responder')
@@ -34,21 +35,38 @@ Responder.registerHandler({
   }
 })
 
+var buffer = new BatchStream({
+  size: 10,
+  timeout: 1000, // try batch write every 2 seconds
+  transform: batchSave
+})
+
+
+function batchSave(items, callback) {
+  var save = function* () {
+    // must be sequential
+    for (var k in items) {
+      var data = items[k]
+      var query = {
+        media_id: data.media_id,
+        scene_id: data.scene_id
+      }
+      // find the channel, tag user with it,
+      // if not exist, will create one
+      var channel = yield Channel.upsert(query.media_id, query.scene_id)
+      yield channel.tagUser(data.subscriber)
+    }
+  }
+  co(save)()
+}
 
 function addChannelTag(info) {
   if (!info.scene_id) {
     return
   }
-  setImmediate(function() {
-    co(function* () {
-      var query = {
-        media_id: info.media.id,
-        scene_id: info.scene_id
-      }
-      // find the channel, tag user with it,
-      // if not exist, will create one
-      var channel = yield Channel.upsert(info.media.id, info.scene_id)
-      yield channel.tagUser(info.subscriber)
-    })()
+  buffer.write({
+    subscriber: info.subscriber,
+    media_id: info.media.id,
+    scene_id: info.scene_id
   })
 }

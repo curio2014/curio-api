@@ -24,10 +24,10 @@ Subscriber.getter.name = function() {
  */
 Subscriber.hook('afterInitialize', function() {
   var self = this
-  if (this.subscribe == null) {
+  if (this.subscribe !== false) {
     this.subscribe = true
   }
-  if (this.credit == null) {
+  if (this.credit === null || this.credit === undefined) {
     this.credit = 0
   }
   // if user oid exists

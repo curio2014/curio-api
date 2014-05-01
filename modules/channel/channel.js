@@ -35,7 +35,7 @@ Channel.upsert = Channel.upsertBy('media_id', 'scene_id')
 
 
 // Fillup data before validate
-Channel.hook('beforeCreate', function* () {
+Channel.hook('beforeSave', function* () {
   // generate a unique scene_id
   if (!this.scene_id) {
     this.scene_id = yield Channel.nextSceneId(this.media_id)
@@ -57,10 +57,9 @@ Channel.nextSceneId = function* (media_id) {
   if (!media_id) {
     throw new Error('Must provide media_id')
   }
-  var max = yield Channel.findOne({ where: { media_id: media_id }, order: 'scene_id desc' })
-  return max ? max.scene_id + 1 : 1
+  var last = yield Channel.findOne({ where: { media_id: media_id }, order: 'scene_id desc' })
+  return last ? last.scene_id + 1 : 1
 }
-
 
 
 // TODO: remove user tags when destroy
@@ -126,10 +125,6 @@ Channel.prototype._ticket_cache_key = function() {
 }
 
 cached.register(Channel)
-
-// ticket will expire in 1800 seconds, so we don't need to save it
-// permanantly, just cache it is enough
-//Channel.enableCache('.getTicket', 1790)
 
 
 SubscriberTag.registerType('channel', 101, Channel)
