@@ -7,6 +7,8 @@ var _ = require_('lib/utils')
 var Media = require_('models/media')
 var SubscriberTag = require_('models/subscriber/tag')
 
+var TAG_TYPE_CHANNEL = 101
+
 /**
  * Channel: QR Code management
  *
@@ -23,12 +25,25 @@ var Channel = db.define('channel', {
   media_id: { type: Number, null: false }, // media_id for channel, must not be null
   scene_id: { type: Number, null: false }, // scene_id for wechat
 })
-
 Channel.belongsTo(Media, {foreignKey: 'media_id'})
 
 Channel.SCHEMA_SQL = [
 "CREATE UNIQUE INDEX ON channel(media_id, scene_id);"
 ].join('\n')
+
+Channel.scolumns = {
+  media_id: null,
+  scene_id: null
+}
+Channel.defaultOrder = 'scene_id desc'
+
+Channel.registerProps({
+  // reply user with text when scan
+  'subscribe_reply': null,
+  'scan_reply': null
+})
+
+SubscriberTag.registerType('channel', TAG_TYPE_CHANNEL, Channel)
 
 
 Channel.upsert = Channel.upsertBy('media_id', 'scene_id')
@@ -45,9 +60,12 @@ Channel.hook('beforeSave', function* () {
   }
 })
 
-// get QRCode after create
+// when creation is done
 Channel.hook('afterCreate', function* () {
+  // get the QRCode
   this.qrcodeUrl = yield this.qrcodeUrl()
+  // create a tag
+  yield SubscriberTag.upsertByObject(this)
 })
 
 /**
@@ -71,8 +89,15 @@ Channel.nextSceneId = function* (media_id) {
 // =========== Instance Methods ============
 //
 
-Channel.prototype.tag = function(media_id) {
-  return SubscriberTag.upsertByObject(media_id, this)
+Channel.prototype.tag = function* () {
+  if (!this.id) {
+    throw new Error('Save the channel first')
+  }
+  var item = yield SubscriberTag.getByObjectId(TAG_TYPE_CHANNEL, this.id)
+  if (!item) {
+    return yield SubscriberTag.upsertByObject(this)
+  }
+  return item
 }
 
 /**
@@ -80,7 +105,7 @@ Channel.prototype.tag = function(media_id) {
  * if the `tag` does not exist, create it
  */
 Channel.prototype.tagUser = function* (subscriber) {
-  var tag = yield this.tag(subscriber.media_id)
+  var tag = yield this.tag()
   return yield function(next) {
     subscriber.tags.add(tag, next)
   }
@@ -125,9 +150,6 @@ Channel.prototype._ticket_cache_key = function() {
 }
 
 cached.register(Channel)
-
-
-SubscriberTag.registerType('channel', 101, Channel)
 
 
 module.exports = Channel

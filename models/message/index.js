@@ -51,19 +51,19 @@ Message.scolumns = {
 /**
  * Get subscriber, if not exists, create one
  */
-Message.fetcher.subscriber = function *() {
-  var item = yield Subscriber.get(this.subscriber_id)
-  if (!item) {
-    // XXX: If subscriber not exists, it is most likely
-    // a cache error, remember to clean message like this!
-    item = new Subscriber({
-      id: this.subscriber_id,
-      oid: 'N/A',
-      media_id: this.media_id
-    })
-  }
-  return item
-}
+//Message.fetcher.subscriber = function *() {
+  //var item = yield Subscriber.get(this.subscriber_id)
+  //if (!item) {
+    //// XXX: If subscriber not exists, it is most likely
+    //// a cache error, remember to clean message like this!
+    //item = new Subscriber({
+      //id: this.subscriber_id,
+      //oid: 'N/A',
+      //media_id: this.media_id
+    //})
+  //}
+  //return item
+//}
 
 function batchSave(items, callback) {
   var b = this

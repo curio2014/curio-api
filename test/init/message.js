@@ -21,6 +21,7 @@ var msg_args = [
   'event unsubscribe',
   'scan 1', // scan when not subscribed
   'scan 1 true', // scan when subscribed
+  'scan 2 true',
   'loc 39.941004 116.41680 "This is a label"',
   // subscriber for test account
   '--user oYAmguC1RY9LPzCxUBflv5n3kyqs scan 2',

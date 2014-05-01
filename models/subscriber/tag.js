@@ -41,12 +41,17 @@ SubscriberTag.registerType = function(name, value, model) {
 }
 
 SubscriberTag.upsert = SubscriberTag.upsertBy('media_id', 'name')
+SubscriberTag.upsertByObjectId = SubscriberTag.upsertBy('type', 'object_id')
+
+SubscriberTag.getByObjectId = function(type, object_id) {
+  return SubscriberTag.getOne({ type: type, object_id: object_id })
+}
 
 /**
  * Create a tag based on related object's type & id
  * @param {Model} obj, must be an instance
  */
-SubscriberTag.upsertByObject = function(media_id, obj) {
+SubscriberTag.upsertByObject = function(obj) {
   // find the type
   var type = _.find(TYPES.all(), function(item) {
     return item.value && item.value.model === obj.constructor
@@ -57,8 +62,12 @@ SubscriberTag.upsertByObject = function(media_id, obj) {
   if (!obj.id) {
     throw new Error('Object does not exist yet, save it first')
   }
+  if (!obj.media_id) {
+    throw new Error('Object must have a media_id')
+  }
   name = obj.name || (type.name + ' ' + (obj.uid || obj.id))
-  return SubscriberTag.upsert(media_id, name, { type: type.id, object_id: obj.id })
+  data = { name: name, media_id: obj.media_id }
+  return SubscriberTag.upsertByObjectId(type.id, obj.id, data)
 }
 
 
@@ -89,6 +98,9 @@ Subscriber.hasAndBelongsToMany(SubscriberTag, {as: 'tags', through: TagIndex})
 /**
  * Fetch all tags for user
  */
-Subscriber.fetcher.tags = function* () {
-  return yield this.tags
+Subscriber.fetcher.tags = function(query) {
+  var self = this
+  return function(next) {
+    self.tags(query || {}, next)
+  }
 }

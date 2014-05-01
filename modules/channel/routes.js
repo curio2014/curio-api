@@ -4,6 +4,9 @@ var Channel = require('./channel')
 mesa.rest('/medias/:id/channels', Collection(Channel))
   .use(mesa.auth.need('mediaAdmin'))
   .use('index', function* (next) {
+    this.params = {
+      media_id: this.params.id
+    }
     // always include qrcodeUrl
     this.query.include = 'qrcodeUrl'
     yield next
