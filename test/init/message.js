@@ -1,46 +1,49 @@
+var send = require('webot-cli').commands.send
 var log = require_('lib/utils/logger').log('test:init')
+var _ = require_('lib/utils')
+var Media = require_('models/media')
 
 require('colors')
 
-var _ = require_('lib/utils')
-var thunkify = require('thunkify')
-var exec = require('child_process').exec
-var Media = require_('models/media')
-
 var msg_args = [
-  'text "hello! 你好！这是一条测试信息"',
-  'text "function test"',
-  'text Hello',
-  'text news1',
-  'text news2',
-  'text news3',
-  'text "abc is a good name"',
-  'image http://www.baidu.com/img/bdlogo.gif',
-  'event click Hello',
-  'event subscribe',
-  'event unsubscribe',
-  'scan 1', // scan when not subscribed
-  'scan 1 true', // scan when subscribed
-  'scan 2 true',
-  'loc 39.941004 116.41680 "This is a label"',
-  // subscriber for test account
-  '--user oYAmguC1RY9LPzCxUBflv5n3kyqs scan 2',
-  '--user oYAmguC1RY9LPzCxUBflv5n3kyqs scan 1',
-  '--user oYAmguC1RY9LPzCxUBflv5n3kyqs event subscribe',
-  '--user afasfaBlahBlah image http://www.baidu.com/img/bdlogo.gif',
-  '--user 29agmh0s823ht12t9aWakaka image http://www.baidu.com/img/bdlogo.gif',
-  '--user Wahaha event subscribe',
+  'hello! 你好！这是一条测试信息',
+  'function test',
+  'Hello',
+  'news1',
+  'news2',
+  'news3',
+  'abc is a good name',
+  ['image', 'http://www.baidu.com/img/bdlogo.gif'],
+  ['event', 'click', 'Hello'],
+  ['event', 'subscribe'],
+  ['event', 'unsubscribe'],
+  ['scan', '1'], // scan when not subscribed
+  ['scan', '1', true], // scan when subscribed
+  ['scan', '2', true],
+  ['loc', '39.941004', '116.41680', 'This is a label'],
+  ['reportloc', '39.941004', '116.41680'],
 ]
 
 var PORT = require_('conf').port
+var oids = ['oYAmguC1RY9LPzCxUBflv5n3kyqs', '92bafofa12tf', 'm31tibasfa012kt1gazta']
 
 function messageGenerator(media, i) {
-  var args = ['--port', PORT, '--route', media.webotPath(), '--token', media.wx_token].join(' ')
-  return _.shuffle(msg_args).map(function(arg) {
-    var cmd = 'webot send ' + args + ' ' + arg
-    return function(next) {
-      exec(cmd, next)
-    }
+  var common = {
+    silent: true,
+    port: PORT,
+    route: media.webotPath(),
+    token: media.wx_token
+  }
+  return oids.map(function(oid) {
+    return _.shuffle(msg_args).map(function(arg) {
+      if ('string' == typeof arg) {
+        arg = ['text', arg]
+      }
+      var opts = _.assign({}, common, { user: oid, input: arg })
+      return function(next) {
+        send(opts, next)
+      }
+    })
   })
 }
 
