@@ -5,10 +5,12 @@ require('./base/app')
 var mount = require('koa-mount')
 var debug = require('debug')('curio:app')
 var conf = require_('conf')
+var log = require_('lib/utils/logger').log('app')
 var logError = require_('lib/utils/logger').error('app')
 var app = require('koa')()
 
 app.debug = debug
+app.log = log
 app.name = 'curio-api'
 app.proxy = true;
 

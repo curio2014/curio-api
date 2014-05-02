@@ -2,6 +2,7 @@
 * read configuration for different environment.
 */
 var utils = require_('lib/utils')
+var log = require_('lib/utils/logger').log('app')
 
 module.exports = readConfig()
 
@@ -10,9 +11,9 @@ module.exports = readConfig()
 */
 function readConfig() {
   var NODE_ENV = global.process.env.NODE_ENV || 'development'
-  console.log()
-  console.log('loading config: conf/%s.conf.js', NODE_ENV)
-  console.log()
+
+  log('loading config: conf/%s.conf.js', NODE_ENV)
+
   var defaultConf = require('./default.conf.js')
   var conf = require('./' + NODE_ENV + '.conf.js')
 
