@@ -16,6 +16,14 @@ app.rest('/auth', Resource(require('./auth/handlers')))
 // Only super user can create/delete user
 app.rest('/users', Collection(User))
   .use(auth.need('super'))
+  .use('create', function* (next) {
+    var data = this.req.body
+    yield next
+    // save password after user is saved
+    if (this.item && data.password) {
+      yield this.item.setPassword(data.password)
+    }
+  })
 
 // Only super user or self can view/edit user
 app.rest('/users/:id([\\w\\-]*)', Resource(User))

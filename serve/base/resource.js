@@ -59,7 +59,7 @@ function defaultHandler(method, model) {
         // will break on first error
         assert(valid, 400, ERRORS.BAD_REQUEST, error)
       }
-      result = yield model.create(data)
+      result = this.item = yield model.create(data)
       this.body = result
     }
   } else if (method == 'read') {
@@ -70,7 +70,7 @@ function defaultHandler(method, model) {
       }
       var item = this.item
       if (!item) {
-        item = yield getRunner(model.getOne(this.params), this.query.include)
+        item = this.item = yield getRunner(model.getOne(this.params), this.query.include)
       }
       assert(item, 404)
       this.body = item
@@ -87,7 +87,7 @@ function defaultHandler(method, model) {
     }
   } else if (method == 'update') {
     return function* update() {
-      var item = this.item || (yield model.getOne(this.params))
+      var item = this.item || (this.item = yield model.getOne(this.params))
       assert(item, 404)
       try {
         yield item.updateAttributes(this.req.body)

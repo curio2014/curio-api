@@ -19,6 +19,9 @@ MediaAdmin.upsert = MediaAdmin.upsertBy('media_id', 'user_id')
 
 MediaAdmin.ROLES = ADMIN_ROLES
 
+MediaAdmin.destroyByMedia = MediaAdmin.destroyBy('media_id')
+MediaAdmin.destroyByUser = MediaAdmin.destroyBy('user_id')
+
 
 module.exports = MediaAdmin
 
@@ -27,20 +30,23 @@ Media.Admin = MediaAdmin
 
 Media.fetcher.admins = function *() {
   var admins = yield MediaAdmin.findByMedia(this.id).attach('user')
-  return admins.map(function(item, i) {
-    var user = item.user
-    return {
+  var items = []
+  admins.forEach(function(item, i) {
+    var user = item.__cachedRelations.user
+    if (!user) return
+    items.push({
       id: user.id,
       uid: user.uid,
       name: user.name,
       level: user.level,
       role: item.role
-    }
+    })
   })
+  return items
 }
 
 /**
- * Put to remote
+ * Use `media.dump('admins', [new User(), ..])` to save admins
  */
 Media.putter.admins = function *(items) {
   if (!Array.isArray(items)) {
@@ -60,13 +66,18 @@ Media.putter.admins = function *(items) {
     }
   })
   if (result.length) {
-    var admins = yield MediaAdmin.findByMedia(this.id)
-    // delete all admins first
-    yield admins.map(function(item) {
-      return item.destroy()
-    })
+    yield MediaAdmin.destroyByMedia(this.id)
     yield MediaAdmin.create(result)
   }
   yield this.load('admins')
 }
+
+Media.hook('afterDestroy', function* (){
+  yield MediaAdmin.destroyByMedia(this.id)
+})
+
+// delete admins for user
+User.hook('afterDestroy', function* () {
+  yield MediaAdmin.destroyByUser(this.id)
+})
 
