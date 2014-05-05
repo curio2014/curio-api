@@ -1,0 +1,11 @@
+{
+  "asi": true,
+  "globalstrict": true,
+  "esnext": true,
+  "laxcomma": true,
+  "node": true,
+  "globals": {
+      "require_": true
+  }
+}
+

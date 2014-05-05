@@ -1,4 +1,5 @@
-// use strict;
+"use strict";
+
 var debug = require_('lib/utils/logger').debug('channel')
 var co = require('co')
 var cached = require_('lib/cached')
@@ -28,14 +29,15 @@ var Channel = db.define('channel', {
 Channel.belongsTo(Media, {foreignKey: 'media_id'})
 
 Channel.SCHEMA_SQL = [
-"CREATE UNIQUE INDEX ON channel(media_id, scene_id);"
+"CREATE UNIQUE INDEX ON channel(media_id, scene_id);",
+"CREATE UNIQUE INDEX ON channel(media_id, name);"
 ].join('\n')
 
 Channel.scolumns = {
   media_id: null,
   scene_id: null
 }
-Channel.defaultOrder = 'scene_id desc'
+Channel.defaultOrder = 'scene_id DESC'
 
 Channel.registerProps({
   // reply user with text when scan
@@ -75,7 +77,7 @@ Channel.nextSceneId = function* (media_id) {
   if (!media_id) {
     throw new Error('Must provide media_id')
   }
-  var last = yield Channel.findOne({ where: { media_id: media_id }, order: 'scene_id desc' })
+  var last = yield Channel.findOne({ where: {media_id: media_id}, order: 'scene_id DESC' })
   return last ? last.scene_id + 1 : 1
 }
 
@@ -119,8 +121,8 @@ Channel.prototype.qrcodeUrl = function* () {
   if (!ticket) {
     ticket = this.ticket = yield this.getTicket()
   }
-  return ticket && 'https://mp.weixin.qq.com/cgi-bin/showqrcode?ticket=' +
-          encodeURIComponent(ticket)
+  return ticket ? 'https://mp.weixin.qq.com/cgi-bin/showqrcode?ticket=' +
+          encodeURIComponent(ticket) : ''
 }
 
 /**

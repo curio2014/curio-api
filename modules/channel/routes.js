@@ -1,3 +1,5 @@
+"use strict";
+var _ = require_('lib/utils')
 var mesa = require_('serve/mesa')
 var Channel = require('./channel')
 
@@ -8,7 +10,7 @@ mesa.rest('/medias/:id/channels', Collection(Channel))
       media_id: this.params.id
     }
     // always include qrcodeUrl
-    this.query.include = 'qrcodeUrl'
+    this.query = _.assign({ include: 'qrcodeUrl' }, this.query)
     yield next
   })
   .use('create', function* (next) {
@@ -32,7 +34,7 @@ mesa.rest('/medias/:id/channels/:channel_id', Resource(Channel))
   })
   .use('read', function* (next) {
     // always include qrcodeUrl
-    this.query.include = 'qrcodeUrl'
+    this.query = _.assign({ include: 'qrcodeUrl' }, this.query)
     yield next
   })
 

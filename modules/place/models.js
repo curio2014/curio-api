@@ -1,10 +1,12 @@
+"use strict";
+
 var db = require_('lib/db')
 
 var Place = db.define('place', {
   created_at: Date,
   updated_at: Date,
-  lat: Number,
-  lng: Number,
+  lat: { type: Number, allowNull: false },
+  lng: { type: Number, allowNull: false },
   name: String,
 })
 

@@ -1,3 +1,4 @@
+"use strict";
 /**
  * To serve a backbone compatible RESTful API
  */
@@ -25,12 +26,12 @@ function getRunner(runner, includes) {
 }
 
 
-function defaultHandler(method, model) {
+function defaultHandler(method, Model) {
   if (method == 'index') {
     return function* list() {
-      var query = model.safeQuery(_.assign(this.query, this.params))
-      var total = yield model.count(query.where)
-      var items = yield getRunner(model.all(query), this.query.include)
+      var query = Model.safeQuery(_.assign(this.query, this.params))
+      var total = yield Model.count(query.where)
+      var items = yield getRunner(Model.all(query), this.query.include)
       var offset = query.offset || 0
       var limit = query.limit || 20
       //yield items[0].updateAttributes({ wx_secret: 'abaf' })
@@ -49,7 +50,7 @@ function defaultHandler(method, model) {
 
       var i, item, valid
       for (i in list) {
-        item = new model(list[i])
+        item = new Model(list[i])
         valid = yield item.validate()
         if (!valid) {
           error = item.errors
@@ -59,7 +60,7 @@ function defaultHandler(method, model) {
         // will break on first error
         assert(valid, 400, ERRORS.BAD_REQUEST, error)
       }
-      result = this.item = yield model.create(data)
+      result = this.item = yield Model.create(data)
       this.body = result
     }
   } else if (method == 'read') {
@@ -70,14 +71,14 @@ function defaultHandler(method, model) {
       }
       var item = this.item
       if (!item) {
-        item = this.item = yield getRunner(model.getOne(this.params), this.query.include)
+        item = this.item = yield getRunner(Model.getOne(this.params), this.query.include)
       }
       assert(item, 404)
       this.body = item
     }
   } else if (method == 'destroy') {
     return function* destroy() {
-      var item = this.item || (yield model.getOne(this.params))
+      var item = this.item || (yield Model.getOne(this.params))
       assert(item, 404)
       yield item.destroy()
       this.status = 202
@@ -87,7 +88,7 @@ function defaultHandler(method, model) {
     }
   } else if (method == 'update') {
     return function* update() {
-      var item = this.item || (this.item = yield model.getOne(this.params))
+      var item = this.item || (this.item = yield Model.getOne(this.params))
       assert(item, 404)
       try {
         yield item.updateAttributes(this.req.body)
