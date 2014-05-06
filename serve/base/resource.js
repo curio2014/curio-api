@@ -29,7 +29,6 @@ function getRunner(runner, includes) {
 function defaultHandler(method, Model) {
   if (method == 'index') {
     return function* list() {
-      console.log(query, items)
       var query = Model.safeQuery(_.assign(this.query, this.params))
       var total = yield Model.count(query.where)
       var items = yield getRunner(Model.all(query), this.query.include)

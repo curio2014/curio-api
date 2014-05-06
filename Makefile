@@ -19,7 +19,7 @@ debug:
 
 ## to debug webot
 webot:
-	@webot send ${SEND} --des=http://api.curio.com/webot/test --token=token --user=oYAmguC1RY9LPzCxUBflv5n3kyqs
+	@webot send ${SEND} --des=http://api.curio.com/webot/test --token=token --user=oYAmguC1RY9LPzCxUBflv5n3kyqs --verbose
 
 send_scan:
 	@SEND='scan' make webot

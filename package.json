@@ -34,6 +34,7 @@
     "jugglingdb": "1602/jugglingdb",
     "jugglingdb-postgres": "jugglingdb/postgres-adapter",
     "pg": "latest",
+    "pg-escape": "latest",
     "redis": "latest",
     "levelup": "latest",
     "leveldown": "latest",

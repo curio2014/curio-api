@@ -1,3 +1,4 @@
+"use strict";
 var debug = require_('lib/utils/logger').debug('channel')
 var BatchStream = require('batch-stream2')
 var co = require('co')
@@ -25,6 +26,10 @@ Responder.registerRule({
 
 Responder.registerHandler({
   '$tag_qrcene': function addQRCodeTag(info) {
+    if (!info.param.eventKey) {
+      // break when no key
+      return
+    }
     var scene_id = info.param.eventKey.replace('qrscene_', '')
     if (scene_id) {
       // add scene id as parameter, so when save message content,

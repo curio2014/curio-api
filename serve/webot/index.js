@@ -1,3 +1,4 @@
+"use strict";
 /**
  * Wechat API interface, backed by webot
  * see `/app.js`
@@ -63,6 +64,9 @@ app.use(function *(next) {
     res = yield this.webot.reply(req)
   } catch (e) {
     console.error('Webot reply error:', e)
+    if (e.stack) {
+      console.error(e.stack)
+    }
     res = '' // use empty reply
   }
   if (!isEmpty(res)) {

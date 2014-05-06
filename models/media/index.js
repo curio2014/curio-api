@@ -1,3 +1,5 @@
+"use strict";
+
 var cached = require_('lib/cached')
 var validators = require_('lib/utils/validators')
 var db = require_('lib/db')
@@ -28,7 +30,7 @@ Media.validate('uid', function(err) {
 }, {message: 'not word'})
 
 cached.register(Media)
-Media.enableCache('get_', '{_model_}:{0}')
+Media.enableCache('get', '{_model_}:{0}')
 Media.itemCacheKeys.push('{_model_}:{uid}')
 
 module.exports = Media
