@@ -9,6 +9,7 @@ var Place = db.define('place', {
   media_id: { type: Number, null: false },
   lat: { type: Number, default: 0, dataType: 'float' },
   lng: { type: Number, default: 0, dataType: 'float' },
+  phone: { type: String },
   name: String,
 })
 Place.belongsTo(Media, {foreignKey: 'media_id'})
