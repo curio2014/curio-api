@@ -19,6 +19,8 @@ mesa.rest('/medias/:id/places/:place_id', Resource(Place))
   .use(mesa.auth.need('mediaAdmin'))
   .use(function *(next) {
     // ID override
-    this.params = { id: this.params.place_id }
+    this.item = yield Place.get(this.params.place_id)
+    this.assert(this.item, 404)
+    this.assert(this.item.media_id === this.params.id, 404)
     yield next
   })

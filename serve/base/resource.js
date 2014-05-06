@@ -29,6 +29,7 @@ function getRunner(runner, includes) {
 function defaultHandler(method, Model) {
   if (method == 'index') {
     return function* list() {
+      console.log(query, items)
       var query = Model.safeQuery(_.assign(this.query, this.params))
       var total = yield Model.count(query.where)
       var items = yield getRunner(Model.all(query), this.query.include)
@@ -131,6 +132,9 @@ function Resource(model, handlers) {
   // Access control middlewares added by `resource.use(method, *fn)` api
   this.befores = {}
 
+  if (handlers && 'function' != typeof model) {
+    throw new Error('Model must be a constructor function')
+  }
   // first argument is not a constructor function, then it is handlers
   if (typeof model == 'object') {
     handlers = model

@@ -1,3 +1,5 @@
+"use strict";
+
 var log = require_('lib/utils/logger').log('user')
 var validators = require_('lib/utils/validators')
 var cached = require_('lib/cached')
@@ -77,14 +79,19 @@ User.prototype.comparePassword = function *comparePassword(raw) {
  */
 User.prototype.mediaRole = function *mediaRole(media_id) {
   var user = this
-  if (user._roles) {
+  if (user._roles && user._roles[media_id]) {
     return user._roles[media_id]
   }
   var admin = yield Media.Admin.get(media_id, this.id)
   if (!admin) {
     return null
   }
-  user._roles = user._roles || {}
+  if (!user._roles) {
+    Object.defineProperty(user, '_roles', {
+      enumerable: false,
+      value: {}
+    })
+  }
   user._roles[media_id] = admin.role
   return admin.role
 }
@@ -108,6 +115,7 @@ User.prototype.mediaAdmins = function *(with_media) {
 }
 
 User.prototype.permitted = function(action) {
+  // to manage any media
   if (action === 'admin') {
     return this._level >= USER_LEVEL.ADMIN
   }

@@ -1,9 +1,10 @@
+"use strict";
+
 var db = require('../lib/db')
 var thunkify = require('thunkify')
 var debug = require('debug')('curio:db_schema')
 
 db.automigrate = thunkify(db.automigrate)
-
 
 
 exports.init = function *() {

@@ -28,8 +28,9 @@ mesa.rest('/medias/:id/channels', Collection(Channel))
 mesa.rest('/medias/:id/channels/:channel_id', Resource(Channel))
   .use(mesa.auth.need('mediaAdmin'))
   .use(function *(next) {
-    // ID override
-    this.params = { id: this.params.channel_id }
+    this.item = yield Channel.get(this.params.channel_id)
+    this.assert(this.item, 404)
+    this.assert(this.item.media_id === this.params.id, 404)
     yield next
   })
   .use('read', function* (next) {
