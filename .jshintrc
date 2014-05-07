@@ -5,7 +5,8 @@
   "laxcomma": true,
   "node": true,
   "globals": {
-      "require_": true
+      "require_": true,
+      "describe": true
   }
 }
 

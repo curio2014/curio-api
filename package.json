@@ -7,7 +7,7 @@
   "repository": "CuriosityChina/curio-api",
   "scripts": {
     "start": "node --harmony server.js",
-    "test": "./node_modules/.bin/mocha"
+    "test": "make test"
   },
   "dependencies": {
     "kue": "~0.7.5",
@@ -55,6 +55,8 @@
   },
   "devDependencies": {
     "webot-cli": ">= 0.0.9",
+    "should": "*",
+    "supertest": "*",
     "mocha": "*",
     "matcha": "*"
   }

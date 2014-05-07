@@ -1,6 +1,12 @@
+.PHONY: test coverage
+
 start:
 	@export DEBUG="curio:* cache* store* wechat*" && supervisor -w 'lib,serve,modules,models,app.js,conf' \
 	--harmony	-p 1000 -n error -- --debug app.js
+
+test:
+	@NODE_END=test DEBUG= node --harmony ./node_modules/.bin/_mocha
+
 
 init:
 	npm install -g gnode
