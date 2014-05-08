@@ -1,3 +1,4 @@
+"use strict";
 var User = require_('models/user')
 var auth = require('./auth')
 var passport = require('./auth/passport')
@@ -18,7 +19,7 @@ app.rest('/users', Collection(User))
   .use(auth.need('super'))
   .use('create', function* (next) {
     var data = this.req.body
-    yield next
+    yield* next
     // save password after user is saved
     if (this.item && data.password) {
       yield this.item.setPassword(data.password)

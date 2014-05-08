@@ -9,7 +9,7 @@ app.rest('/medias/:id/subscribers', Collection(Subscriber))
     this.params = {
       media_id: this.params.id
     }
-    yield next
+    yield* next
   })
 
 app.rest('/medias/:id/subscribers/:subscriber_id', Resource(Subscriber))
@@ -18,6 +18,6 @@ app.rest('/medias/:id/subscribers/:subscriber_id', Resource(Subscriber))
     this.params = {
       id: this.params.subscriber_id
     }
-    yield next
+    yield* next
   })
 

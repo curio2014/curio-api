@@ -33,7 +33,7 @@ exports.error = function(opts) {
     // yield utils.sleep(.3)
 
     try {
-      yield next
+      yield* next
       if (null == this.status) {
         this.status = 404
         this.body = {
@@ -85,7 +85,7 @@ exports.flash = function() {
       messages[category] = text
     }
 
-    yield next
+    yield* next
 
     if (Object.keys(messages).length) {
       this.session.messages = messages
@@ -97,7 +97,7 @@ exports.flash = function() {
 
 exports.parseBody = function(options) {
   return function *parseBody(next) {
-    if (['POST', 'PUT'].indexOf(this.method) == -1) return yield next;
+    if (['POST', 'PUT'].indexOf(this.method) == -1) return yield* next;
     var body
 
     this.parse = function *() {
@@ -112,6 +112,6 @@ exports.parseBody = function(options) {
     })
     // parse with default options
     yield this.parse
-    return yield next
+    return yield* next
   }
 }

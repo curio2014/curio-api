@@ -1,3 +1,5 @@
+"use strict";
+
 var ERRORS = require_('serve/base/consts').ERRORS
 var Media = require_('models/media')
 var Message = require_('models/message')
@@ -17,6 +19,6 @@ app.rest('/medias/:id/messages', Collection(Message))
     this.params = {
       media_id: this.params.id
     }
-    yield next
+    yield* next
   })
 

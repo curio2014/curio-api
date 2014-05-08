@@ -8,7 +8,7 @@ mesa.rest('/medias/:id/responder')
   .use(function* checkMediaExist(next) {
     this.media = yield Media.get(this.params.id)
     this.assert(this.media, 404)
-    yield next
+    yield* next
   })
   .get(function* getResponder() {
     this.body = yield Responder.get(this.params.id)

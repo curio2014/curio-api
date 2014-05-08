@@ -8,7 +8,7 @@ var User = require_('models/user')
 var checks = {
   login: function* requireLogin(next) {
     this.assert(this.req.user, 401, ERRORS.NEED_LOGIN)
-    if (next) yield next
+    yield* next
   },
   mediaAdmin: function* requireMediaAdmin(next) {
     var user = this.req.user
@@ -21,14 +21,13 @@ var checks = {
     role = yield this.req.user.canAdmin(media_id)
 
     this.assert(role, 403, ERRORS.NOT_ALLOWED)
-
-    if (next) yield next
+    yield* next
   },
   self: function *(next) {
     user = this.req.user
     user_id = this.params.id || this.params.user_id
     this.assert(user.isSuper() || user.id == user_id, 403, ERRORS.NOT_ALLOWED)
-    if (next) yield next
+    yield* next
   }
 }
 
@@ -42,7 +41,7 @@ exports.need = function(act) {
   checks[act] = function* checkPermission(next) {
     this.assert(this.req.user, 401, ERRORS.NEED_LOGIN)
     this.assert(this.req.user.permitted(act), 403, ERRORS.NOT_ALLOWED)
-    if (next) yield next
+    yield* next
   }
   return checks[act]
 }

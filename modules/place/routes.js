@@ -9,10 +9,10 @@ mesa.rest('/medias/:id/places', Collection(Place))
     this.params = {
       media_id: this.params.id
     }
-    yield next
+    yield* next
   })
   .use('create', function* (next) {
-    yield next
+    yield* next
   })
 
 mesa.rest('/medias/:id/places/:place_id', Resource(Place))
@@ -22,5 +22,5 @@ mesa.rest('/medias/:id/places/:place_id', Resource(Place))
     this.item = yield Place.get(this.params.place_id)
     this.assert(this.item, 404)
     this.assert(this.item.media_id === this.params.id, 404)
-    yield next
+    yield* next
   })

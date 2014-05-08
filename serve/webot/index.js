@@ -34,7 +34,7 @@ app.use(function *(next) {
   this.media = media
   this.webot = webot
 
-  yield next
+  yield* next
 })
 
 app.use(wechat())
@@ -78,7 +78,7 @@ app.use(function *(next) {
   }
   // log request
   Message.incoming(media_id, subscriber_id, req)
-  yield next
+  yield* next
 })
 
 

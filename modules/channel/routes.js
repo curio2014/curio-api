@@ -12,7 +12,7 @@ mesa.rest('/medias/:id/channels', Collection(Channel))
     }
     // always include qrcodeUrl
     this.query = _.assign({ include: 'qrcodeUrl' }, this.query)
-    yield next
+    yield* next
   })
   .use('create', function* (next) {
     var data = this.req.body
@@ -23,7 +23,7 @@ mesa.rest('/medias/:id/channels', Collection(Channel))
         item.scene_id = n + i
       })
     }
-    yield next
+    yield* next
   })
 
 mesa.rest('/medias/:id/channels/:channel_id', Resource(Channel))
@@ -33,11 +33,11 @@ mesa.rest('/medias/:id/channels/:channel_id', Resource(Channel))
     this.item = yield Channel.get(this.params.channel_id)
     this.assert(this.item, 404)
     this.assert(this.item.media_id == this.media.id, 404)
-    yield next
+    yield* next
   })
   .use('read', function* (next) {
     // always include qrcodeUrl
     this.item.qrcodeUrl = yield this.item.load('qrcodeUrl')
-    yield next
+    yield* next
   })
 
