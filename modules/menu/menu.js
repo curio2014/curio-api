@@ -47,8 +47,11 @@ Menu.prototype.toJSON = function() {
  */
 Menu.prototype.sync = function* () {
   var media = yield Media.get(this._media_id)
-  var wx = media.wx();
-  var result = wx.createMenu(this._menu)
+  var wx = media && media.wx();
+  if (!wx) {
+    throw new Error('invalid media')
+  }
+  var result = yield wx.createMenu(this._menu)
 
   return result
 }
@@ -68,7 +71,7 @@ Menu.get = function* (media_id) {
  *
  * @param menu, an json string of webot menu
  */
-Menu.dump = function(media_id, menu) {
+Menu.dump = function*(media_id, menu) {
   if (!menu || menu.length <= 0) {
     throw new Error('Menu can not empty')
   }
