@@ -1,8 +1,8 @@
 "use strict";
 var _ = require_('lib/utils')
 var mesa = require_('serve/mesa')
+var Media = require_('models/media')
 var Channel = require('./channel')
-var Media = require('models/media')
 
 mesa.rest('/medias/:id/channels', Collection(Channel))
   .use(mesa.auth.need('mediaAdmin'))
