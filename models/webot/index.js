@@ -1,3 +1,5 @@
+"use strict";
+
 var debug = require_('lib/utils/logger').debug('webot')
 var Responder = require_('models/responder')
 var Media = require_('models/media')
@@ -6,9 +8,10 @@ var cache = require('lru-cache')({
   max: 20,
 })
 
-
+// Just silent any errors
 Webot.prototype.codeReplies = {
-  '404': ''
+  '404': '',
+  '500': ''
 }
 
 
