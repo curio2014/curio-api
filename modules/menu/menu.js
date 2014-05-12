@@ -15,7 +15,7 @@ function Menu(data) {
     data = { media_id: data }
   }
   this._media_id = data.media_id;
-  this._menu="";
+  this._menu = data.menu || "";
 }
 
 /**
@@ -42,6 +42,17 @@ Menu.prototype.toJSON = function() {
   };
 }
 
+/**
+ * Sync to wechat server
+ */
+Menu.prototype.sync = function* () {
+  var media = yield Media.get(this._media_id)
+  var wx = media.wx();
+  var result = wx.createMenu(this._menu)
+
+  return result
+}
+
 
 /**
  * Get menu by media id
@@ -61,7 +72,9 @@ Menu.dump = function(media_id, menu) {
   if (!menu || menu.length <= 0) {
     throw new Error('Menu can not empty')
   }
-  return store.set(media_id, menu)
+  if (store.set(media_id, menu)) {
+    return new Menu({ media_id: media_id, menu: menu })
+  }
 }
 
 /**
