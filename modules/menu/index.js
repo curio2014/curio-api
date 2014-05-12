@@ -5,7 +5,6 @@
 var mesa = require_('serve/mesa')
 var Menu = require('./menu')
 var ERRORS = require_('models/errors')
-var Media = reuquire_("models/media")
 
 mesa.rest('/medias/:id/menu')
   .use(mesa.auth.need('mediaAdmin'))
