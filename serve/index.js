@@ -1,3 +1,5 @@
+"use strict";
+
 // enable `app.rest` API
 // apply the monkey patch
 require('./base/app')
@@ -31,7 +33,7 @@ app.curio_modules = require_('modules').all()
 
 app.on('error', function(err, ctx) {
   logError('REQUEST: %j', ctx.request)
-  logError(err.stack || err)
+  logError(err)
 })
 
 module.exports = app

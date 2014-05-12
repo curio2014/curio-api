@@ -1,5 +1,14 @@
 .PHONY: test coverage
 
+DB_USER     := curio
+DB_PASSWORD :=
+DB_NAME     := curio
+
+SQL_CREATE_USER := CREATE ROLE ${DB_USER} NOSUPERUSER NOCREATEDB NOCREATEROLE INHERIT LOGIN;
+SQL_CREATE_DB   := CREATE DATABASE ${DB_NAME} OWNER=${DB_USER};
+SQL_CREATE_EXT  := CREATE EXTENSION cube; CREATE EXTENSION earthdistance;
+
+
 start:
 	@export DEBUG="curio:* cache* store* wechat*" && supervisor -w 'lib,serve,modules,models,app.js,conf' \
 	--harmony	-p 1000 -n error -- --debug app.js
@@ -13,6 +22,20 @@ init:
 	npm install -g webot-cli
 	mkdir ./var/dbstore
 	cp -vi ./conf/development.conf.js.tmpl ./conf/development.conf.js
+	make createdb
+	make init_db
+
+createdb:
+	@echo "${SQL_CREATE_USER} ${SQL_CREATE_DB}" | psql
+	@echo "${SQL_CREATE_EXT}" | psql curio
+
+init_db:
+	rm -rf ./var/dbstore
+	mkdir ./var/dbstore
+	./bin/curio init_db
+
+fillup:
+	./bin/curio fillup
 
 build:
 	@export NODE_ENV=production && \
@@ -30,20 +53,11 @@ webot:
 send_scan:
 	@SEND='scan' make webot
 
+send_location:
+	@SEND='location' make webot
+
 inspector:
 	@node-inspector --web-port=3001
-
-createdb:
-	createuser -P -e curio
-	createdb -e -O curio curio 'The wechat app Curio'
-
-init_db:
-	rm -rf ./var/dbstore
-	mkdir ./var/dbstore
-	./bin/curio init_db
-
-fillup:
-	./bin/curio fillup
 
 shrink:
 	npm shrinkwrap

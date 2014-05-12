@@ -1,3 +1,5 @@
+"use strict";
+
 //var debug = require_('lib/utils/logger').debug('subscriber')
 var db = require_('lib/db')
 var cached = require_('lib/cached')
@@ -19,6 +21,13 @@ var Subscriber = db.define('subscriber', {
 
 module.exports = Subscriber
 
+Subscriber.SCHEMA_SQL = [
+"CREATE INDEX ON subscriber(media_id);",
+"CREATE INDEX ON subscriber(updated_at DESC);",
+"CREATE INDEX ON subscriber(credit DESC) WHERE subscribe IS TRUE;",
+"CREATE UNIQUE INDEX ON subscriber(oid, media_id);"
+].join('\n')
+
 // source media account
 Subscriber.belongsTo(Media, {as: 'media', foreignKey: 'media_id'})
 
@@ -27,13 +36,6 @@ Subscriber.scolumns = {
   media_id: null,
   subscribe: null
 }
-
-Subscriber.SCHEMA_SQL = [
-"CREATE INDEX ON subscriber(media_id);",
-"CREATE INDEX ON subscriber(updated_at DESC);",
-"CREATE INDEX ON subscriber(credit DESC) WHERE subscribe IS TRUE;",
-"CREATE UNIQUE INDEX ON subscriber(oid, media_id);"
-].join('\n')
 
 //Subscriber.get = Subscriber.findBy('oid', 'media_id', true)
 Subscriber.upsert = Subscriber.upsertBy('oid', 'media_id')

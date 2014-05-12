@@ -1,9 +1,13 @@
+"use strict";
+
 /**
  * Decode customed rules from shortcuts configures
  */
 module.exports = revive
 
+var co = require('co')
 var _ = require_('lib/utils')
+var logError = require_('lib/utils/logger').error('app')
 var sandbox = require_('lib/utils/sandbox')
 var error = require_('lib/utils/logger').error('responder')
 var Responder = require('./index')
@@ -28,7 +32,7 @@ Responder.prototype.rules = function() {
  *    }
  */
 Responder.registerPattern = function(mapping) {
-  _.assign(metaPattern, mapping)
+  assign(metaPattern, mapping)
   shared_rules.forEach(function(rule) {
     // replace existing shared rule's shortcodes
     if (rule.pattern in mapping) {
@@ -37,7 +41,7 @@ Responder.registerPattern = function(mapping) {
   })
 }
 Responder.registerHandler = function(mapping) {
-  _.assign(metaHandler, mapping)
+  assign(metaHandler, mapping, generatorToAsync)
   shared_rules.forEach(function(rule) {
     // replace existing shared rule's shortcodes
     if (rule.handler in mapping) {
@@ -55,6 +59,9 @@ metaPattern = {
   '$location': function isLocation(info) {
     return info.is('location')
   },
+  '$report_loc': function isReportLoc(info) {
+    return info.is('event') && info.param.event == 'LOCATION'
+  },
   '$any': function isAny(info) {
     // any text/voice/image messages
     return !info.is('event')
@@ -65,11 +72,42 @@ metaPattern = {
 }
 
 metaHandler = {
-  'silent': function silentReply(info) {
+  '$silent': function silentReply(info) {
     // silently ignore this message, no reply
     info.ended = true
     return ''
   }
+}
+
+function assign(metas, more, converter) {
+  for (var k in more) {
+    if (!more.hasOwnProperty(k)) continue
+    if (k in metas) {
+      throw new Error('shortcode "' + k + '" already exists')
+    }
+    metas[k] = converter ? converter(more[k]) : more[k]
+  }
+}
+
+function generatorToAsync(fn) {
+  if (_.isGeneratorFunction(fn)) {
+    return function(info, next) {
+      console.log(info)
+      co(function* (info) {
+        var err, ret
+        try {
+          ret = yield* fn
+        } catch (e) {
+          logError(e)
+          // always break on thrown Error
+          info.ended = true
+        }
+        console.log(ret)
+        next(null, ret)
+      }).call(this, info)
+    }
+  }
+  return fn
 }
 
 
@@ -107,7 +145,6 @@ function reviveHandler(v) {
   return v
 }
 
-
 function reviveKeywords(words) {
   var reg = []
   words.forEach(function(item) {
@@ -125,6 +162,7 @@ function reviveKeywords(words) {
   // always ignore cases
   return new RegExp(reg.join('|'), 'i')
 }
+
 function revive(rules) {
   var ret = []
   _.each(rules, function(rule, i) {

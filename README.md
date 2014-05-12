@@ -8,18 +8,6 @@ Currently, `node v0.11.10` is recommended. (Since node v0.11.11 has issue buildi
 
 ## Start
 
-### Create databases
-
-Run a PostgreSQL server, add your own user and database via `psql` or `createuser`:
-
-    createuser -P -e curio   # `-P` means prompt password(`--pwprompt`)
-    createdb -e -O curio curio 'The wechat app Curio'  # `-O` means `--owner`.
-
-
-Or simply `make createdb`.
-
-And make sure you have a `redis-server` running.
-
 ### Install debug tool globally
 
 	  npm install -g webot-cli
@@ -27,7 +15,14 @@ And make sure you have a `redis-server` running.
     npm install -g node-inspector
 
 
-### Create local configurations
+### Create databases
+
+Start a PostgreSQL server, then run `make createdb`.
+
+Also remember to start a `redis-server` running.
+
+
+### Set local configurations
 
 Use `make init` to copy conf/development.conf.js.tmpl to `conf/development.conf.js`, edit it, add some of your own configs.
 

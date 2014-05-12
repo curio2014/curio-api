@@ -1,3 +1,5 @@
+"use strict";
+
 /**
  * Common Shared rules across all media
  */

@@ -1,3 +1,5 @@
+"use strict";
+
 /**
  * Wechat advanced API integrations
  */
@@ -34,7 +36,6 @@ Media.prototype.wx = function() {
 
 // check appkey and secret against wechat api
 Media.validateAsync('wx_appkey', function(error, done) {
-
   // an in-memory cache contains exsiting key/secret info
   // so we must delete it first
   cache.del(this.id)

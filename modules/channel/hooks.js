@@ -1,4 +1,5 @@
 "use strict";
+
 var debug = require_('lib/utils/logger').debug('channel')
 var BatchStream = require('batch-stream2')
 var co = require('co')
@@ -8,20 +9,23 @@ var Channel = require('./channel')
 
 
 Responder.registerRule({
-  name: 'unsubscribed scan',
-  pattern: function isUnsubscribedScan(info) {
+  pattern: '$unsubscribed_scan',
+  handler: '$tag_qrcene'
+}, {
+  pattern: '$subscribed_scan',
+  handler: '$tag_qrcene'
+})
+
+Responder.registerPattern({
+  '$unsubscribed_scan': function isUnsubscribedScan(info) {
     return info.is('event') &&
            info.param.event == 'subscribe' &&
            info.param.eventKey
   },
-  handler: '$tag_qrcene'
-}, {
-  name: 'subscribed scan',
-  pattern: function isSubscribedScan(info) {
+  '$subscribed_scan': function isSubscribedScan(info) {
     return info.is('event') &&
            info.param.event == 'SCAN'
   },
-  handler: '$tag_qrcene'
 })
 
 Responder.registerHandler({
@@ -34,7 +38,7 @@ Responder.registerHandler({
     if (scene_id) {
       // add scene id as parameter, so when save message content,
       // content.scene_id will exist
-      info.scene_id = info.param.scene_id = scene_id
+      info.scene_id = scene_id
       addChannelTag(info)
     }
   }

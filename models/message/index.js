@@ -1,3 +1,5 @@
+"use strict";
+
 var co = require('co')
 var BatchStream = require('batch-stream2')
 var debug = require_('lib/utils/logger').debug('message')
@@ -32,7 +34,7 @@ Message.belongsTo(Media, {as: 'media', foreignKey: 'media_id'})
 Message.belongsTo(Subscriber, {as: 'subscriber', foreignKey: 'subscriber_id'})
 Message.belongsTo(User, {as: 'replier', foreignKey: 'user_id'})
 
-Subscriber.SCHEMA_SQL = [
+Message.SCHEMA_SQL = [
 "CREATE INDEX ON message(media_id);",
 "CREATE INDEX ON message(subscriber_id);",
 "CREATE INDEX ON message(content_type) where content_type in (" + [CONTENT_TYPES.SUBSCRIBE, CONTENT_TYPES.UNSUBSCRIBE] + ");",
@@ -109,18 +111,23 @@ Message.incoming = function(media_id, subscriber_id, content) {
   var content_type = content.type.toUpperCase()
   if (content_type == 'EVENT') {
     var param = content.param || {}
-    content_type = (param.event || '').toUpperCase()
+    var evt = (param.event || '').toUpperCase()
     // message type "loation" is different with report location via an EVENT message
-    if (content_type == 'LOCATION') {
-      content_type = 'REPORT_LOC'
-    } else if (content_type == 'SCAN') {
-      // clean a little bit
-      content.param = { scene_id: content.param.scene_id }
-    } else if (content_type == 'SUBSCRIBE') {
-      if (content.param.scene_id) {
-        content.param = { scene_id: content.param.scene_id }
+    if (evt == 'LOCATION') {
+      evt = 'REPORT_LOC'
+    } else if (evt == 'SCAN') {
+      content.param = {
+        scene_id: content.param.eventKey
+      }
+    } else if (evt == 'SUBSCRIBE') {
+      if (content.param.eventKey) {
+        var scene_id = content.param.eventKey.replace('qrscene_', '')
+        if (scene_id) {
+          content.param = { scene_id: scene_id }
+        }
       }
     }
+    content_type = evt || 'EVENT'
   }
   // convert content type to a INT consts
   if (content_type in CONTENT_TYPES) {

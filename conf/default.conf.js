@@ -1,8 +1,8 @@
 module.exports = {
   debug: false,
   port: 3301,
-  root: 'http://api.curio.com',
-  corsOrigin: 'http://www.curio.com',
+  root: 'http://api.curio.im',
+  pagesRoot: 'http://curio.im',
   secret: 'say hello',
   salt: 'hello again',
   dbstore: './var/dbstore',
@@ -21,7 +21,7 @@ module.exports = {
     // port: ..
     database: 'curio',
     username: 'curio',
-    password: 'curio',
+    password: '',
     charset: 'utf8'
     // ssl: ..
     // debug: ..
