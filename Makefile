@@ -26,8 +26,8 @@ init:
 	make init_db
 
 createdb:
-	@echo "${SQL_CREATE_USER} ${SQL_CREATE_DB}" | psql
-	@echo "${SQL_CREATE_EXT}" | psql curio
+	@echo "${SQL_CREATE_USER} ${SQL_CREATE_DB}" | psql postgres
+	@echo "${SQL_CREATE_EXT}" | psql ${DB_NAME}
 
 init_db:
 	rm -rf ./var/dbstore

@@ -61,7 +61,7 @@ Place.nearby = function* (lat, lng, options) {
     throw new Error('Invalid media_id')
   }
 
-  var cond = 'earthbox(ll_to_earth(%s, %s), %s) @> ll_to_earch(lat, lng)'
+  var cond = 'earth_box(ll_to_earth(%s, %s), %s) @> ll_to_earth(lat, lng)'
   if (media_id) {
     cond += ' AND media_id=' + media_id
   }
@@ -69,7 +69,11 @@ Place.nearby = function* (lat, lng, options) {
 
   options.where = this.esc(cond, lat, lng, meters, lat, lng)
 
-  return yield this.all(options)
+  return yield this.all({
+    limit: options.limit,
+    offset: options.offset,
+    where: options.where
+  })
 }
 
 

@@ -36,7 +36,7 @@ Responder.registerPattern = function(mapping) {
   shared_rules.forEach(function(rule) {
     // replace existing shared rule's shortcodes
     if (rule.pattern in mapping) {
-      rule.pattern = mapping[rule.pattern]
+      rule.pattern = metaPattern[rule.pattern]
     }
   })
 }
@@ -45,7 +45,7 @@ Responder.registerHandler = function(mapping) {
   shared_rules.forEach(function(rule) {
     // replace existing shared rule's shortcodes
     if (rule.handler in mapping) {
-      rule.handler = mapping[rule.handler]
+      rule.handler = metaHandler[rule.handler]
     }
   })
 }
@@ -92,17 +92,15 @@ function assign(metas, more, converter) {
 function generatorToAsync(fn) {
   if (_.isGeneratorFunction(fn)) {
     return function(info, next) {
-      console.log(info)
       co(function* (info) {
         var err, ret
         try {
-          ret = yield* fn
+          ret = yield* fn(info)
         } catch (e) {
           logError(e)
           // always break on thrown Error
           info.ended = true
         }
-        console.log(ret)
         next(null, ret)
       }).call(this, info)
     }
