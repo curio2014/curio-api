@@ -55,7 +55,7 @@
     "nomnom": "latest"
   },
   "devDependencies": {
-    "webot-cli": ">= 0.0.9",
+    "webot-cli": ">= 0.0.10",
     "should": "*",
     "supertest": "*",
     "mocha": "*",
