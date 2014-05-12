@@ -31,7 +31,7 @@
     "passport": "jaredhanson/passport",
     "koa-passport": "rkusa/koa-passport",
     "koa-passport-fw": "ktmud/koa-passport-fw",
-    "jugglingdb": "1602/jugglingdb",
+    "jugglingdb": "ktmud/jugglingdb",
     "jugglingdb-postgres": "ktmud/postgres-adapter",
     "pg": "latest",
     "pg-escape": "latest",
